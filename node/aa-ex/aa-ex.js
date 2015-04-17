@@ -27,10 +27,10 @@
         setTimeout(function () {
           try {
             throw new Error('err in timerErrThunk');
+            cb(null); // unreached
           } catch (err) {
             cb(err);
           }
-          cb(null);
         }, ms);
       }
     }
@@ -46,10 +46,10 @@
         setTimeout(function () {
           try {
             throw new Error('err in timerErrPromise');
+            res(); // unreached
           } catch (err) {
             rej(err);
           }
-          res();
         }, ms);
       });
     }
