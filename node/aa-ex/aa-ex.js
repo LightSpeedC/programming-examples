@@ -3,7 +3,16 @@
 
     var aa = require('aa');
 
+    function sleep(ms) {
+      return function (cb) {
+        setTimeout(function () { cb(null); }, ms); }; }
+
     function *makeErr() {
+      console.log(111);
+      yield sleep(10);
+      console.log(222);
+      yield sleep(10);
+      console.log(333);
       throw new Error('err in makeErr');
     }
 
@@ -13,43 +22,46 @@
       function (val) { console.log('aa1 end:', val); },
       function (err) { console.log('aa1 err:', err); });
 
-    function timerErrThunk() {
+    function timerErrThunk(ms) {
       return function (cb) {
         setTimeout(function () {
           try {
-            new Error('err in timerErrThunk');
+            throw new Error('err in timerErrThunk');
           } catch (err) {
             cb(err);
           }
           cb(null);
-        }, 100);
+        }, ms);
       }
     }
 
-    function timerErrPromise() {
-      return new Promise(function (res, rej) {
-        setTimeout(function () {
-          try {
-            new Error('err in timerErrPromise');
-          } catch (err) {
-            rej(err);
-          }
-          res();
-        }, 200);
-      });
-    }
-
     aa(function *() {
-      yield timerErrThunk();
+      yield timerErrThunk(100);
     }).then(
       function (val) { console.log('aa2 end:', val); },
       function (err) { console.log('aa2 err:', err); });
 
+    function timerErrPromise(ms) {
+      return new Promise(function (res, rej) {
+        setTimeout(function () {
+          try {
+            throw new Error('err in timerErrPromise');
+          } catch (err) {
+            rej(err);
+          }
+          res();
+        }, ms);
+      });
+    }
+
     aa(function *() {
-      yield timerErrPromise();
+      yield timerErrPromise(200);
     }).then(
       function (val) { console.log('aa3 end:', val); },
       function (err) { console.log('aa3 err:', err); });
 
+    timerErrPromise(300).then(
+      function (val) { console.log('pr1 end:', val); },
+      function (err) { console.log('pr1 err:', err); });
 
 })();
