@@ -1,0 +1,11 @@
+{
+  "name": "co-generators-ex",
+  "version": "0.0.0",
+  "description": "co-generators-ex",
+  "main": "co1.js",
+  "scripts": {
+    "test": "iojs co2"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
