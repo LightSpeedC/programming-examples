@@ -1,0 +1,22 @@
+{
+  "name": "co-pararell-ex",
+  "version": "0.0.0",
+  "description": "co pararell example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "co"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "co": "^4.5.2",
+    "co-chan": "0.0.2"
+  }
+}
