@@ -35,6 +35,7 @@ this.mod11 = function () {
     assert.equal(0, mod11(14));
     assert.equal(1, mod11(22));
     assert.equal(0, mod11(23));
+    assert.equal(5, mod11(12345678));
     assert.equal(2, mod11(123456789));
     assert.equal(1, mod11(987654321));
     assert.equal(6, mod11(4444333999999999));
