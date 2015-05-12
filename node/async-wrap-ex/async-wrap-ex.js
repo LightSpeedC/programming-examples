@@ -24,9 +24,15 @@ function asyncAfter() {
 console.log('a100');
 
 // Set all the necessary callbacks.
-//async_wrap.setupHooks.call(asyncHooksObject, asyncInit, asyncBefore, asyncAfter);
-async_wrap.setupHooks.call(asyncHooksObject, asyncInit, asyncBefore, asyncAfter);
-//async_wrap.setupHooks.call(asyncHooksObject, asyncInit, asyncBefore, asyncAfter, asyncHooksObject);
+if (typeof async_wrap.enable === 'function') {
+  console.log('io.js style');
+  async_wrap.setupHooks(asyncInit, asyncBefore, asyncAfter);
+  async_wrap.enable();
+}
+else {
+  console.log('node.js style');
+  async_wrap.setupHooks(asyncHooksObject, asyncInit, asyncBefore, asyncAfter);
+}
 
 console.log('a200');
 
