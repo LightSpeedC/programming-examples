@@ -1,0 +1,28 @@
+{
+  "name": "dialog-ex",
+  "version": "0.0.0",
+  "homepage": "https://github.com/LightSpeedC/programming-examples",
+  "authors": [
+    "LightSpeedC"
+  ],
+  "description": "dialog example",
+  "main": "dialog1.html",
+  "moduleType": [
+    "globals",
+    "node"
+  ],
+  "keywords": [
+    "dialog"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "dialog-polyfill": ">=0.3.0"
+  }
+}

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8"> 
+  <meta http-equiv="Content-Language" content="ja">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Dialog 0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="bower_components/dialog-polyfill/dialog-polyfill.js"></script>
+  <link rel="stylesheet" type="text/css" href="bower_components/dialog-polyfill/dialog-polyfill.css" />
+</head>
+<body>
+  <dialog onclick="this.close()">I'm a dialog!</dialog>
+  <script>
+    var dialog = document.querySelector('dialog');
+    if (typeof dialogPolyfill !== 'undefined')
+      dialogPolyfill.registerDialog(dialog);
+    // Now dialog acts like a native <dialog>.
+    dialog.showModal();
+  </script>
+</body>
+</html>
