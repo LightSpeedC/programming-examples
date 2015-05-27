@@ -1,0 +1,22 @@
+{
+  "name": "postgresql-ex",
+  "version": "0.0.0",
+  "description": "postgresql example",
+  "private": true,
+  "main": "index.js",
+  "keywords": [
+    "postgresql"
+  ],
+  "dependencies": {
+    "pg": ">=4.3.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
