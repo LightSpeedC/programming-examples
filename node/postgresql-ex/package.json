@@ -8,7 +8,9 @@
     "postgresql"
   ],
   "dependencies": {
-    "pg": ">=4.3.0"
+    "aa": "0.0.5",
+    "pg": ">=4.3.0",
+    "promise-light": ">=0.1.0"
   },
   "repository": {
     "type": "git",
