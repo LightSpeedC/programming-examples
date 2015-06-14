@@ -1,0 +1,24 @@
+{
+  "name": "fs-dir-tree-ex",
+  "version": "0.0.0",
+  "description": "fs directory tree",
+  "main": "co-dir-tree.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "directory",
+    "tree"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "aa": "0.0.5",
+    "co": "^4.5.4",
+    "co-fs": "^1.2.0"
+  }
+}
