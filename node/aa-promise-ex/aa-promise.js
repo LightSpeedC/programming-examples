@@ -5,37 +5,8 @@ this.AaPromise = function () {
 
   var slice = [].slice;
 
-  Promise.wrap = function wrap(fn) {
-    return function () {
-      var args = slice.call(arguments);
-      return Promise(function (res, rej) {
-        fn.apply(null, args.concat(
-          function (err, val) {
-            try { if (err) rej(err); else res(val); } catch (e) { rej(e); } }));
-      });
-    }
-  }
-
-  Promise.resolve = function resolve(val) {
-    if (isPromise(val))
-      return Promise(function (res, rej) {
-        val.then(
-          function (v) { res(v); },
-          function (e) { rej(e); });
-      });
-    return Promise(function (res, rej) { res(val); });
-  };
-
-  Promise.reject = function reject(err) {
-    return Promise(function (res, rej) { rej(err); });
-  };
-
-  function isPromise(p) {
-    return !!p && typeof p.then === 'function';
-  }
-  Promise.isPromise = isPromise;
-
-  Promise.cast = Promise.resolve;
+  var COLOR_ERROR  = typeof window !== 'undefined' ? '' : '\x1b[35m';
+  var COLOR_NORMAL = typeof window !== 'undefined' ? '' : '\x1b[m';
 
   var STATE_UNRESOLVED = -1;
   var STATE_RESOLVED = 1;
@@ -43,6 +14,7 @@ this.AaPromise = function () {
   var STATE_THUNK = 2;
   var ARGS_ERR = 0;
   var ARGS_VAL = 1;
+
   function Promise(setup) {
     var thens = [];
     var state = STATE_UNRESOLVED;
@@ -128,6 +100,38 @@ this.AaPromise = function () {
 
     return thunk;
   }
+
+  Promise.wrap = function wrap(fn) {
+    return function () {
+      var args = slice.call(arguments);
+      return Promise(function (res, rej) {
+        fn.apply(null, args.concat(
+          function (err, val) {
+            try { if (err) rej(err); else res(val); } catch (e) { rej(e); } }));
+      });
+    }
+  }
+
+  Promise.resolve = function resolve(val) {
+    if (isPromise(val))
+      return Promise(function (res, rej) {
+        val.then(
+          function (v) { res(v); },
+          function (e) { rej(e); });
+      });
+    return Promise(function (res, rej) { res(val); });
+  };
+
+  Promise.reject = function reject(err) {
+    return Promise(function (res, rej) { rej(err); });
+  };
+
+  function isPromise(p) {
+    return !!p && typeof p.then === 'function';
+  }
+  Promise.isPromise = isPromise;
+
+  Promise.cast = Promise.resolve;
 
   if (typeof module === 'object' && module && module.exports)
     module.exports = Promise;
