@@ -5,10 +5,10 @@ this.AaPromise = function () {
 
   var slice = [].slice;
 
-  AaPromise.wrap = function wrap(fn) {
+  Promise.wrap = function wrap(fn) {
     return function () {
       var args = slice.call(arguments);
-      return AaPromise(function (res, rej) {
+      return Promise(function (res, rej) {
         fn.apply(null, args.concat(
           function (err, val) {
             try { if (err) rej(err); else res(val); } catch (e) { rej(e); } }));
@@ -16,26 +16,26 @@ this.AaPromise = function () {
     }
   }
 
-  AaPromise.resolve = function resolve(val) {
+  Promise.resolve = function resolve(val) {
     if (isPromise(val))
-      return AaPromise(function (res, rej) {
+      return Promise(function (res, rej) {
         val.then(
           function (v) { res(v); },
           function (e) { rej(e); });
       });
-    return AaPromise(function (res, rej) { res(val); });
+    return Promise(function (res, rej) { res(val); });
   };
 
-  AaPromise.reject = function reject(err) {
-    return AaPromise(function (res, rej) { rej(err); });
+  Promise.reject = function reject(err) {
+    return Promise(function (res, rej) { rej(err); });
   };
 
   function isPromise(p) {
     return !!p && typeof p.then === 'function';
   }
-  AaPromise.isPromise = isPromise;
+  Promise.isPromise = isPromise;
 
-  AaPromise.cast = AaPromise.resolve;
+  Promise.cast = Promise.resolve;
 
   var STATE_UNRESOLVED = -1;
   var STATE_RESOLVED = 1;
@@ -43,7 +43,7 @@ this.AaPromise = function () {
   var STATE_THUNK = 2;
   var ARGS_ERR = 0;
   var ARGS_VAL = 1;
-  function AaPromise(setup) {
+  function Promise(setup) {
     var thens = [];
     var state = STATE_UNRESOLVED;
     var args;
@@ -86,7 +86,7 @@ this.AaPromise = function () {
       if (typeof cb !== 'function')
         new TypeError('callback must be a function');
 
-      var p = AaPromise();
+      var p = Promise();
       return fire(p, [undefined, undefined,
         function (err, val) {
           try {
@@ -102,7 +102,7 @@ this.AaPromise = function () {
       if (rej && typeof rej !== 'function')
         new TypeError('rejected must be a function');
 
-      var p = AaPromise();
+      var p = Promise();
       return fire(p, [
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } },
         function (val) { try { p.$resolve(res(val)); } catch (e) { p.$reject(e); } }
@@ -113,14 +113,14 @@ this.AaPromise = function () {
       if (rej && typeof rej !== 'function')
         new TypeError('rejected must be a function');
 
-      var p = AaPromise();
+      var p = Promise();
       return fire(p, [
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } }
       ]);
     };
 
     thunk.toString = function toString() {
-      return 'AaPromise { ' + (
+      return 'Promise { ' + (
         state === STATE_UNRESOLVED ? '<pending>' :
         state === STATE_RESOLVED ? JSON.stringify(args[ARGS_VAL]) :
         '<rejected> ' + args[ARGS_ERR]) + ' }';
@@ -130,10 +130,9 @@ this.AaPromise = function () {
   }
 
   if (typeof module === 'object' && module && module.exports)
-    module.exports = AaPromise;
+    module.exports = Promise;
 
-  AaPromise.Promise = AaPromise;
-  AaPromise.AaPromise = AaPromise;
-  return AaPromise;
+  Promise.AaPromise = Promise.Promise = Promise;
+  return Promise;
 
 }();
