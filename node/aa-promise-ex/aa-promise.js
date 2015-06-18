@@ -1,6 +1,6 @@
-// aa-promise.js
+// promise-thunk.js
 
-this.AaPromise = function () {
+this.PromiseThunk = function () {
   'use strict';
 
   var STATE_UNRESOLVED = -1;
@@ -338,7 +338,7 @@ this.AaPromise = function () {
   if (typeof module === 'object' && module && module.exports)
     module.exports = Promise;
 
-  setValue(Promise, 'AaPromise', Promise);
+  setValue(Promise, 'PromiseThunk', Promise);
   setValue(Promise, 'Promise', Promise);
   return Promise;
 
