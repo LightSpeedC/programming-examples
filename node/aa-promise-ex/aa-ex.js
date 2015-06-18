@@ -3,7 +3,7 @@
 (function () {
 
   var aa = require('./aa');
-  var AaPromise = require('./aa-promise');
+  var PromiseThunk = require('./promise-thunk');
   var TIME = 300;
   var LONG_TIME = 500;
 
@@ -23,9 +23,9 @@
     });
   }
 
-  // AaPromise
+  // PromiseThunk
   function sleep3(ms) {
-    return AaPromise(function (res, rej) {
+    return PromiseThunk(function (res, rej) {
       if (ms < 0) rej(new RangeError('msec must be plus number'));
       else setTimeout(res, ms);
     });
@@ -94,7 +94,7 @@
     (makeLast('   p'));
 
     console.log();
-    console.log('*** sleep AaPromise version');
+    console.log('*** sleep PromiseThunk version');
     yield aa(function *() {
       console.log('111z');
       yield sleep3(TIME);

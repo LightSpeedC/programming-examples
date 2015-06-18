@@ -26,7 +26,7 @@
 (function () {
   'use strict';
 
-  var AaPromise = require('./aa-promise');
+  var PromiseThunk = require('./promise-thunk');
 
   var slice = [].slice;
 
@@ -93,7 +93,7 @@
 
     var args = slice.call(arguments);
 
-    return new AaPromise(function (res, rej) {
+    return new PromiseThunk(function (res, rej) {
       sleep1.apply(null, args.concat(
         function (err, val) {
           if (err) rej(err);
@@ -101,7 +101,7 @@
     });
   }
 
-  var sleep5 = AaPromise.wrap(sleep1);
+  var sleep5 = PromiseThunk.wrap(sleep1);
 
   sleep1(1000, 'sleep1 ', function (err, val) { console.log('sleep1 ', err, val, 101); });
   sleep2(1000, 'sleep2 ')(function (err, val) { console.log('sleep2 ', err, val, 201); });
@@ -138,13 +138,13 @@
     console.log('', new Promise(function (res, rej) {}));
   }
 
-  if (typeof AaPromise !== 'undefined') {
-    console.log('', AaPromise.resolve('AaPromise.resolve'));
-    console.log('', new AaPromise(function (res, rej) { res('AaPromise.resolve'); }));
-    console.log('', AaPromise.reject(new Error('AaPromise.reject')));
-    console.log('', new AaPromise(function (res, rej) { rej(new Error('AaPromise.reject')); }));
-    console.log('', AaPromise(function (res, rej) { res('AaPromise()'); }));
-    console.log('', new AaPromise(function (res, rej) {}));
+  if (typeof PromiseThunk !== 'undefined') {
+    console.log('', PromiseThunk.resolve('PromiseThunk.resolve'));
+    console.log('', new PromiseThunk(function (res, rej) { res('PromiseThunk.resolve'); }));
+    console.log('', PromiseThunk.reject(new Error('PromiseThunk.reject')));
+    console.log('', new PromiseThunk(function (res, rej) { rej(new Error('PromiseThunk.reject')); }));
+    console.log('', PromiseThunk(function (res, rej) { res('PromiseThunk()'); }));
+    console.log('', new PromiseThunk(function (res, rej) {}));
   }
 
 })();

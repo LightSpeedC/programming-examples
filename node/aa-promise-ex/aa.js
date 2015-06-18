@@ -1,9 +1,9 @@
 // aa.js - async-await.js
 
 this.aa = function () {
-  var AaPromise = require('./aa-promise');
-  var isPromise = AaPromise.isPromise;
-  var wrap = AaPromise.wrap;
+  var PromiseThunk = require('./promise-thunk');
+  var isPromise = PromiseThunk.isPromise;
+  var wrap = PromiseThunk.wrap;
 
   // GeneratorFunction
   try {
@@ -19,7 +19,7 @@ this.aa = function () {
     if (isGeneratorFunction(gtor)) gtor = gtor.apply(ctx, args);
     if (typeof gtor === 'function') return wrap.call(ctx, gtor);
 
-    var p = AaPromise();
+    var p = PromiseThunk();
 
     if (isPromise(gtor)) {
       gtor.then(p.$resolve, p.$reject);
@@ -127,8 +127,8 @@ this.aa = function () {
   aa.isGeneratorFunction = isGeneratorFunction;
   aa.isGenerator = isGenerator;
   aa.aa = aa;
-  for (var i in AaPromise)
-    aa[i] = AaPromise[i];
+  for (var i in PromiseThunk)
+    aa[i] = PromiseThunk[i];
   return aa;
 
 }();
