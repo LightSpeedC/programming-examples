@@ -71,12 +71,18 @@ this.PromiseThunk = function () {
     function nextTick(fn) { setTimeout(fn, 0); };
 
   var tasksHighPrio = new Queue();
+  var tasksLowPrio = new Queue();
 
   var nextTickProgress = false;
 
-  // nextTick(fn)
-  function nextTick(fn) {
-    tasksHighPrio.push(fn);
+  // nextTick(fn, fnLow)
+  function nextTick(fn, fnLow) {
+    if (typeof fn === 'function')
+      tasksHighPrio.push(fn);
+
+    if (typeof fnLow === 'function')
+      tasksLowPrio.push(fnLow);
+
     if (nextTickProgress) return;
 
     nextTickProgress = true;
@@ -84,8 +90,15 @@ this.PromiseThunk = function () {
     nextTickDo(function () {
       var fn;
 
-      while (fn = tasksHighPrio.shift())
+      for (;;) {
+        while (fn = tasksHighPrio.shift())
+          fn();
+
+        fn = tasksLowPrio.shift();
+        if (!fn) break;
+
         fn();
+      }
 
       nextTickProgress = false;
     });
@@ -151,7 +164,7 @@ this.PromiseThunk = function () {
         if (elem[STATE_THUNK]) elem[STATE_THUNK].apply(null, $args);
         else if (elem[$state]) elem[$state]($args[$state]);
       }
-      nextTick($checkUnhandledRejection);
+      nextTick(null, $checkUnhandledRejection);
     }
 
     // $checkUnhandledRejection
