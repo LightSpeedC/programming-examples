@@ -35,6 +35,8 @@ this.aa = function () {
     if (!isGenerator(gtor))
       throw new TypeError('arguments must be Generator or GeneratorFunction');
 
+    var uniqId = 100; // unique id for debug
+
     function next(err, val) {
       //console.log('\x1b[43merr&val', typeof err, err+'', typeof val, '\x1b[m');
       try {
@@ -44,42 +46,44 @@ this.aa = function () {
         return p.$reject(err);
       }
 
-      //console.log('\x1b[44m    ret', typeof ret,
-      //  '{done:',  ret && ret.done,
-      //  'value:', (ret && ret.value &&
-      //             ret.value.hasOwnProperty('toString') && ret.value + '') ||
-      //            (ret && ret.value &&
-      //             typeof ret.value === 'function' && 'function') + '}', '\x1b[m');
+      //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+      //var xyz = ret && ret.value;
+      var id = uniqId++;
+
+      //console.log('\x1b[44m    ret', id, typeof xyz,
+      //  ':', (xyz && xyz.hasOwnProperty('toString') && xyz + '') ||
+      //       (xyz && typeof xyz === 'function' && 'function' || xyz),
+      //  (ret && ret.done && '!!done!!' || ''), '\x1b[m');
+
       if (ret.done)
         return p.$resolve(ret.value);
 
-      doValue(ret.value, next);
+      doValue(ret.value, next, id);
     }
 
-    function doValue(value, next) {
+    function doValue(value, next, id) {
+
+      //var xyz = value;
+
+      // generator function, generator or promise
+      if (isGeneratorFunction(value) ||
+          isGenerator(value) || isPromise(value))
+        return aa.call(ctx, value)(next);
+
+      // function must be a thunk
+      if (typeof value === 'function')
+        return value(next);
+
       setImmediate(function () {
         var called;
 
-        // generator function, generator or promise
-        if (isGeneratorFunction(value) ||
-            isGenerator(value) || isPromise(value))
-          aa(value)(next);
-        // function must be a thunk
-        else if (typeof value === 'function') {
-          if (ret != null) console.log('###', ret);
-          var ret = value.call(ctx, function (e, v) {
-            if (ret != null && e != null && v != null)
-              console.log('@@@', ret, e, v);
-            if (ret == null) return next(e, v);
-            if (e) return next(e, v);
-            if (isGeneratorFunction(ret) ||
-                isGenerator(ret) || isPromise(ret))
-              return aa(ret)(next);
-            return next(e, v);
-          });
-        }
+        //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+        //console.log('\x1b[46m    xyz', id, typeof xyz,
+        //  ':', (xyz && xyz.hasOwnProperty('toString') && xyz + '') ||
+        //       (xyz && typeof xyz === 'function' && 'function'|| xyz), '\x1b[m');
+
         // array
-        else if (value instanceof Array) {
+        if (value instanceof Array) {
           var n = value.length;
           var arr = Array(value.length);
           value.forEach(function (val, i) {
@@ -91,6 +95,7 @@ this.aa = function () {
             });
           });
         }
+
         // object
         else if (value && typeof value === 'object') {
           var keys = Object.keys(value);
@@ -106,7 +111,9 @@ this.aa = function () {
             });
           });
         }
-        else // other value
+
+        // other value
+        else
           next(null, value);
       });
     }
