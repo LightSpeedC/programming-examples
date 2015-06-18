@@ -18,18 +18,16 @@ this.aa = function () {
     var args = slice.call(arguments, 1);
 
     // is generator function? then get generator.
-    if (isGeneratorFunction(gtor)) gtor = gtor.apply(ctx, args);
-
-    // is function? then wrap it.
-    if (typeof gtor === 'function') return wrap.call(ctx, gtor);
-
-    var p = PromiseThunk();
+    if (isGeneratorFunction(gtor))
+      gtor = gtor.apply(ctx, args);
 
     // is promise? then do it.
-    if (isPromise(gtor)) {
-      gtor.then(p.$resolve, p.$reject);
-      return p;
-    }
+    if (isPromise(gtor))
+      return PromiseThunk.convert(gtor);
+
+    // is function? then wrap it.
+    if (typeof gtor === 'function')
+      return wrap.call(ctx, gtor);
 
     // is not generator?
     if (!isGenerator(gtor))
@@ -37,13 +35,17 @@ this.aa = function () {
 
     var uniqId = 100; // unique id for debug
 
+    var resolve, reject;
+    var p = PromiseThunk(
+      function (res, rej) { resolve = res; reject = rej; });
+
     function next(err, val) {
       //console.log('\x1b[43merr&val', typeof err, err+'', typeof val, '\x1b[m');
       try {
         if (err) var ret = gtor['throw'](err);
         else     var ret = gtor.next(val);
       } catch (err) {
-        return p.$reject(err);
+        return reject(err);
       }
 
       //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -56,7 +58,7 @@ this.aa = function () {
       //  (ret && ret.done && '!!done!!' || ''), '\x1b[m');
 
       if (ret.done)
-        return p.$resolve(ret.value);
+        return resolve(ret.value);
 
       doValue(ret.value, next, id);
     }
