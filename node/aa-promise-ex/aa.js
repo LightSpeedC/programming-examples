@@ -23,7 +23,7 @@ this.aa = function () {
 
     // is promise? then do it.
     if (isPromise(gtor))
-      return PromiseThunk.convert(gtor);
+      return PromiseThunk(gtor);
 
     // is function? then wrap it.
     if (typeof gtor === 'function')
