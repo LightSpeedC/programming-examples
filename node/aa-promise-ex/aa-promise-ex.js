@@ -1,4 +1,4 @@
-// aa-promise-ex.js
+// promise-thunk-ex.js
 
 // aa.fork(function *() {}) -> returns p : thenable promise thunk
 // aa(function *() {}) -> returns p : thenable promise thunk
