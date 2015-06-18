@@ -70,13 +70,13 @@ this.PromiseThunk = function () {
     typeof process === 'object' && process && typeof process.nextTick === 'function' ? process.nextTick :
     function nextTick(fn) { setTimeout(fn, 0); };
 
-  var queue = new Queue();
+  var tasksHighPrio = new Queue();
 
   var nextTickProgress = false;
 
   // nextTick(fn)
   function nextTick(fn) {
-    queue.push(fn);
+    tasksHighPrio.push(fn);
     if (nextTickProgress) return;
 
     nextTickProgress = true;
@@ -84,7 +84,7 @@ this.PromiseThunk = function () {
     nextTickDo(function () {
       var fn;
 
-      while (fn = queue.shift())
+      while (fn = tasksHighPrio.shift())
         fn();
 
       nextTickProgress = false;
