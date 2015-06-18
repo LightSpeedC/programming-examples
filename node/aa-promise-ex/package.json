@@ -5,7 +5,8 @@
   "main": "aa-ex.js",
   "private": true,
   "dependencies": {
-    "co-chan": ">=0.0.2"
+    "co-chan": ">=0.0.2",
+    "promise-thunk": "0.0.0"
   },
   "keywords": [
     "async-await",
