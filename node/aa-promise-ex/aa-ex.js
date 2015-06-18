@@ -1,6 +1,6 @@
 // aa-ex.js
 
-(function () {
+(function main() {
 
   var aa = require('./aa');
   var PromiseThunk = require('./promise-thunk');
@@ -40,7 +40,7 @@
     };
   }
 
-  aa(function *() {
+  aa(function *aaMain() {
 
     console.log();
     console.log('*** yield 10, 20, and return 30');
@@ -130,6 +130,5 @@
     (function (e, v) { console.log('xxx'); return sleep3(LONG_TIME); });
 
   });
-
 
 })();
