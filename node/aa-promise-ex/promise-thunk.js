@@ -119,12 +119,8 @@ this.PromiseThunk = function () {
 
     if (setup === PROMISE_RESOLVE)
       resolve(arguments[1]);
-      //$state = STATE_RESOLVED;
-      //$args = [null, arguments[1]];
     else if (setup === PROMISE_REJECT)
       reject(arguments[1]);
-      //$state = STATE_REJECTED;
-      //$args = [arguments[1]];
     else if (typeof setup === 'function')
       // setup(res, rej)
       try {
@@ -157,7 +153,6 @@ this.PromiseThunk = function () {
     // fire()
     function fire() {
       var elem;
-      //if (elem) $callbacks.push(elem);
       if (!$args) return; // not yet fired
       while (elem = $callbacks.shift()) {
         $handled = true;
