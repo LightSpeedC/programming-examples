@@ -16,15 +16,22 @@ this.aa = function () {
   function aa(gtor) {
     var ctx = this;
     var args = slice.call(arguments, 1);
+
+    // is generator function? then get generator.
     if (isGeneratorFunction(gtor)) gtor = gtor.apply(ctx, args);
+
+    // is function? then wrap it.
     if (typeof gtor === 'function') return wrap.call(ctx, gtor);
 
     var p = PromiseThunk();
 
+    // is promise? then do it.
     if (isPromise(gtor)) {
       gtor.then(p.$resolve, p.$reject);
       return p;
     }
+
+    // is not generator?
     if (!isGenerator(gtor))
       throw new TypeError('arguments must be Generator or GeneratorFunction');
 
