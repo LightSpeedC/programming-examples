@@ -99,7 +99,7 @@ this.PromiseThunk = function () {
 
   // PromiseThunk(setup(resolve, reject))
   function PromiseThunk(setup) {
-    var $queue = new Queue();
+    var $callbacks = new Queue();
     var $state = STATE_UNRESOLVED;
     var $args;
     var $handled = false;
@@ -144,9 +144,9 @@ this.PromiseThunk = function () {
     // fire()
     function fire() {
       var elem;
-      //if (elem) $queue.push(elem);
+      //if (elem) $callbacks.push(elem);
       if (!$args) return; // not yet fired
-      while (elem = $queue.shift()) {
+      while (elem = $callbacks.shift()) {
         $handled = true;
         if (elem[STATE_THUNK]) elem[STATE_THUNK].apply(null, $args);
         else if (elem[$state]) elem[$state]($args[$state]);
@@ -179,7 +179,7 @@ this.PromiseThunk = function () {
         new TypeError('callback must be a function');
 
       var p = PromiseThunk();
-      $queue.push([undefined, undefined,
+      $callbacks.push([undefined, undefined,
         function (err, val) {
           try {
             if (err) p.$resolve(cb(err));
@@ -198,7 +198,7 @@ this.PromiseThunk = function () {
         new TypeError('rejected must be a function');
 
       var p = PromiseThunk();
-      $queue.push([
+      $callbacks.push([
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } },
         function (val) { try { p.$resolve(res(val)); } catch (e) { p.$reject(e); } }
       ]);
@@ -212,7 +212,7 @@ this.PromiseThunk = function () {
         new TypeError('rejected must be a function');
 
       var p = PromiseThunk();
-      $queue.push([
+      $callbacks.push([
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } }
       ]);
       nextTick(fire);
