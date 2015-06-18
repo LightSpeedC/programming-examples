@@ -2,6 +2,7 @@
 
 this.aa = function () {
   var PromiseThunk = require('./promise-thunk');
+  var chan = require('co-chan');
   var isPromise = PromiseThunk.isPromise;
   var wrap = PromiseThunk.wrap;
 
@@ -11,6 +12,28 @@ this.aa = function () {
   } catch (e) {}
 
   var slice = [].slice;
+
+  // defProp
+  var defProp = function (obj) {
+    if (!Object.defineProperty) return null;
+    try {
+      Object.defineProperty(obj, 'prop', {value: 'str'});
+      return obj.prop === 'str' ? Object.defineProperty : null;
+    } catch (err) { return null; }
+  } ({});
+
+  // setConst(obj, prop, val)
+  var setConst = defProp ?
+    function setConst(obj, prop, val) {
+      defProp(obj, prop, {value: val}); } :
+    function setConst(obj, prop, val) { obj[prop] = val; };
+
+  // setValue(obj, prop, val)
+  var setValue = defProp ?
+    function setValue(obj, prop, val) {
+      defProp(obj, prop, {value: val,
+        writable: true, configurable: true}); } :
+    function setValue(obj, prop, val) { obj[prop] = val; };
 
   // aa
   function aa(gtor) {
@@ -31,7 +54,8 @@ this.aa = function () {
 
     // is not generator?
     if (!isGenerator(gtor))
-      throw new TypeError('arguments must be Generator or GeneratorFunction');
+      return chan.apply(ctx, arguments);
+      //throw new TypeError('arguments must be Generator or GeneratorFunction');
 
     var uniqId = 100; // unique id for debug
 
@@ -140,11 +164,22 @@ this.aa = function () {
 
   if (GeneratorFunction)
     aa.GeneratorFunction = GeneratorFunction;
+
   aa.isGeneratorFunction = isGeneratorFunction;
-  aa.isGenerator = isGenerator;
-  aa.aa = aa;
-  for (var i in PromiseThunk)
-    aa[i] = PromiseThunk[i];
+  aa.isGenerator  = isGenerator;
+  aa.aa           = aa;
+  aa.chan         = chan;
+
+  if (Object.getOwnPropertyNames)
+    Object.getOwnPropertyNames(PromiseThunk).forEach(function (prop) {
+      if (!aa.hasOwnProperty(prop))
+        setValue(aa, prop, PromiseThunk[prop]);
+    });
+  else
+    for (var prop in PromiseThunk)
+      if (!aa.hasOwnProperty(prop))
+        setValue(aa, prop, PromiseThunk[prop]);
+
   return aa;
 
 }();
