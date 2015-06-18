@@ -95,10 +95,10 @@ this.PromiseThunk = function () {
   function PROMISE_REJECT() {}
   function PROMISE_THEN() {}
 
-  setProto(Promise.prototype, Function.prototype);
+  setProto(PromiseThunk.prototype, Function.prototype);
 
-  // Promise(setup(resolve, reject))
-  function Promise(setup) {
+  // PromiseThunk(setup(resolve, reject))
+  function PromiseThunk(setup) {
     var $queue = new Queue();
     var $state = STATE_UNRESOLVED;
     var $args;
@@ -178,7 +178,7 @@ this.PromiseThunk = function () {
       if (typeof cb !== 'function')
         new TypeError('callback must be a function');
 
-      var p = Promise();
+      var p = PromiseThunk();
       $queue.push([undefined, undefined,
         function (err, val) {
           try {
@@ -190,14 +190,14 @@ this.PromiseThunk = function () {
       return p;
     }
 
-    // Promise#then(res, rej)
+    // PromiseThunk#then(res, rej)
     setConst(thunk, 'then', function (res, rej) {
       if (res && typeof res !== 'function')
         new TypeError('resolved must be a function');
       if (rej && typeof rej !== 'function')
         new TypeError('rejected must be a function');
 
-      var p = Promise();
+      var p = PromiseThunk();
       $queue.push([
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } },
         function (val) { try { p.$resolve(res(val)); } catch (e) { p.$reject(e); } }
@@ -206,12 +206,12 @@ this.PromiseThunk = function () {
       return p;
     });
 
-    // Promise#catch(rej)
+    // PromiseThunk#catch(rej)
     setConst(thunk, 'catch', function (rej) {
       if (rej && typeof rej !== 'function')
         new TypeError('rejected must be a function');
 
-      var p = Promise();
+      var p = PromiseThunk();
       $queue.push([
         function (err) { try { p.$resolve(rej(err)); } catch (e) { p.$reject(e); } }
       ]);
@@ -219,24 +219,24 @@ this.PromiseThunk = function () {
       return p;
     });
 
-    // Promise#toString()
+    // PromiseThunk#toString()
     setConst(thunk, 'toString', function toString() {
-      return 'Promise { ' + (
+      return 'PromiseThunk { ' + (
         $state === STATE_UNRESOLVED ? '<pending>' :
         $state === STATE_RESOLVED ? JSON.stringify($args[ARGS_VAL]) :
         '<rejected> ' + $args[ARGS_ERR]) + ' }';
     });
 
-    setProto(thunk, Promise.prototype);
+    setProto(thunk, PromiseThunk.prototype);
 
     return thunk;
   }
 
-  // Promise.wrap(fn)
-  setValue(Promise, 'wrap', function wrap(fn) {
+  // PromiseThunk.wrap(fn)
+  setValue(PromiseThunk, 'wrap', function wrap(fn) {
     return function () {
       var $args = slice.call(arguments);
-      return Promise(function (res, rej) {
+      return PromiseThunk(function (res, rej) {
         fn.apply(null, $args.concat(
           function (err, val) {
             try { if (err) rej(err); else res(val); } catch (e) { rej(e); } }));
@@ -244,22 +244,22 @@ this.PromiseThunk = function () {
     }
   });
 
-  // Promise.resolve(val)
-  setValue(Promise, 'resolve', function resolve(val) {
-    return Promise(PROMISE_RESOLVE, val);
+  // PromiseThunk.resolve(val)
+  setValue(PromiseThunk, 'resolve', function resolve(val) {
+    return PromiseThunk(PROMISE_RESOLVE, val);
   });
 
-  // Promise.reject(err)
-  setValue(Promise, 'reject', function reject(err) {
-    return Promise(PROMISE_REJECT, err);
+  // PromiseThunk.reject(err)
+  setValue(PromiseThunk, 'reject', function reject(err) {
+    return PromiseThunk(PROMISE_REJECT, err);
   });
 
-  // Promise.all([p, ...])
-  setValue(Promise, 'all', function all(promises) {
+  // PromiseThunk.all([p, ...])
+  setValue(PromiseThunk, 'all', function all(promises) {
     if (isIterator(promises)) promises = makeArrayFromIterator(promises);
     if (!(promises instanceof Array))
       throw new TypeError('promises must be an array');
-    return Promise(
+    return PromiseThunk(
       function promiseAll(resolve, reject) {
         var n = promises.length;
         if (n === 0) return resolve([]);
@@ -267,42 +267,42 @@ this.PromiseThunk = function () {
         promises.forEach(function (p, i) {
           function complete(val) {
             res[i] = val; if (--n === 0) resolve(res); }
-          if (p instanceof Promise || isPromise(p))
+          if (p instanceof PromiseThunk || isPromise(p))
             return p.then(complete, reject);
           complete(p);
         }); // promises.forEach
       }
-    ); // return Promise
+    ); // return PromiseThunk
   }); // all
 
-  // Promise.race([p, ...])
-  setValue(Promise, 'race', function race(promises) {
+  // PromiseThunk.race([p, ...])
+  setValue(PromiseThunk, 'race', function race(promises) {
     if (isIterator(promises)) promises = makeArrayFromIterator(promises);
     if (!(promises instanceof Array))
       throw new TypeError('promises must be an array');
-    return Promise(
+    return PromiseThunk(
       function promiseRace(resolve, reject) {
         promises.forEach(function (p) {
-          if (p instanceof Promise || isPromise(p))
+          if (p instanceof PromiseThunk || isPromise(p))
             return p.then(resolve, reject);
           resolve(p);
         }); // promises.forEach
       }
-    ); // return Promise
+    ); // return PromiseThunk
   }); // race
 
   // isPromise(p)
-  setValue(Promise, 'isPromise', isPromise);
+  setValue(PromiseThunk, 'isPromise', isPromise);
   function isPromise(p) {
     return !!p && typeof p.then === 'function';
   }
 
-  // Promise.accept(val)
-  setValue(Promise, 'accept', Promise.resolve);
+  // PromiseThunk.accept(val)
+  setValue(PromiseThunk, 'accept', PromiseThunk.resolve);
 
-  // Promise.defer()
-  setValue(Promise, 'defer', function defer() {
-    var p = Promise();
+  // PromiseThunk.defer()
+  setValue(PromiseThunk, 'defer', function defer() {
+    var p = PromiseThunk();
     return {promise: p, resolve: p.$resolve, reject: p.$reject};
   });
 
@@ -336,10 +336,10 @@ this.PromiseThunk = function () {
   }
 
   if (typeof module === 'object' && module && module.exports)
-    module.exports = Promise;
+    module.exports = PromiseThunk;
 
-  setValue(Promise, 'PromiseThunk', Promise);
-  setValue(Promise, 'Promise', Promise);
-  return Promise;
+  setValue(PromiseThunk, 'PromiseThunk', PromiseThunk);
+  setValue(PromiseThunk, 'Promise', Promise);
+  return PromiseThunk;
 
 }();
