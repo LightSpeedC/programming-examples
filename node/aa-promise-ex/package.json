@@ -1,0 +1,24 @@
+{
+  "name": "aa-promise-ex",
+  "version": "0.0.0",
+  "description": "async-await promise thunk example",
+  "main": "aa-ex.js",
+  "private": true,
+  "dependencies": {
+    "co-chan": ">=0.0.2"
+  },
+  "keywords": [
+    "async-await",
+    "promise",
+    "thunk"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
