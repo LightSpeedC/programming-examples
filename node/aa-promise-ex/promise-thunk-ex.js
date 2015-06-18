@@ -138,11 +138,18 @@
     console.log('', new Promise(function (res, rej) {}));
   }
 
+  function callback(err, val) {
+    if (err)
+      console.error('Catch: \x1b[41m%s\x1b[m', err);
+    else
+      console.info('Value: %s', val);
+  }
+
   if (typeof PromiseThunk !== 'undefined') {
     console.log('', PromiseThunk.resolve('PromiseThunk.resolve'));
     console.log('', new PromiseThunk(function (res, rej) { res('PromiseThunk.resolve'); }));
-    console.log('', PromiseThunk.reject(new Error('PromiseThunk.reject')));
-    console.log('', new PromiseThunk(function (res, rej) { rej(new Error('PromiseThunk.reject')); }));
+    console.log('', PromiseThunk.reject(new Error('PromiseThunk.reject'))(callback));
+    console.log('', new PromiseThunk(function (res, rej) { rej(new Error('PromiseThunk.reject')); })(callback));
     console.log('', PromiseThunk(function (res, rej) { res('PromiseThunk()'); }));
     console.log('', new PromiseThunk(function (res, rej) {}));
   }
