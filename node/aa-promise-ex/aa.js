@@ -8,7 +8,7 @@ this.aa = function () {
 
   // GeneratorFunction
   try {
-    var GeneratorFunction = Function('return function*(){}')().constructor;
+    var GeneratorFunction = Function('return function*(){}.constructor')();
   } catch (e) {}
 
   var slice = [].slice;
