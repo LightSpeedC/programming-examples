@@ -1,0 +1,11 @@
+<html lang="en">
+<head>
+    <title>Child</title>
+</head>
+<body>
+    <p><a href="#" onClick="window.open('about:blank', '_self').close(); return false;">Close window 1 (some hack)</a></p>
+    <p><a href="#" onClick="window.close(); return false;">Close window 2 (normal close)</a></p>
+    <p><a href="#" onClick="if (/Chrome/i.test(navigator.userAgent)) window.close(); else window.open('about:blank', '_self').close(); return false;">Close window 3 (if browser is chrome then normal close; else some hack)</a></p>
+
+</body>
+</html>
