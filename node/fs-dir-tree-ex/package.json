@@ -19,5 +19,8 @@
   "dependencies": {
     "aa": ">=0.1.1",
     "co-fs": ">=1.2.0"
+  },
+  "devDependencies": {
+    "co": ">=4.5.4"
   }
 }
