@@ -28,7 +28,7 @@ this.dirTree = function () {
     try {
       var names = yield cofs.readdir(dir);
     } catch (err) {
-      err && console.log('fs.readdir: ' + err);
+      console.log('fs.readdir: ' + err);
       return err; //  null;
     }
 
@@ -45,7 +45,7 @@ this.dirTree = function () {
         return {name:name, file:file, stat:fs_stat(file)}
       });
     } catch (err) {
-      err && console.log('fs_stat: ' + err);
+      console.log('fs_stat: ' + err);
       children['*error'] = err;
       return children;
     }
@@ -55,8 +55,10 @@ this.dirTree = function () {
     res = yield res.map(function (elem) {
       var stat = elem.stat;
 
-      if (stat instanceof Error)
+      if (stat instanceof Error) {
+        console.log('stat error: ' + err);
         return {name:elem.name, size:0, child:null};
+      }
 
       var size = stat.size;
 
@@ -66,7 +68,7 @@ this.dirTree = function () {
       return {name:elem.name, size:size, child:child}
     });
     } catch (err) {
-      err && console.log('dirTree: ' + err);
+      console.log('dirTree: ' + err);
       children['*error'] = err;
       return children;
     }
