@@ -1,9 +1,9 @@
-// co-dir-tree.js
+// aa-dir-tree.js
 
 this.dirTree = function () {
   'use strict';
 
-  var co = require('aa');
+  var aa = require('aa');
   var fs = require('co-fs');
   var path = require('path');
   var $totalsize = '*totalsize*';
@@ -18,9 +18,11 @@ this.dirTree = function () {
     } catch (err) {
       return null;
     }
+
     var totalsize = 0;
     var dirsize = 0;
     var children = {};
+
     for (var i = 0, n = names.length; i < n; ++i) {
       var name = names[i];
       var file = path.resolve(dir, name);
@@ -37,6 +39,7 @@ this.dirTree = function () {
       totalsize += size + (child ? child[$totalsize] : 0);
       dirsize += size;
     }
+
     //children[$dirsize] = dirsize;
     children[$totalsize] = totalsize;
     return children;
@@ -66,13 +69,14 @@ this.dirTree = function () {
     // main
     if (require.main === module) {
       var tree = 
-      co(dirTree(process.argv[2])).then(function (tree) {
+      aa(dirTree(process.argv[2] || '.')).then(function (tree) {
         console.log(require('util').inspect(tree,
           {colors: true, depth: null}).replace(/\'/g, ''));
       }, function (err) {
         console.log(err.stack);
       });
     }
+
   }
 
   return dirTree;
