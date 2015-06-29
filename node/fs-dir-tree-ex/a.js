@@ -21,15 +21,18 @@ this.dirTree = function () {
     }
   }
 
-  function *dirTree(dir, minSize) {
+  function *dirTree(dir, minSize, indent) {
     if (!dir) dir = '.';
     dir = path.resolve(dir);
+    //console.log(dir);
+    if (!indent) indent = 0;
 
     try {
       var names = yield cofs.readdir(dir);
     } catch (err) {
       console.log('fs.readdir: ' + err);
-      return err; //  null;
+      children['*error'] = err;
+      return children; //  null;
     }
 
     var totalsize = 0;
@@ -53,19 +56,21 @@ this.dirTree = function () {
     try {
     // sync parallel: dirTree
     res = yield res.map(function (elem) {
+      var name = elem.name;
       var stat = elem.stat;
 
       if (stat instanceof Error) {
         console.log('stat error: ' + err);
-        return {name:elem.name, size:0, child:null};
+        return {name:name, size:0, child:null};
       }
 
       var size = stat.size;
+      var file = elem.file;
 
       if (stat.isDirectory())
-        var child = dirTree(elem.file);
+        var child = dirTree(file, minSize, indent + 1);
 
-      return {name:elem.name, size:size, child:child}
+      return {name:name, size:size, child:child}
     });
     } catch (err) {
       console.log('dirTree: ' + err);
@@ -79,7 +84,9 @@ this.dirTree = function () {
       var size = elem.size;
       var child = elem.child;
 
-      if (child) {
+      if (child instanceof Error)
+        children[name] = size;
+      else if (child) {
         if (child[$totalsize] >= minSize)
           children[name] = child;
         else
@@ -92,7 +99,7 @@ this.dirTree = function () {
       totalsize += size;
       dirsize += size;
 
-      return {name: elem.name, size: elem.size, child: child};
+      return {name:name, size:size, child:child};
     });
 
     children[$totalsize] = totalsize;
@@ -107,13 +114,19 @@ this.dirTree = function () {
 
     // main
     if (require.main === module) {
+      var dir = require('path').resolve(process.argv[2] || '.');
+      console.log(dir);
       var tree = 
-      aa(dirTree(process.argv[2] || '.', eval(process.argv[3]) || 0)).then(function (tree) {
-        console.log(require('util').inspect(tree,
-          {colors: false, depth: null}).replace(/\'/g, ''));
-      }, function (err) {
-        console.log(err.stack);
-      });
+      aa(dirTree(dir, eval(process.argv[3]) || 0, 0))
+      .then(
+        function (tree) {
+          console.log(require('util').inspect(tree,
+            {colors: false, depth: null}).replace(/\'/g, ''));
+        },
+        function (err) {
+          console.log(err.stack);
+        }
+      ); // then
     }
 
   }
