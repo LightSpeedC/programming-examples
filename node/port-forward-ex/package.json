@@ -1,0 +1,25 @@
+{
+  "name": "port-forward-ex",
+  "version": "0.0.0",
+  "description": "port forward example",
+  "main": "port-forward-ex.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "net",
+    "port",
+    "forward",
+    "aa"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "aa": "^0.1.6",
+    "control-c": "0.0.5"
+  }
+}
