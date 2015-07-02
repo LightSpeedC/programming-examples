@@ -16,8 +16,8 @@
 
     aa(function * () {
       try {
-        yield [aa(soc2soc(svrSoc, cliSoc, 'cli<-svr')),
-               aa(soc2soc(cliSoc, svrSoc, 'cli->svr'))];
+        yield [soc2soc(svrSoc, cliSoc, 'cli<-svr'),
+               soc2soc(cliSoc, svrSoc, 'cli->svr')];
       } catch (err) { error(err, 'main'); }
       cliSoc.end(), svrSoc.end();
     });
