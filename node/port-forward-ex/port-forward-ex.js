@@ -4,7 +4,7 @@
   'use strict';
 
   var net = require('net');
-  var aa = require('./aa');
+  var aa = require('aa');
   var config = require('./config').config;
   var MAX_DUMP_LEN = 360;
 
@@ -35,7 +35,7 @@
     var chan = aa().stream(reader), buff = null, count = 0;
     try {
       while(buff = yield chan) {
-        if (count++ <= 1) console.error('%s: (%s) %s', msg, count, buff2str(buff));
+        if (count++ <= 0) console.error('%s: (%s) %s', msg, count, buff2str(buff));
         writer.write(buff), buff = null;
       }
     } catch (err) {
