@@ -3,12 +3,14 @@
   "version": "0.0.0",
   "description": "port forward example",
   "main": "port-forward-ex.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "private": true,
+  "dependencies": {
+    "aa": ">=0.1.7",
+    "control-c": ">=0.0.9"
   },
   "repository": {
     "type": "git",
-    "url": "repo"
+    "url": "LightSpeedWorks/programming-examples"
   },
   "keywords": [
     "net",
@@ -18,8 +20,7 @@
   ],
   "author": "LightSpeedC",
   "license": "MIT",
-  "dependencies": {
-    "aa": "^0.1.6",
-    "control-c": "0.0.5"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
