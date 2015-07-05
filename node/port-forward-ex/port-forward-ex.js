@@ -5,13 +5,14 @@
 
   var net = require('net');
   var aa = require('aa');
-  var log = require('log-manager').setWriter(new require('log-writer')('port-forward-ex-%s.log')).getLogger();
-  log.setLevel('TRACE');
-  //log.setLevel('DEBUG');
-  var config = require('./config').config;
+
   var MAX_DUMP_LEN = 800;
   var socketIdSeq = 0;
   var numConnections = 0;
+
+  var config = require('./config').config;
+  var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
+  log.setLevel(config.logLevel);
 
   var server = net.createServer(function connection(cliSoc) {
     aa(function * () {
@@ -19,27 +20,23 @@
       var socketId = ++socketIdSeq;
       try {
         var ctx = {socketId:socketId, color:socketId % 6 + 41, startTime:Date.now()};
-        log.info('\x1b[%sm#%s(%s) ++ connected!\x1b[m',
+        log.info('\x1b[%sm%s#%s ++ connected!\x1b[m',
           ctx.color, zz(numConnections), zzz(socketId));
         var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
         svrSoc.on('error', function (err) {
-          log.warn('\x1b[%sm#%s(%s) %s: \x1b[m %s', 
+          log.warn('\x1b[%sm%s#%s %s: ????? \x1b[m %s', 
             ctx.color, zz(numConnections), zzz(socketId), 'c<=s err ', err);
         });
-        try {
-          yield [soc2soc(svrSoc, cliSoc, 'c<-s', ctx, ctx.color),
-                 soc2soc(cliSoc, svrSoc, 'c->s', ctx, ctx.color + ';30;5')];
-        } catch (err) {
-          log.warn('\x1b[%sm#%s(%s) %s: \x1b[m %s', 
-             ctx.color, zz(numConnections), zzz(socketId), 'c<>s err', err);
-        }
+        yield [soc2soc(svrSoc, cliSoc, 'c<-s', ctx, ctx.color),
+               soc2soc(cliSoc, svrSoc, 'c->s', ctx, ctx.color + ';30;5')];
       } catch (err) {
-        log.warn('\x1b[%sm#%s(%s) %s: \x1b[m %s', 
-           ctx.color, zz(numConnections), zzz(socketId), 'c??s err', err);
+        log.warn('\x1b[%sm%s#%s %s: \x1b[m %s', 
+           ctx.color, zz(numConnections), zzz(socketId), 'c<>s err', err);
       }
       --numConnections;
-      log.info('\x1b[%sm#%s(%s) -- disconnect\x1b[m',
-        ctx.color, zz(numConnections), zzz(socketId));
+      var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
+      log.info('\x1b[%sm%s#%s -- disconnect %s s\x1b[m',
+        ctx.color, zz(numConnections), zzz(socketId), ms);
       cliSoc.end(); svrSoc.end();
     });
 
@@ -61,7 +58,7 @@
           buff2str(buff).split('\r\n').forEach(function (str) {
             var low = str.substr(0, 90).toLowerCase();
             if (low.indexOf('connection:') >= 0) return;
-            if (low.indexOf('content-') >= 0) return;
+            if (low.indexOf('content-') == 0) return;
             if (low.indexOf('accept') == 0) return;
             if (low.indexOf('application') == 0) return;
             if (low.indexOf('host:') >= 0) return;
@@ -77,7 +74,8 @@
             if (low.indexOf('etag:') == 0) return;
             if (low.indexOf('last-') == 0) return;
             if (low.indexOf('appex-') == 0) return;
-            log.trace('\x1b[%sm#%s(%s) %s: %s s\x1b[m %s',
+            if (low.indexOf('age:') == 0) return;
+            log.trace('\x1b[%sm%s#%s %s: %s s\x1b[m %s',
               color, zz(numConnections), zzz(socketId), msg, ms, str.substr(0, 90));
           });
         }
@@ -85,14 +83,9 @@
         buff = null;
       }
     } catch (err) {
-      if (buff !== null)
-        log.warn('\x1b[%sm#%s(%s) %s: write err \x1b[m %s %s', 
-          color, zz(numConnections), zzz(socketId), msg,
-          typeof buff, buff2str(buff));
-      log.warn('\x1b[%sm#%s(%s) %s: write err \x1b[m %s', 
-        color, zz(numConnections), zzz(socketId), msg,
-        err2str(err));
-      //error(err, msg);
+      var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
+      log.warn('\x1b[%sm%s#%s %s: %s s %s err \x1b[m %s', 
+        color, zz(numConnections), zzz(socketId), msg, ms, buff ? 'write' : 'read', err);
     }
     reader.end();
     writer.end();
@@ -104,11 +97,6 @@
   function zzz(x) {
     return ('00' + x.toString(26)).substr(-3);
   }
-
-  //function error(err, msg) {
-  //  log.warn('\x1b[45m%s: %s\x1b[m', msg, err2str(err));
-  //  return err;
-  //}
 
   function err2str(err) {
     return err + '';
