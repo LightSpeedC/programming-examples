@@ -6,7 +6,10 @@
   "private": true,
   "dependencies": {
     "aa": ">=0.1.7",
-    "control-c": ">=0.0.9"
+    "control-c": ">=0.0.9",
+    "date-time-string": ">=0.0.9",
+    "log-manager": ">=0.0.8",
+    "log-writer": ">=0.0.6"
   },
   "repository": {
     "type": "git",
