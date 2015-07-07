@@ -1,112 +1,130 @@
 // fwd.js
 
-(function () {
+var fwd = function () {
   'use strict';
 
   var net = require('net');
   var aa = require('aa');
 
   var MAX_DUMP_LEN = 800;
-  var socketIdSeq = 0;
-  var numConnections = 0;
-  var ctxConnections = {};
 
-  var config = require('./config').config;
-  var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
-  log.setLevel(config.logLevel);
+  function fwd(config) {
+    var socketIdSeq = 0;
+    var numConnections = 0;
+    var ctxConnections = {};
 
-  var server = net.createServer(function connection(cliSoc) {
-    ++numConnections;
-    var socketId = ++socketIdSeq;
-    var ctx = {socketId:socketId, color:socketId % 6 + 41, startTime:Date.now()};
-    ctxConnections[socketId] = ctx;
-    aa.call(ctx, function * () {
-      try {
-        log.info('\x1b[%sm%s#%s ++ connected!\x1b[m',
-          ctx.color, zz(numConnections), zzz(socketId));
-        var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
-        svrSoc.on('error', function (err) {
-          log.warn('\x1b[%sm%s#%s %s: ????? \x1b[m %s', 
-            ctx.color, zz(numConnections), zzz(socketId), 'c<=s err ', err);
-        });
-        yield [soc2soc.call(this, svrSoc, cliSoc, 'c<-s', ctx.color),
-               soc2soc.call(this, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
-      } catch (err) {
-        log.warn('\x1b[%sm%s#%s %s: \x1b[m %s', 
-           ctx.color, zz(numConnections), zzz(socketId), 'c<>s err', err);
-      }
-      --numConnections;
-      var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-      log.info('\x1b[%sm%s#%s -- disconnect %s s\x1b[m',
-        ctx.color, zz(numConnections), zzz(socketId), ms);
-      cliSoc.end(); svrSoc.end();
-      delete ctxConnections[socketId];
+    var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
+    log.setLevel(config.logLevel);
+
+    var server = net.createServer(function connection(cliSoc) {
+      ++numConnections;
+      var socketId = ++socketIdSeq;
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[]}
+      ctx.updateTime = ctx.startTime = Date.now();
+      ctxConnections[socketId] = ctx;
+      aa.call(ctx, function * () {
+        try {
+          log.info('\x1b[%sm%s#%s ++++: %s\x1b[m connected!',
+            ctx.color + ';30;5', zz(numConnections), zzz(socketId), seconds(ctx.startTime));
+          var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
+          svrSoc.on('error', function (err) {
+            log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
+              ctx.color, zz(numConnections), zzz(socketId), 'c<=s', seconds(ctx.startTime), err);
+          });
+          yield [soc2soc.call(this, svrSoc, cliSoc, 'c<-s', ctx.color),
+                 soc2soc.call(this, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
+        } catch (err) {
+          log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
+             ctx.color, zz(numConnections), zzz(socketId), 'c<>s', seconds(ctx.startTime), err);
+        }
+        --numConnections;
+        var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
+        log.info('\x1b[%sm%s#%s ----: %s\x1b[m disconnect',
+          ctx.color, zz(numConnections), zzz(socketId), seconds(ctx.startTime));
+        cliSoc.end(); svrSoc.end();
+        delete ctxConnections[socketId];
+      });
+
+    });
+    server.listen(config.servicePort, function listening() {
+      log.info('server bound. port: %s', config.servicePort);
     });
 
-  });
-  server.listen(config.servicePort, function listening() {
-    log.info('server bound. port: %s', config.servicePort);
-  });
+    log.info(config);
 
-  log.info(config);
-
-  // thread: reader -> writer
-  function * soc2soc(reader, writer, msg, color) {
-    var ctx = this;
-    var chan = aa().stream(reader), buff = null, count = 0;
-    var socketId = ctx.socketId;
-    try {
-      while(buff = yield chan) {
-        ctx.updateTime = Date.now();
-        if (count++ <= 0) {
-          var ms = ((ctx.updateTime - ctx.startTime)/1000.0).toFixed(3);
-          buff2str(buff).split('\r\n').forEach(function (str, i) {
-            var low = str.substr(0, 90).toLowerCase();
-            if (i === 0 ||
-                low.startsWith('user-agent:') ||
-                low.startsWith('server:')) {
-              log.trace('\x1b[%sm%s#%s %s: %s s\x1b[m %s',
-                color, zz(numConnections), zzz(socketId), msg, ms, str.substr(0, 90));
-              ctx[msg] = ctx[msg] || [];
-              ctx[msg].push(str);
-            }
-          });
+    require('control-c')(
+      function () {
+        for (var i in ctxConnections) {
+          var ctx = ctxConnections[i];
+          log.debug('\x1b[%sm%s#%s ====: %s\x1b[m %s %s',
+            ctx.color, zz(numConnections), zzz(ctx.socketId),
+            seconds(ctx.startTime), seconds(ctx.updateTime),
+            ctx['c->s']);
         }
-        else {
-          var str = buff2str(buff);
-          if (str.startsWith('HTTP/') ||
-              str.startsWith('CONNECT ') ||
-              str.startsWith('GET http') ||
-              str.startsWith('POST http') ||
-              str.startsWith('PUT http') ||
-              str.startsWith('DELETE http') ||
-              str.startsWith('HEAD http') ||
-              str.startsWith('OPTIONS http')) {
+      },
+      function () { console.log('process.exit();'); process.exit(); });
 
-            str.split('\r\n').forEach(function (str, i) {
+
+    // thread: reader -> writer
+    function * soc2soc(reader, writer, msg, color) {
+      var ctx = this;
+      var chan = aa().stream(reader), buff = null, count = 0;
+      var socketId = ctx.socketId;
+      try {
+        while(buff = yield chan) {
+          ctx.updateTime = Date.now();
+          if (count++ <= 0) {
+            var ms = ((ctx.updateTime - ctx.startTime)/1000.0).toFixed(3);
+            buff2str(buff).split('\r\n').forEach(function (str, i) {
               var low = str.substr(0, 90).toLowerCase();
               if (i === 0 ||
                   low.startsWith('user-agent:') ||
                   low.startsWith('server:')) {
-                log.trace('\x1b[%sm%s#%s %s: %s s\x1b[m %s',
-                  color, zz(numConnections), zzz(socketId), msg, ms, str.substr(0, 90));
-                ctx[msg] = ctx[msg] || [];
+                log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
+                  color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                if (i === 0) ctx[msg] = [];
                 ctx[msg].push(str);
               }
             });
-
           }
+          else {
+            var str = buff2str(buff);
+            if (str.startsWith('HTTP/') ||
+                str.startsWith('CONNECT ') ||
+                str.startsWith('GET http') ||
+                str.startsWith('POST http') ||
+                str.startsWith('PUT http') ||
+                str.startsWith('DELETE http') ||
+                str.startsWith('HEAD http') ||
+                str.startsWith('OPTIONS http')) {
+
+              str.split('\r\n').forEach(function (str, i) {
+                var low = str.substr(0, 90).toLowerCase();
+                if (i === 0 ||
+                    low.startsWith('user-agent:') ||
+                    low.startsWith('server:')) {
+                  log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
+                    color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                  if (i === 0) ctx[msg] = [];
+                  ctx[msg].push(str);
+                }
+              });
+
+            }
+          }
+          writer.write(buff);
+          buff = null;
         }
-        writer.write(buff);
-        buff = null;
+      } catch (err) {
+        //var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
+        log.warn('\x1b[%sm%s#%s %s: %s\x1b[m %s err %s', 
+          color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime),
+          buff ? 'write' : 'read', err);
       }
-    } catch (err) {
-      var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-      log.warn('\x1b[%sm%s#%s %s: %s s %s err \x1b[m %s', 
-        color, zz(numConnections), zzz(socketId), msg, ms, buff ? 'write' : 'read', err);
+      reader.end();
+      writer.end();
     }
-    reader.end();
-    writer.end();
+
   }
 
   function zz(x) {
@@ -114,6 +132,10 @@
   }
   function zzz(x) {
     return ('00' + x.toString(26)).substr(-3);
+  }
+  function seconds(startTime) {
+    var s = ((Date.now() - startTime)/1000.0).toFixed(3) + ' s';
+    return ('  ' + s).substr(- Math.max(s.length, 9))
   }
 
   function err2str(err) {
@@ -140,13 +162,24 @@
     return str;
   }
 
-  require('control-c')(
-    function () {
-      console.log('ctrl-c');
-      for (var i in ctxConnections)
-        log.info(new Date(ctxConnections[i].updateTime), ctxConnections[i]['c->s']);
-    },
-    function () { console.log('server.close();'); server.close(); },
-    function () { console.log('process.exit();'); process.exit(); });
+  return fwd;
 
-})();
+}();
+
+fwd(require('./config').config);
+
+/*
+fwd({
+  servicePort: 9999,
+  forwardPort: 9997,
+  logFile: "fwd-%s.log",
+  logLevel: "TRACE"
+});
+
+fwd({
+  servicePort: 9997,
+  forwardPort: 9998,
+  logFile: "fwd-%s.log",
+  logLevel: "TRACE"
+});
+*/
