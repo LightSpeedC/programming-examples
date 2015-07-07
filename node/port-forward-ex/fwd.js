@@ -1,4 +1,4 @@
-// port-forward-ex.js
+// fwd.js
 
 (function () {
   'use strict';
