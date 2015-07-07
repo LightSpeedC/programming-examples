@@ -1,4 +1,4 @@
 pushd %~dp0
-iojs port-forward-ex
+iojs fwd
 pause
 popd
