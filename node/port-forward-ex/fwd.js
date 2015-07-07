@@ -22,7 +22,7 @@ var fwd = function () {
       var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[]}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
-      aa.call(ctx, function * () {
+      aa(function * () {
         try {
           log.info('\x1b[%sm%s#%s ++++: %s\x1b[m connected!',
             ctx.color + ';30;5', zz(numConnections), zzz(socketId), seconds(ctx.startTime));
@@ -31,8 +31,8 @@ var fwd = function () {
             log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
               ctx.color, zz(numConnections), zzz(socketId), 'c<=s', seconds(ctx.startTime), err);
           });
-          yield [soc2soc.call(this, svrSoc, cliSoc, 'c<-s', ctx.color),
-                 soc2soc.call(this, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
+          yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
+                 soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
           log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
              ctx.color, zz(numConnections), zzz(socketId), 'c<>s', seconds(ctx.startTime), err);
@@ -66,8 +66,7 @@ var fwd = function () {
 
 
     // thread: reader -> writer
-    function * soc2soc(reader, writer, msg, color) {
-      var ctx = this;
+    function * soc2soc(ctx, reader, writer, msg, color) {
       var chan = aa().stream(reader), buff = null, count = 0;
       var socketId = ctx.socketId;
       try {
