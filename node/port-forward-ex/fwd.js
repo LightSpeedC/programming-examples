@@ -28,19 +28,19 @@ var fwd = function () {
             ctx.color + ';30;5', zz(numConnections), zzz(socketId), seconds(ctx.startTime));
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
           svrSoc.on('error', function (err) {
-            log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
+            log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41;30;5m%s\x1b[m', 
               ctx.color, zz(numConnections), zzz(socketId), 'c<=s', seconds(ctx.startTime), err);
           });
           yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
-          log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err %s', 
+          log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41;30;5m%s\x1b[m', 
              ctx.color, zz(numConnections), zzz(socketId), 'c<>s', seconds(ctx.startTime), err);
         }
         --numConnections;
         var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-        log.info('\x1b[%sm%s#%s ----: %s\x1b[m disconnect',
-          ctx.color, zz(numConnections), zzz(socketId), seconds(ctx.startTime));
+        log.info('\x1b[%sm%s#%s ----: %s\x1b[m disconnect \x1b[90m%s\x1b[m',
+          ctx.color, zz(numConnections), zzz(socketId), seconds(ctx.startTime), ctx['c->s'][0]);
         cliSoc.end(); svrSoc.end();
         delete ctxConnections[socketId];
       });
@@ -116,7 +116,7 @@ var fwd = function () {
         }
       } catch (err) {
         //var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-        log.warn('\x1b[%sm%s#%s %s: %s\x1b[m %s err %s', 
+        log.warn('\x1b[%sm%s#%s %s: %s\x1b[m %s err \x1b[41;30;5m%s\x1b[m', 
           color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime),
           buff ? 'write' : 'read', err);
       }
