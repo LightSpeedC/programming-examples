@@ -171,14 +171,14 @@ fwd(require('./config').config);
 fwd({
   servicePort: 9999,
   forwardPort: 9997,
-  logFile: "fwd-%s.log",
+  logFile: "log/fwd-%s.log",
   logLevel: "TRACE"
 });
 
 fwd({
   servicePort: 9997,
   forwardPort: 9998,
-  logFile: "fwd-%s.log",
+  logFile: "log/fwd-%s.log",
   logLevel: "TRACE"
 });
 */
