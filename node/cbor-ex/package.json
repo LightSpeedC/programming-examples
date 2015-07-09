@@ -1,0 +1,23 @@
+{
+  "name": "cbor-ex",
+  "version": "0.0.0",
+  "description": "CBOR example",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "cbor": ">=0.3.14"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "CBOR",
+    "binary"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
