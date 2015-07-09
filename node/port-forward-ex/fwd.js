@@ -54,13 +54,16 @@ var fwd = this.fwd = function () {
 
     require('control-c')(
       function () {
+        var count = 0;
         for (var i in ctxConnections) {
           var ctx = ctxConnections[i];
           log.debug('\x1b[%sm%s#%s ====: %s\x1b[m %s %s',
             ctx.color, zz(numConnections), zzz(ctx.socketId),
             seconds(ctx.startTime), seconds(ctx.updateTime),
             ctx['c->s']);
+          ++count;
         }
+        if (count === 0) log.warn('ctrl-c: print status: no connections.');
       },
       function () { log.warn('ctrl-c: process.exit();'); process.exit(); });
 
