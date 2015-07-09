@@ -62,7 +62,7 @@ var fwd = this.fwd = function () {
             ctx['c->s']);
         }
       },
-      function () { console.log('process.exit();'); process.exit(); });
+      function () { log.warn('ctrl-c: process.exit();'); process.exit(); });
 
 
     // thread: reader -> writer
@@ -165,7 +165,13 @@ var fwd = this.fwd = function () {
 
 }();
 
-fwd(require('./config').config);
+  if (typeof module === 'object' && module &&
+      typeof require === 'function' && require.main === module) {
+    require('fs').mkdir('log', function (err) {
+      if (err && err.code !== 'EEXIST') console.log(err);
+      fwd(require('./config').config);
+    });
+  }
 
 /*
 fwd({
