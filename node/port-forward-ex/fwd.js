@@ -1,6 +1,6 @@
 // fwd.js
 
-var fwd = function () {
+var fwd = this.fwd = function () {
   'use strict';
 
   var net = require('net');
