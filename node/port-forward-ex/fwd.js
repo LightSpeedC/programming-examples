@@ -24,25 +24,25 @@ var fwd = this.fwd = function () {
       ctxConnections[socketId] = ctx;
       aa(function * () {
         try {
-          log.debug('\x1b[%sm%s#%s ++++: %s\x1b[m connected!',
-            ctx.color + ';30;5', zz(numConnections), zzz(socketId), seconds(ctx.startTime));
+          log.debug('\x1b[%sm%s#%s %s: %s\x1b[m %s',
+            ctx.color + ';30;5', zz(numConnections), zzz(ctx.socketId), '++++', seconds(ctx.startTime), 'connected!');
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
           svrSoc.on('error', function (err) {
             log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m', 
-              ctx.color, zz(numConnections), zzz(socketId), 'c<=s', seconds(ctx.startTime), err);
+              ctx.color, zz(numConnections), zzz(ctx.socketId), 'c<=s', seconds(ctx.startTime), err);
           });
           yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
           log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m', 
-             ctx.color, zz(numConnections), zzz(socketId), 'c<>s', seconds(ctx.startTime), err);
+             ctx.color, zz(numConnections), zzz(ctx.socketId), 'c<>s', seconds(ctx.startTime), err);
         }
         --numConnections;
         var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-        log.debug('\x1b[%sm%s#%s ----: %s\x1b[m disconnect \x1b[90m%s\x1b[m',
-          ctx.color, zz(numConnections), zzz(socketId), seconds(ctx.startTime), ctx['c->s'][0]);
+        log.debug('\x1b[%sm%s#%s %s: %s\x1b[m %s \x1b[90m%s\x1b[m',
+          ctx.color, zz(numConnections), zzz(ctx.socketId), '----', seconds(ctx.startTime), 'disconnect', ctx['c->s'][0]);
         cliSoc.end(); svrSoc.end();
-        delete ctxConnections[socketId];
+        delete ctxConnections[ctx.socketId];
       });
 
     });
@@ -57,8 +57,8 @@ var fwd = this.fwd = function () {
         var count = 0;
         for (var i in ctxConnections) {
           var ctx = ctxConnections[i];
-          log.info('\x1b[%sm%s#%s ====: %s\x1b[m %s %s',
-            ctx.color, zz(numConnections), zzz(ctx.socketId),
+          log.info('\x1b[%sm%s#%s %s: %s\x1b[m %s %s',
+            ctx.color, zz(numConnections), zzz(ctx.socketId), '====',
             seconds(ctx.startTime), seconds(ctx.updateTime),
             ctx['c->s']);
           ++count;
@@ -71,7 +71,6 @@ var fwd = this.fwd = function () {
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
       var chan = aa().stream(reader), buff = null, count = 0;
-      var socketId = ctx.socketId;
       try {
         while(buff = yield chan) {
           ctx.updateTime = Date.now();
@@ -83,7 +82,7 @@ var fwd = this.fwd = function () {
                   low.startsWith('user-agent:') ||
                   low.startsWith('server:')) {
                 log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
-                  color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                  color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
                 if (i === 0) ctx[msg] = [];
                 ctx[msg].push(str);
               }
@@ -106,7 +105,7 @@ var fwd = this.fwd = function () {
                     low.startsWith('user-agent:') ||
                     low.startsWith('server:')) {
                   log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
-                    color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                    color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
                   if (i === 0) ctx[msg] = [];
                   ctx[msg].push(str);
                 }
@@ -120,10 +119,9 @@ var fwd = this.fwd = function () {
       } catch (err) {
         //var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
         log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m %s', 
-          color, zz(numConnections), zzz(socketId), msg, seconds(ctx.startTime),
+          color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime),
           err, buff ? 'write' : 'read');
       }
-      reader.end();
       writer.end();
     }
 
