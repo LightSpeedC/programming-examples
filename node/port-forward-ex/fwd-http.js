@@ -16,10 +16,11 @@ var fwdHttp = this.fwdHttp = function () {
     var numConnections = 0;
     var ctxConnections = {};
 
-    var HTTP_PORT = config.servicePort;  // internal proxy server port
+    // var HTTP_PORT = config.servicePort;  // internal proxy server port
     var PROXY_URL = config.proxyUrl;     // external proxy server URL
     var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
     var PROXY_PORT = PROXY_URL ? (Number(url.parse(PROXY_URL).port) || 80) : null;
+    var PORT_COLOR = config.servicePort % 6 + 41;
 
     var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
     log.setLevel(config.logLevel);
@@ -51,7 +52,7 @@ var fwdHttp = this.fwdHttp = function () {
         else
           var options = {host: x.hostname, port: x.port || 80, path: x.path,
                          method: cliReq.method, headers: reqHeaders, agent: cliSoc.$agent};
-        log.info(config.servicePort, options.method, options.host, options.port, options.path);
+        log.info('\x1b[%sm%s\x1b[m', PORT_COLOR, config.servicePort, options.method, options.host, options.port, options.path);
 
         var genChan = aa();
 
@@ -102,7 +103,7 @@ var fwdHttp = this.fwdHttp = function () {
 
     });
     server.listen(config.servicePort, function listening() {
-      log.info('%s server listening', config.servicePort);
+      log.info('\x1b[%sm%s\x1b[m server listening', PORT_COLOR, config.servicePort);
     });
 
     // HTTP CONNECT request コネクト要求
@@ -167,7 +168,7 @@ var fwdHttp = this.fwdHttp = function () {
 
     });
 
-    log.info('%s config: \x1b[44m%s\x1b[m', config.servicePort, config);
+    log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort, config);
 
     server.on('connection', function onConn(cliSoc) {
       // http Agent エージェント
@@ -187,9 +188,12 @@ var fwdHttp = this.fwdHttp = function () {
           loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
           ++count;
         }
-        if (count === 0) log.warn('%s ctrl-c: print status: no connections.', config.servicePort);
+        if (count === 0)
+          log.warn('\x1b[%sm%s\x1b[m ctrl-c: print status: no connections.', PORT_COLOR, config.servicePort);
       },
-      function () { log.warn('%s ctrl-c: process.exit();', config.servicePort); process.exit(); });
+      function () {
+        log.warn('\x1b[%sm%s\x1b[m ctrl-c: process.exit();', PORT_COLOR, config.servicePort); process.exit();
+      });
 
     function funcOnSocErr(ctx, msg, url) {
       return function onSocErr(err) {
@@ -249,27 +253,27 @@ var fwdHttp = this.fwdHttp = function () {
     }
 
     function logdebug(ctx, color, msg1, msg2) {
-     log.debug('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
-       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+     log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
        msg1, seconds(ctx.startTime), msg2);
     }
 
     function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('%s \x1b[%sm%s#%s %s:%s\x1b[m err \x1b[41m%s\x1b[m%s', 
-        config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
+      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m err \x1b[41m%s\x1b[m%s', 
+        PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
         msg1, seconds(ctx.startTime), err,
         msg2 ? ' ' + msg2 : '');
     }
 
     function loginfo(ctx, color, msg1, msg2) {
-     log.info('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
-       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+     log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
        msg1, seconds(ctx.startTime), msg2);
     }
 
     function logtrace(ctx, color, msg1, msg2) {
-     log.trace('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
-       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+     log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
        msg1, seconds(ctx.startTime), msg2);
     }
 
@@ -313,11 +317,11 @@ var fwdHttp = this.fwdHttp = function () {
     require('fs').mkdir('log', function (err) {
       if (err && err.code !== 'EEXIST') console.log(err);
       //fwdHttp(require('./config-proxy').config);
-      fwdHttp({servicePort: 9999, proxyUrl: 'http://127.0.0.1:9997',
+      fwdHttp({servicePort: 9999, proxyUrl: 'http://localhost:9997',
         logFile: 'log/proxy-%s.log', logLevel: 'trace'});
       fwdHttp({servicePort: 9997,
         logFile: 'log/proxy-%s.log', logLevel: 'trace'});
-      fwdHttp({servicePort: 8888, proxyUrl: 'http://127.0.0.1:9998',
+      fwdHttp({servicePort: 8888, proxyUrl: 'http://localhost:9998',
         logFile: 'log/proxy-%s.log', logLevel: 'trace'});
     });
   }
