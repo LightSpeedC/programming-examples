@@ -51,19 +51,17 @@ var fwdHttp = this.fwdHttp = function () {
         else
           var options = {host: x.hostname, port: x.port || 80, path: x.path,
                          method: cliReq.method, headers: reqHeaders, agent: cliSoc.$agent};
-        log.info(options);
+        log.info(config.servicePort, options.method, options.host, options.port, options.path);
 
         var genChan = aa();
 
         // send request 要求を送信
         var svrReq = http.request(options, genChan);
-        log.info(1);
+        cliReq.pipe(svrReq);
         svrReq.on('error', function (err) {
           logwarn(ctx, ctx.color, 'c->s', err);
         });
-        log.info(2);
         var svrRes = yield genChan;
-        log.info(3);
 
         // response headers 応答ヘッダ
         var resHeaders = {};
