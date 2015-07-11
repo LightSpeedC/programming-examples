@@ -7,3 +7,5 @@
     logFile: 'log/fwd-%s.log', logLevel: 'trace'});
   fwdHttp({servicePort: 9997, proxyUrl: 'http://localhost:9998',
     logFile: 'log/proxy-%s.log', logLevel: 'trace'});
+  fwdHttp({servicePort: 9998,
+    logFile: 'log/proxy-%s.log', logLevel: 'trace'});
