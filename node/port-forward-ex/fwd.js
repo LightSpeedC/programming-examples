@@ -24,44 +24,37 @@ var fwd = this.fwd = function () {
       ctxConnections[socketId] = ctx;
       aa(function * () {
         try {
-          log.debug('\x1b[%sm%s#%s %s: %s\x1b[m %s',
-            ctx.color + ';30;5', zz(numConnections), zzz(ctx.socketId), '++++', seconds(ctx.startTime), 'connected!');
+          logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
           yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
-          log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m', 
-             ctx.color, zz(numConnections), zzz(ctx.socketId), 'c<>s', seconds(ctx.startTime), err);
+          logwarn(ctx, ctx.color, 'c<>s', err);
         }
         --numConnections;
-        var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
-        log.debug('\x1b[%sm%s#%s %s: %s\x1b[m %s \x1b[90m%s\x1b[m',
-          ctx.color, zz(numConnections), zzz(ctx.socketId), '----', seconds(ctx.startTime), 'disconnect', ctx['c->s'][0]);
+        logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx['c->s'][0] + '\x1b[m');
         cliSoc.end(); svrSoc.end();
         delete ctxConnections[ctx.socketId];
       });
 
     });
     server.listen(config.servicePort, function listening() {
-      log.info('server bound. port: %s', config.servicePort);
+      log.info('%s server listening', config.servicePort);
     });
 
-    log.info(config);
+    log.info('%s config: \x1b[44m%s\x1b[m', config.servicePort, config);
 
     require('control-c')(
       function () {
         var count = 0;
         for (var i in ctxConnections) {
           var ctx = ctxConnections[i];
-          log.info('\x1b[%sm%s#%s %s: %s\x1b[m %s %s',
-            ctx.color, zz(numConnections), zzz(ctx.socketId), '====',
-            seconds(ctx.startTime), seconds(ctx.updateTime),
-            ctx['c->s']);
+          loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
           ++count;
         }
-        if (count === 0) log.warn('ctrl-c: print status: no connections.');
+        if (count === 0) log.warn('%s ctrl-c: print status: no connections.', config.servicePort);
       },
-      function () { log.warn('ctrl-c: process.exit();'); process.exit(); });
+      function () { log.warn('%s ctrl-c: process.exit();', config.servicePort); process.exit(); });
 
 
     // thread: reader -> writer
@@ -71,14 +64,12 @@ var fwd = this.fwd = function () {
         while(buff = yield chan) {
           ctx.updateTime = Date.now();
           if (count++ <= 0) {
-            var ms = ((ctx.updateTime - ctx.startTime)/1000.0).toFixed(3);
             buff2str(buff).split('\r\n').forEach(function (str, i) {
               var low = str.substr(0, 90).toLowerCase();
               if (i === 0 ||
                   low.startsWith('user-agent:') ||
                   low.startsWith('server:')) {
-                log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
-                  color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                logtrace(ctx, color, msg, str.substr(0, 90));
                 if (i === 0) ctx[msg] = [];
                 ctx[msg].push(str);
               }
@@ -100,8 +91,7 @@ var fwd = this.fwd = function () {
                 if (i === 0 ||
                     low.startsWith('user-agent:') ||
                     low.startsWith('server:')) {
-                  log.trace('\x1b[%sm%s#%s %s: %s\x1b[m %s',
-                    color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime), str.substr(0, 90));
+                  logtrace(ctx, color, msg, str.substr(0, 90));
                   if (i === 0) ctx[msg] = [];
                   ctx[msg].push(str);
                 }
@@ -113,11 +103,34 @@ var fwd = this.fwd = function () {
           buff = null;
         }
       } catch (err) {
-        log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m %s', 
-          color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime),
-          err, buff ? 'write' : 'read');
+        logwarn(ctx, color, msg, err, buff ? 'write' : 'read');
       }
       writer.end();
+    }
+
+    function logdebug(ctx, color, msg1, msg2) {
+     log.debug('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+       msg1, seconds(ctx.startTime), msg2);
+    }
+
+    function logwarn(ctx, color, msg1, err, msg2) {
+      log.warn('%s \x1b[%sm%s#%s %s:%s\x1b[m err \x1b[41m%s\x1b[m%s', 
+        config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
+        msg1, seconds(ctx.startTime), err,
+        msg2 ? ' ' + msg2 : '');
+    }
+
+    function loginfo(ctx, color, msg1, msg2) {
+     log.info('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+       msg1, seconds(ctx.startTime), msg2);
+    }
+
+    function logtrace(ctx, color, msg1, msg2) {
+     log.trace('%s \x1b[%sm%s#%s %s:%s\x1b[m %s',
+       config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
+       msg1, seconds(ctx.startTime), msg2);
     }
 
   }
@@ -126,16 +139,11 @@ var fwd = this.fwd = function () {
     return ('0' + x).substr(-2);
   }
   function zzz(x) {
-    return ('00' + x.toString(26)).substr(-3);
+    return ('000' + x.toString(26)).substr(-4);
   }
   function seconds(startTime) {
     var s = ((Date.now() - startTime)/1000.0).toFixed(3) + ' s';
-    return ('  ' + s).substr(- Math.max(s.length, 9))
-  }
-
-  function err2str(err) {
-    return err + '';
-    //return !!err && err.stack || (err + '');
+    return ('   ' + s).substr(- Math.max(s.length, 10))
   }
 
   var buff2strx = 41;
@@ -161,26 +169,9 @@ var fwd = this.fwd = function () {
 
 }();
 
-  if (typeof module === 'object' && module &&
-      typeof require === 'function' && require.main === module) {
+  if (require.main === module) {
     require('fs').mkdir('log', function (err) {
       if (err && err.code !== 'EEXIST') console.log(err);
       fwd(require('./config').config);
     });
   }
-
-/*
-fwd({
-  servicePort: 9999,
-  forwardPort: 9997,
-  logFile: "log/fwd-%s.log",
-  logLevel: "TRACE"
-});
-
-fwd({
-  servicePort: 9997,
-  forwardPort: 9998,
-  logFile: "log/fwd-%s.log",
-  logLevel: "TRACE"
-});
-*/
