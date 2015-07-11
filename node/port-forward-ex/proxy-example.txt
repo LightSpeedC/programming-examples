@@ -1,0 +1,12 @@
+Proxy example
+
+9999: proxy for git
+8888: proxy for browsers
+9990: proxy for intranet
+
+9995: proxy for direct
+	192.168.*	^192\.168\..*$
+	kok*		^kok.*$
+	. -> \.
+	* -> .*
+9998: proxy for internet
