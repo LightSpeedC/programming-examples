@@ -27,10 +27,6 @@ var fwd = this.fwd = function () {
           log.debug('\x1b[%sm%s#%s %s: %s\x1b[m %s',
             ctx.color + ';30;5', zz(numConnections), zzz(ctx.socketId), '++++', seconds(ctx.startTime), 'connected!');
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
-          svrSoc.on('error', function (err) {
-            log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m', 
-              ctx.color, zz(numConnections), zzz(ctx.socketId), 'c<=s', seconds(ctx.startTime), err);
-          });
           yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
@@ -117,7 +113,6 @@ var fwd = this.fwd = function () {
           buff = null;
         }
       } catch (err) {
-        //var ms = ((Date.now() - ctx.startTime)/1000.0).toFixed(3);
         log.warn('\x1b[%sm%s#%s %s: %s\x1b[m err \x1b[41m%s\x1b[m %s', 
           color, zz(numConnections), zzz(ctx.socketId), msg, seconds(ctx.startTime),
           err, buff ? 'write' : 'read');
