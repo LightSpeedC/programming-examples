@@ -4,6 +4,7 @@ var fwdHttp = this.fwdHttp = function () {
   'use strict';
 
   var http = require('http');
+  var net = require('net');
   var url = require('url');
   var aa = require('aa');
 
@@ -18,7 +19,7 @@ var fwdHttp = this.fwdHttp = function () {
     var HTTP_PORT = config.servicePort;  // internal proxy server port
     var PROXY_URL = config.proxyUrl;     // external proxy server URL
     var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
-    var PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
+    var PROXY_PORT = PROXY_URL ? (Number(url.parse(PROXY_URL).port) || 80) : null;
 
     var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
     log.setLevel(config.logLevel);
@@ -34,10 +35,10 @@ var fwdHttp = this.fwdHttp = function () {
 
         var cliSoc = cliReq.socket || cliReq.connection;
         var x = url.parse(cliReq.url);
-        loginfo(ctx, ctx.color + ';30;5', 'GET  ',
+        loginfo(ctx, ctx.color + ';30;5', cliReq.method,
             x.hostname + ':' + (x.port || 80));
 
-        // request headers óvãÅÉwÉbÉ_
+        // request headers Ë¶ÅÊ±Ç„Éò„ÉÉ„ÉÄ
         var reqHeaders = {};
         for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
           reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
@@ -50,25 +51,35 @@ var fwdHttp = this.fwdHttp = function () {
         else
           var options = {host: x.hostname, port: x.port || 80, path: x.path,
                          method: cliReq.method, headers: reqHeaders, agent: cliSoc.$agent};
+        log.info(options);
 
         var genChan = aa();
 
-        // send request óvãÅÇëóêM
+        // send request Ë¶ÅÊ±Ç„ÇíÈÄÅ‰ø°
         var svrReq = http.request(options, genChan);
+        log.info(1);
+        svrReq.on('error', function (err) {
+          logwarn(ctx, ctx.color, 'c->s', err);
+        });
+        log.info(2);
         var svrRes = yield genChan;
+        log.info(3);
 
-        // response headers âûìöÉwÉbÉ_
+        // response headers ÂøúÁ≠î„Éò„ÉÉ„ÉÄ
         var resHeaders = {};
         for (var i = 0; i < svrRes.rawHeaders.length; i += 2)
           resHeaders[svrRes.rawHeaders[i]] = svrRes.rawHeaders[i + 1];
 
-        // âûìöÉwÉbÉ_Ç… Date Ç™ñ≥ÇØÇÍÇŒÅAÇªÇÃÇ‹Ç‹ // TODO???
+        // ÂøúÁ≠î„Éò„ÉÉ„ÉÄ„Å´ Date „ÅåÁÑ°„Åë„Çå„Å∞„ÄÅ„Åù„ÅÆ„Åæ„Åæ // TODO???
         cliRes.sendDate = false;
 
-        // ÉXÉeÅ[É^ÉXÉÅÉbÉZÅ[ÉW
-        cliRes.writeHead(svrRes.statusCode, svrRes.statusMessage, resHeaders);
+        // „Çπ„ÉÜ„Éº„Çø„Çπ„É°„ÉÉ„Çª„Éº„Ç∏
+        if (svrRes.statusMessage)
+          cliRes.writeHead(svrRes.statusCode, svrRes.statusMessage, resHeaders);
+        else
+          cliRes.writeHead(svrRes.statusCode, resHeaders);
 
-        // ÉTÅ[ÉoâûìöÇÅAÉNÉâÉCÉAÉìÉgâûìöÇ÷ó¨Ç∑
+        // „Çµ„Éº„ÉêÂøúÁ≠î„Çí„ÄÅ„ÇØ„É©„Ç§„Ç¢„É≥„ÉàÂøúÁ≠î„Å∏ÊµÅ„Åô
         svrRes.pipe(cliRes);
         return;
 
@@ -96,7 +107,7 @@ var fwdHttp = this.fwdHttp = function () {
       log.info('%s server listening', config.servicePort);
     });
 
-    // HTTP CONNECT request ÉRÉlÉNÉgóvãÅ
+    // HTTP CONNECT request „Ç≥„Éç„ÇØ„ÉàË¶ÅÊ±Ç
     server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
       ++numConnections;
       var socketId = ++socketIdSeq;
@@ -104,11 +115,11 @@ var fwdHttp = this.fwdHttp = function () {
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
 
-      // ÉRÉlÉNÉgóvãÅÇÃURLÇÕ server:port å`éÆ
+      // „Ç≥„Éç„ÇØ„ÉàË¶ÅÊ±Ç„ÅÆURL„ÅØ server:port ÂΩ¢Âºè
       var x = url.parse('https://' + cliReq.url);
       loginfo(ctx, ctx.color, 'https', cliReq.url);
 
-      // request headers óvãÅÉwÉbÉ_
+      // request headers Ë¶ÅÊ±Ç„Éò„ÉÉ„ÉÄ
       var reqHeaders = {};
       for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
         reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
@@ -161,7 +172,7 @@ var fwdHttp = this.fwdHttp = function () {
     log.info('%s config: \x1b[44m%s\x1b[m', config.servicePort, config);
 
     server.on('connection', function onConn(cliSoc) {
-      // http Agent ÉGÅ[ÉWÉFÉìÉg
+      // http Agent „Ç®„Éº„Ç∏„Çß„É≥„Éà
       cliSoc.$agent = new http.Agent({keepAlive: true});
       cliSoc.$serverRequested = false;
 
@@ -304,9 +315,11 @@ var fwdHttp = this.fwdHttp = function () {
     require('fs').mkdir('log', function (err) {
       if (err && err.code !== 'EEXIST') console.log(err);
       //fwdHttp(require('./config-proxy').config);
-      fwdHttp({servicePort: 9999, proxyUrl: 'http://localhost:9998',
+      fwdHttp({servicePort: 9999, proxyUrl: 'http://127.0.0.1:9997',
         logFile: 'log/proxy-%s.log', logLevel: 'trace'});
-      fwdHttp({servicePort: 8888, proxyUrl: 'http://localhost:9998',
+      fwdHttp({servicePort: 9997,
+        logFile: 'log/proxy-%s.log', logLevel: 'trace'});
+      fwdHttp({servicePort: 8888, proxyUrl: 'http://127.0.0.1:9998',
         logFile: 'log/proxy-%s.log', logLevel: 'trace'});
     });
   }
