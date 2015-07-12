@@ -23,8 +23,11 @@ var fwdHttp = this.fwdHttp = function () {
     var PROXY_PORT = PROXY_URL ? (Number(url.parse(PROXY_URL).port) || 80) : null;
     var PORT_COLOR = config.servicePort % 6 + 41;
 
-    var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
-    log.setLevel(config.logLevel);
+    var log = config.log;
+    if (!log) {
+      var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
+      log.setLevel(config.logLevel);
+    }
 
     var server = http.createServer(function connection(cliReq, cliRes) {
       ++numConnections;

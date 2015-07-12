@@ -4,6 +4,7 @@ var fwd = this.fwd = function () {
   'use strict';
 
   var net = require('net');
+  var url = require('url');
   var aa = require('aa');
   var util = require('util');
 
@@ -15,10 +16,16 @@ var fwd = this.fwd = function () {
     var numConnections = 0;
     var ctxConnections = {};
 
+    var PROXY_URL = config.proxyUrl;     // external proxy server URL
+    var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
+    var PROXY_PORT = PROXY_URL ? (Number(url.parse(PROXY_URL).port) || 80) : null;
     var PORT_COLOR = config.servicePort % 6 + 41;
 
-    var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
-    log.setLevel(config.logLevel);
+    var log = config.log;
+    if (!log) {
+      var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
+      log.setLevel(config.logLevel);
+    }
 
     // create server and on connection
     var server = net.createServer(function connection(cliSoc) {
@@ -31,7 +38,7 @@ var fwd = this.fwd = function () {
         try {
           ctx.status = 'ok';
           logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
-          var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
+          var svrSoc = net.connect(PROXY_PORT, PROXY_HOST); // 'connect' event ignored
           yield [soc2soc(ctx, svrSoc, cliSoc, 'recv', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'send', ctx.color + ';30;5')];
         } catch (err) {
@@ -71,7 +78,7 @@ var fwd = this.fwd = function () {
     });
 
     log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort,
-      [config.servicePort, config.forwardPort]);
+      [config.servicePort, config.proxyUrl]);
 
 
     // thread: reader -> writer
