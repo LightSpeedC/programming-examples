@@ -102,6 +102,12 @@ var fwdHttp = this.fwdHttp = function () {
 */
 
     });
+
+    // server on error
+    server.on('error', function (err) {
+      log.warn('server on error:', err);
+    });
+
     server.listen(config.servicePort, function listening() {
       log.info('\x1b[%sm%s\x1b[m server listening', PORT_COLOR, config.servicePort);
     });
