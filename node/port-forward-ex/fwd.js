@@ -27,6 +27,11 @@ var fwd = this.fwd = function () {
       log.setLevel(config.logLevel);
     }
 
+    var filters = [];
+    for (var key in config.filters) {
+      log.info(key, config.filters[key]);
+    }
+
     // create server and on connection
     var server = net.createServer(function connection(cliSoc) {
       ++numConnections;

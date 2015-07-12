@@ -6,11 +6,12 @@
   var fwd = require('./fwd').fwd;
   var fwdHttp = require('./fwd-http').fwdHttp;
 
-  fwd({servicePort: 9999, proxyUrl: 'http://localhost:9997',
-    log:log, logFile:logFile, logLevel:logLevel});
-  fwd({servicePort: 8888, proxyUrl: 'http://localhost:9997',
-    log:log, logFile:logFile, logLevel:logLevel});
-  fwdHttp({servicePort: 9997, proxyUrl: 'http://localhost:9998',
-    log:log, logFile:logFile, logLevel:logLevel});
-  fwdHttp({servicePort: 9998,
-    log:log, logFile:logFile, logLevel:logLevel});
+  var filters = {
+    '192.168.*;kok*-*': 'http://localhost:9996',
+  };
+
+  fwd({log:log, servicePort: 9999, proxyUrl: 'http://localhost:9997', filters:filters});
+  fwd({log:log, servicePort: 8888, proxyUrl: 'http://localhost:9997', filters:filters});
+  fwdHttp({log:log, servicePort: 9996});
+  fwdHttp({log:log, servicePort: 9997, proxyUrl: 'http://localhost:9998'});
+  fwdHttp({log:log, servicePort: 9998});
