@@ -52,7 +52,8 @@ var fwdHttp = this.fwdHttp = function () {
         else
           var options = {host: x.hostname, port: x.port || 80, path: x.path,
                          method: cliReq.method, headers: reqHeaders, agent: cliSoc.$agent};
-        log.info('\x1b[%sm%s\x1b[m', PORT_COLOR, config.servicePort, options.method, options.host, options.port, options.path);
+        //log.info('\x1b[%sm%s\x1b[m', PORT_COLOR, config.servicePort,
+        //  options.method, options.host, options.port, options.path);
 
         var genChan = aa();
 
@@ -105,7 +106,7 @@ var fwdHttp = this.fwdHttp = function () {
 
     // server on error
     server.on('error', function (err) {
-      log.warn('server on error:', err);
+      log.warn('server on error:\x1b[41m', err, '\x1b[m');
     });
 
     server.listen(config.servicePort, function listening() {
@@ -143,7 +144,7 @@ var fwdHttp = this.fwdHttp = function () {
         var svrSoc = null;
         svrReq.on('connect', function onSvrConn(svrRes, svrSoc2, svrHead) {
           svrSoc = svrSoc2;
-          cliSoc.write('HTTP/1.1 200 Connection established\r\n\r\n');
+          cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
           if (cliHead && cliHead.length) svrSoc.write(cliHead);
           if (svrHead && svrHead.length) cliSoc.write(svrHead);
           svrSoc.pipe(cliSoc);
@@ -159,7 +160,7 @@ var fwdHttp = this.fwdHttp = function () {
       } // if PROXY_HOST
       else {
         var svrSoc = net.connect(x.port || 443, x.hostname, function onSvrConn() {
-          cliSoc.write('HTTP/1.1 200 Connection established\r\n\r\n');
+          cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
           if (cliHead && cliHead.length) svrSoc.write(cliHead);
           cliSoc.pipe(svrSoc);
         });
