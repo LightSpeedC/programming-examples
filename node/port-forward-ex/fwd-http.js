@@ -111,6 +111,23 @@ var fwdHttp = this.fwdHttp = function () {
 
     server.listen(config.servicePort, function listening() {
       log.info('\x1b[%sm%s\x1b[m server listening', PORT_COLOR, config.servicePort);
+
+      require('control-c')(
+        function () {
+          var count = 0;
+          for (var i in ctxConnections) {
+            var ctx = ctxConnections[i];
+            loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
+            ++count;
+          }
+          if (count === 0)
+            log.warn('\x1b[%sm%s\x1b[m ctrl-c: print status: no connections.', PORT_COLOR, config.servicePort);
+        },
+        function () {
+          log.warn('\x1b[%sm%s\x1b[m ctrl-c: process.exit();', PORT_COLOR, config.servicePort);
+          setTimeout(function () { process.exit(); }, 0);
+        });
+
     });
 
     // HTTP CONNECT request コネクト要求
@@ -186,22 +203,6 @@ var fwdHttp = this.fwdHttp = function () {
         log.warn('agent err', err);
       });
     });
-
-    require('control-c')(
-      function () {
-        var count = 0;
-        for (var i in ctxConnections) {
-          var ctx = ctxConnections[i];
-          loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
-          ++count;
-        }
-        if (count === 0)
-          log.warn('\x1b[%sm%s\x1b[m ctrl-c: print status: no connections.', PORT_COLOR, config.servicePort);
-      },
-      function () {
-        log.warn('\x1b[%sm%s\x1b[m ctrl-c: process.exit();', PORT_COLOR, config.servicePort);
-        setTimeout(function () { process.exit(); }, 0);
-      });
 
     function funcOnSocErr(ctx, msg, url) {
       return function onSocErr(err) {
