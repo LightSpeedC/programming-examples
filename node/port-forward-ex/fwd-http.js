@@ -198,7 +198,8 @@ var fwdHttp = this.fwdHttp = function () {
           log.warn('\x1b[%sm%s\x1b[m ctrl-c: print status: no connections.', PORT_COLOR, config.servicePort);
       },
       function () {
-        log.warn('\x1b[%sm%s\x1b[m ctrl-c: process.exit();', PORT_COLOR, config.servicePort); process.exit();
+        log.warn('\x1b[%sm%s\x1b[m ctrl-c: process.exit();', PORT_COLOR, config.servicePort);
+        setTimeout(function () { process.exit(); }, 0);
       });
 
     function funcOnSocErr(ctx, msg, url) {
@@ -259,28 +260,28 @@ var fwdHttp = this.fwdHttp = function () {
     }
 
     function logdebug(ctx, color, msg1, msg2) {
-     log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+     log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       msg1, seconds(ctx.startTime), msg2);
+       seconds(ctx.startTime), msg1, msg2);
     }
 
     function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m err \x1b[41m%s\x1b[m%s', 
+      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err \x1b[41m%s\x1b[m%s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
-        msg1, seconds(ctx.startTime), err,
+        seconds(ctx.startTime), msg1, err,
         msg2 ? ' ' + msg2 : '');
     }
 
     function loginfo(ctx, color, msg1, msg2) {
-     log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+     log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       msg1, seconds(ctx.startTime), msg2);
+       seconds(ctx.startTime), msg1, msg2);
     }
 
     function logtrace(ctx, color, msg1, msg2) {
-     log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s:%s\x1b[m %s',
+     log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       msg1, seconds(ctx.startTime), msg2);
+       seconds(ctx.startTime), msg1, msg2);
     }
 
   }
