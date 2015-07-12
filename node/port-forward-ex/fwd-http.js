@@ -66,7 +66,7 @@ var fwdHttp = this.fwdHttp = function () {
         for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
           reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
         logdebug(ctx, ctx.color + ';30;5', 'headr',
-          (cliReq.headers['user-agent'] || cliReq.headers['host']).substr(0, 60));
+          (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60));
 
         var host = PROXY_HOST ? PROXY_HOST : x.hostname;
         var port = PROXY_PORT ? PROXY_PORT : x.port;
@@ -178,7 +178,7 @@ var fwdHttp = this.fwdHttp = function () {
         reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
 
       logdebug(ctx, ctx.color, 'headr',
-        (cliReq.headers['user-agent'] || cliReq.headers['host']).substr(0, 60));
+        (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60));
 
       var host = PROXY_HOST ? PROXY_HOST : x.hostname;
       var port = PROXY_PORT ? PROXY_PORT : x.port || 443;
