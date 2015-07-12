@@ -28,7 +28,7 @@ var fwdHttp = this.fwdHttp = function () {
     var server = http.createServer(function connection(cliReq, cliRes) {
       ++numConnections;
       var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[]}
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[], status:'--'}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
 
@@ -61,9 +61,11 @@ var fwdHttp = this.fwdHttp = function () {
         var svrReq = http.request(options, genChan);
         cliReq.pipe(svrReq);
         svrReq.on('error', function (err) {
+          ctx.status = 'ng';
           logwarn(ctx, ctx.color, 'c->s', err);
         });
         var svrRes = yield genChan;
+        ctx.status = 'ok';
 
         // response headers 応答ヘッダ
         var resHeaders = {};
@@ -117,7 +119,7 @@ var fwdHttp = this.fwdHttp = function () {
           var count = 0;
           for (var i in ctxConnections) {
             var ctx = ctxConnections[i];
-            loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
+            loginfo(ctx, ctx.color, '====', [seconds(ctx.updateTime), ctx['c->s'], ctx.status].join(' '));
             ++count;
           }
           if (count === 0)
@@ -134,7 +136,7 @@ var fwdHttp = this.fwdHttp = function () {
     server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
       ++numConnections;
       var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[]}
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[], status:'--'}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
 

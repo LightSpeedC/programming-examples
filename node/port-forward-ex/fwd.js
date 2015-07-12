@@ -23,16 +23,18 @@ var fwd = this.fwd = function () {
     var server = net.createServer(function connection(cliSoc) {
       ++numConnections;
       var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[]}
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[], status: '--'}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
       aa(function * () {
         try {
+          ctx.status = 'ok';
           logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
           yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
         } catch (err) {
+          ctx.status = 'ng';
           logwarn(ctx, ctx.color, 'c<>s', err);
         }
         --numConnections;
@@ -52,7 +54,7 @@ var fwd = this.fwd = function () {
           var count = 0;
           for (var i in ctxConnections) {
             var ctx = ctxConnections[i];
-            loginfo(ctx, ctx.color, '====', seconds(ctx.updateTime) + ' ' + ctx['c->s']);
+            loginfo(ctx, ctx.color, '====', [seconds(ctx.updateTime), ctx['c->s'], ctx.status].join(' '));
             ++count;
           }
           if (count === 0)
