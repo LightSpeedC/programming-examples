@@ -31,18 +31,20 @@ var fwd = this.fwd = function () {
       log.setLevel(config.logLevel);
     }
 
-    // create server and on connection
+    // net create server and on connection
     var server = net.createServer(function connection(cliSoc) {
-      ++numConnections;
-      var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, send:[], recv:[], status: '--'}
-      ctx.updateTime = ctx.startTime = Date.now();
-      ctxConnections[socketId] = ctx;
       aa(function * () {
+        ++numConnections;
+        var socketId = ++socketIdSeq;
+        var ctx = {socketId:socketId, color:socketId % 6 + 41, send:[], recv:[], status: '--'}
+        ctx.updateTime = ctx.startTime = Date.now();
+        ctxConnections[socketId] = ctx;
         try {
           ctx.status = 'ok';
           logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
           var svrSoc = net.connect(PROXY_PORT, PROXY_HOST); // 'connect' event ignored
+          svrSoc.on('error', function (err) { log.fatal('fwd svrSoc.on error(0):', err); });
+          cliSoc.on('error', function (err) { log.fatal('fwd cliSoc.on error(0):', err); });
           yield [soc2soc(ctx, svrSoc, cliSoc, 'recv', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'send', ctx.color + ';30;5')];
         } catch (err) {
@@ -53,11 +55,10 @@ var fwd = this.fwd = function () {
         delete ctxConnections[ctx.socketId];
         logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx.send[0] + '\x1b[m');
         cliSoc.end(); svrSoc.end();
-      });
+      }); // aa
+    }); // net create server and on 'connection'
 
-    });
-
-    // server listen and on listening
+    // server listen and on 'listening'
     server.listen(config.servicePort, function listening() {
       log.info('\x1b[%sm%s\x1b[m server listening', PORT_COLOR, config.servicePort);
 
@@ -79,7 +80,7 @@ var fwd = this.fwd = function () {
           setTimeout(function () { process.exit(); }, 0);
         });
 
-    });
+    }); // server listen and on 'listening'
 
     log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort,
       [config.servicePort, config.proxyUrl]);
@@ -88,6 +89,9 @@ var fwd = this.fwd = function () {
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
       var chan = aa().stream(reader), buff = null, count = 0;
+      reader.on('error', function (err) {
+        logwarn(ctx, color, msg, err, buff ? 'write(1)' : 'read(1)');
+      });
       try {
         while(buff = yield chan) {
           ctx.updateTime = Date.now();
