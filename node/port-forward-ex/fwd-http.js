@@ -36,7 +36,7 @@ var fwdHttp = this.fwdHttp = function () {
       }).join('|'));
       //log.info([key, rex, config.filters[key]]);
       filters.push({rex:rex,
-        host:url.parse(config.filters[key]).hostname
+        host:url.parse(config.filters[key]).hostname,
         port:(Number(url.parse(config.filters[key]).port) || 80)})
     }
 
