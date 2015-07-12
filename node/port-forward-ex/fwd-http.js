@@ -29,6 +29,17 @@ var fwdHttp = this.fwdHttp = function () {
       log.setLevel(config.logLevel);
     }
 
+    var filters = [];
+    for (var key in config.filters) {
+      var rex = new RegExp(key.replace(/,/g, ';').split(';').map(function (host) {
+        return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+      }).join('|'));
+      //log.info([key, rex, config.filters[key]]);
+      filters.push({rex:rex,
+        host:url.parse(config.filters[key]).hostname
+        port:(Number(url.parse(config.filters[key]).port) || 80)})
+    }
+
     var server = http.createServer(function connection(cliReq, cliRes) {
       ++numConnections;
       var socketId = ++socketIdSeq;

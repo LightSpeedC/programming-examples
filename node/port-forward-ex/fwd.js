@@ -21,6 +21,10 @@ var fwd = this.fwd = function () {
     var PROXY_PORT = PROXY_URL ? (Number(url.parse(PROXY_URL).port) || 80) : null;
     var PORT_COLOR = config.servicePort % 6 + 41;
 
+    var BINARY_URL = config.binaryUrl;
+    var BINARY_HOST = BINARY_URL ?  url.parse(BINARY_URL).hostname    : null;
+    var BINARY_PORT = BINARY_URL ? (Number(url.parse(BINARY_URL).port) || 80) : null;
+
     var log = config.log;
     if (!log) {
       var log = require('log-manager').setWriter(new require('log-writer')(config.logFile)).getLogger();
@@ -29,7 +33,13 @@ var fwd = this.fwd = function () {
 
     var filters = [];
     for (var key in config.filters) {
-      log.info(key, config.filters[key]);
+      var rex = new RegExp(key.replace(/,/g, ';').split(';').map(function (host) {
+        return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+      }).join('|'));
+      //log.info([key, rex, config.filters[key]]);
+      filters.push({rex:rex,
+        host:url.parse(config.filters[key]).hostname
+        port:(Number(url.parse(config.filters[key]).port) || 80)})
     }
 
     // create server and on connection
