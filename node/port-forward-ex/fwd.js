@@ -5,6 +5,7 @@ var fwd = this.fwd = function () {
 
   var net = require('net');
   var aa = require('aa');
+  var util = require('util');
 
   var MAX_DUMP_LEN = 800;
 
@@ -38,9 +39,9 @@ var fwd = this.fwd = function () {
           logwarn(ctx, ctx.color, 'c<>s', err);
         }
         --numConnections;
+        delete ctxConnections[ctx.socketId];
         logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx.send[0] + '\x1b[m');
         cliSoc.end(); svrSoc.end();
-        delete ctxConnections[ctx.socketId];
       });
 
     });
@@ -54,7 +55,9 @@ var fwd = this.fwd = function () {
           var count = 0;
           for (var i in ctxConnections) {
             var ctx = ctxConnections[i];
-            loginfo(ctx, ctx.color, '====', [seconds(ctx.updateTime), ctx.send, ctx.status].join(' '));
+            var reqStr = '';
+            if (ctx.send && ctx.send[0]) reqStr = ctx.send[0];
+            loginfo(ctx, ctx.color, '====', [ctx.status, seconds(ctx.updateTime), reqStr].join(' '));
             ++count;
           }
           if (count === 0)
@@ -67,7 +70,8 @@ var fwd = this.fwd = function () {
 
     });
 
-    log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort, config);
+    log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort,
+      [config.servicePort, config.forwardPort]);
 
 
     // thread: reader -> writer
