@@ -28,7 +28,7 @@ var fwdHttp = this.fwdHttp = function () {
     var server = http.createServer(function connection(cliReq, cliRes) {
       ++numConnections;
       var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[], status:'--'}
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, send:[], recv:[], status:'--'}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
 
@@ -43,7 +43,8 @@ var fwdHttp = this.fwdHttp = function () {
         var reqHeaders = {};
         for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
           reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
-        logdebug(ctx, ctx.color + ';30;5', 'headr', cliReq.headers['user-agent'] || cliReq.headers['host']);
+        logdebug(ctx, ctx.color + ';30;5', 'headr',
+          (cliReq.headers['user-agent'] || cliReq.headers['host']).substr(0, 60));
 
         // proxy or direct
         if (PROXY_URL)
@@ -62,7 +63,7 @@ var fwdHttp = this.fwdHttp = function () {
         cliReq.pipe(svrReq);
         svrReq.on('error', function (err) {
           ctx.status = 'ng';
-          logwarn(ctx, ctx.color, 'c->s', err);
+          logwarn(ctx, ctx.color, 'send', err);
         });
         var svrRes = yield genChan;
         ctx.status = 'ok';
@@ -92,13 +93,13 @@ var fwdHttp = this.fwdHttp = function () {
         try {
           logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
           var svrSoc = net.connect(config.forwardPort); // 'connect' event ignored
-          yield [soc2soc(ctx, svrSoc, cliSoc, 'c<-s', ctx.color),
-                 soc2soc(ctx, cliSoc, svrSoc, 'c->s', ctx.color + ';30;5')];
+          yield [soc2soc(ctx, svrSoc, cliSoc, 'recv', ctx.color),
+                 soc2soc(ctx, cliSoc, svrSoc, 'send', ctx.color + ';30;5')];
         } catch (err) {
           logwarn(ctx, ctx.color, 'c<>s', err);
         }
         --numConnections;
-        logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx['c->s'][0] + '\x1b[m');
+        logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx.send[0] + '\x1b[m');
         cliSoc.end(); svrSoc.end();
         delete ctxConnections[ctx.socketId];
       });
@@ -119,7 +120,7 @@ var fwdHttp = this.fwdHttp = function () {
           var count = 0;
           for (var i in ctxConnections) {
             var ctx = ctxConnections[i];
-            loginfo(ctx, ctx.color, '====', [seconds(ctx.updateTime), ctx['c->s'], ctx.status].join(' '));
+            loginfo(ctx, ctx.color, '====', [seconds(ctx.updateTime), ctx.send, ctx.status].join(' '));
             ++count;
           }
           if (count === 0)
@@ -136,7 +137,7 @@ var fwdHttp = this.fwdHttp = function () {
     server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
       ++numConnections;
       var socketId = ++socketIdSeq;
-      var ctx = {socketId:socketId, color:socketId % 6 + 41, 'c->s':[], 'c<-s':[], status:'--'}
+      var ctx = {socketId:socketId, color:socketId % 6 + 41, send:[], recv:[], status:'--'}
       ctx.updateTime = ctx.startTime = Date.now();
       ctxConnections[socketId] = ctx;
 
@@ -149,7 +150,8 @@ var fwdHttp = this.fwdHttp = function () {
       for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
         reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
 
-      logdebug(ctx, ctx.color, 'headr', cliReq.headers['user-agent'] || cliReq.headers['host']);
+      logdebug(ctx, ctx.color, 'headr',
+        (cliReq.headers['user-agent'] || cliReq.headers['host']).substr(0, 60));
 
       // proxy or direct
       if (PROXY_HOST) {
@@ -266,30 +268,34 @@ var fwdHttp = this.fwdHttp = function () {
     function logdebug(ctx, color, msg1, msg2) {
      log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), msg1, msg2);
+       seconds(ctx.startTime), rpad(msg1, 5), msg2);
     }
 
     function logwarn(ctx, color, msg1, err, msg2) {
       log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err \x1b[41m%s\x1b[m%s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
-        seconds(ctx.startTime), msg1, err,
+        seconds(ctx.startTime), rpad(msg1, 5), err,
         msg2 ? ' ' + msg2 : '');
     }
 
     function loginfo(ctx, color, msg1, msg2) {
      log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), msg1, msg2);
+       seconds(ctx.startTime), rpad(msg1, 5), msg2);
     }
 
     function logtrace(ctx, color, msg1, msg2) {
      log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
        PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), msg1, msg2);
+       seconds(ctx.startTime), rpad(msg1, 5), msg2);
     }
 
   }
 
+  var SPACES = '          ';
+  function rpad(s, n) {
+    return (s + SPACES).substr(0, Math.max(s.length, n));
+  }
   function zz(x) {
     return ('0' + x).substr(-2);
   }
