@@ -50,6 +50,8 @@ var fwdHttp = this.fwdHttp = function () {
       ctxConnections[socketId] = ctx;
 
       aa(function *() { // TODO indent
+        // log.info('cliReq', util.inspect(cliReq, {colors:true, depth:1}));
+        // log.info('cliRes', util.inspect(cliRes, {colors:true, depth:1}));
 
         var cliSoc = cliReq.socket || cliReq.connection;
         if (!cliSoc.$setError) {
@@ -90,6 +92,14 @@ var fwdHttp = this.fwdHttp = function () {
 
         // send request 要求を送信
         var svrReq = http.request(options, genChan);
+
+        //log.info('svrReq', Object.getOwnPropertyNames(svrReq).join(', '));
+        svrReq.socket &&
+        svrReq.socket.on('error', function (err) { log.fatal('fwdHttp svrReq.socket.on error:', err); });
+
+        svrReq.connection &&
+        svrReq.connection.on('error', function (err) { log.fatal('fwdHttp svrReq.connection.on error:', err); });
+
         ctx.status = 'sn';
         cliReq.pipe(svrReq);
         svrReq.on('error', function (err) {
@@ -101,6 +111,10 @@ var fwdHttp = this.fwdHttp = function () {
           logwarn(ctx, ctx.color, 'send cliReq', err);
         });
         var svrRes = yield genChan;
+
+        //log.info('svrRes', Object.getOwnPropertyNames(svrRes).join(', '));
+        svrRes.socket.on('error', function (err) { log.fatal('fwdHttp svrRes.socket.on error:', err); });
+
         svrRes.on('error', function (err) { log.fatal('fwdHttp svrRes.on error:', err); });
         ctx.status = 'ok';
 
@@ -200,16 +214,17 @@ var fwdHttp = this.fwdHttp = function () {
         ctx.status = 's1';
         ctx.send = [options.host + ':' + options.port + ' -> ' + options.path];
         var svrReq = http.request(options);
-        // svrReq.on('error', function (err) { log.fatal('fwdHttp svrReq.on error (connect):', err); }); // dup: svrRq2
+
         if (cliSoc.$serverRequested)
           logwarn(ctx, ctx.color, 'https', 'server requested! twice!');
         cliSoc.$serverRequested = true;
-        svrReq.end();
+
         var svrSoc = null;
         svrReq.on('connect', function onSvrConn(svrRes, svrSoc2, svrHead) {
-          svrRes.on('error', function (err) { log.fatal('fwdHttp svrRes.on error (connect):', err); });
           svrSoc = svrSoc2;
-          svrSoc.on('error', function (err) { log.fatal('fwdHttp svrSoc2.on error (connect):', err); });
+          // svrSoc.on('error', function (err) { log.fatal('fwdHttp svrSoc2.on error (connect):', err); }); // dup svrSc2
+          svrSoc.on('error', funcOnSocErr(ctx, 'svrSc2', cliReq.url));
+          svrRes.on('error', function (err) { log.fatal('fwdHttp svrRes.on error (connect):', err); });
           cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
           if (cliHead && cliHead.length) svrSoc.write(cliHead);
           if (svrHead && svrHead.length) cliSoc.write(svrHead);
@@ -219,16 +234,14 @@ var fwdHttp = this.fwdHttp = function () {
             if (!cliSoc.$serverRequested)
               logwarn(ctx, ctx.color, 'https', 'server request false! twice!');
             cliSoc.$serverRequested = false;
-          }); // soc on end
-          svrSoc.on('error', funcOnSocErr(ctx, 'svrSc2', cliReq.url));
-          svrSoc.on('end', function () {
             --numConnections;
             delete ctxConnections[ctx.socketId];
-          });
+          }); // soc on end
         }); // on connect
         svrReq.on('error', funcOnSocErr(ctx, 'svrRq2', cliReq.url));
         cliReq.on('error', funcOnSocErr(ctx, 'cliRq2', cliReq.url));
         cliSoc.on('error', funcOnSocErr(ctx, 'cliSc2', cliReq.url));
+        svrReq.end();
       } // if PROXY_HOST
       else {
         ctx.status = 's0';

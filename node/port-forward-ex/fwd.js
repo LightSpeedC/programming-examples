@@ -43,8 +43,8 @@ var fwd = this.fwd = function () {
           ctx.status = 'ok';
           logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
           var svrSoc = net.connect(PROXY_PORT, PROXY_HOST); // 'connect' event ignored
-          svrSoc.on('error', function (err) { log.fatal('fwd svrSoc.on error(0):', err); });
-          cliSoc.on('error', function (err) { log.fatal('fwd cliSoc.on error(0):', err); });
+          //svrSoc.on('error', function (err) { log.fatal('fwd svrSoc.on error(0):', err); });
+          //cliSoc.on('error', function (err) { log.fatal('fwd cliSoc.on error(0):', err); });
           yield [soc2soc(ctx, svrSoc, cliSoc, 'recv', ctx.color),
                  soc2soc(ctx, cliSoc, svrSoc, 'send', ctx.color + ';30;5')];
         } catch (err) {
@@ -93,9 +93,9 @@ var fwd = this.fwd = function () {
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
       var chan = aa().stream(reader), buff = null, count = 0;
-      reader.on('error', function (err) {
-        logwarn(ctx, color, msg, err, buff ? 'write(1)' : 'read(1)');
-      });
+      //reader.on('error', function (err) {
+      //  logwarn(ctx, color, msg, err, buff ? 'write(1)' : 'read(1)');
+      //});
       try {
         while(buff = yield chan) {
           ctx.updateTime = Date.now();
