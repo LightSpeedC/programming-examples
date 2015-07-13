@@ -85,6 +85,10 @@ var fwd = this.fwd = function () {
     log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort,
       [config.servicePort, config.proxyUrl]);
 
+    // server on error
+    server.on('error', function (err) {
+      log.warn('fwdHttp server on error:', err);
+    });
 
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
@@ -147,7 +151,7 @@ var fwd = this.fwd = function () {
     }
 
     function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err \x1b[41m%s\x1b[m%s', 
+      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err %s %s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
         seconds(ctx.startTime), rpad(msg1, 5), err,
         msg2 ? ' ' + msg2 : '');

@@ -132,7 +132,7 @@ var fwdHttp = this.fwdHttp = function () {
 
     // server on error
     server.on('error', function (err) {
-      log.warn('server on error:\x1b[41m', err, '\x1b[m');
+      log.warn('fwdHttp server on error:', err);
     });
 
     server.listen(config.servicePort, function listening() {
@@ -200,7 +200,7 @@ var fwdHttp = this.fwdHttp = function () {
         ctx.status = 's1';
         ctx.send = [options.host + ':' + options.port + ' -> ' + options.path];
         var svrReq = http.request(options);
-        svrReq.on('error', function (err) { log.fatal('fwdHttp svrReq.on error (connect):', err); });
+        // svrReq.on('error', function (err) { log.fatal('fwdHttp svrReq.on error (connect):', err); }); // dup: svrRq2
         if (cliSoc.$serverRequested)
           logwarn(ctx, ctx.color, 'https', 'server requested! twice!');
         cliSoc.$serverRequested = true;
@@ -332,7 +332,7 @@ var fwdHttp = this.fwdHttp = function () {
     }
 
     function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err \x1b[41m%s\x1b[m%s', 
+      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err %s %s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
         seconds(ctx.startTime), rpad(msg1, 5), err,
         msg2 ? ' ' + msg2 : '');
