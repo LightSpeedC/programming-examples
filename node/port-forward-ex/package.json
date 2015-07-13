@@ -8,7 +8,7 @@
     "aa": ">=0.1.7",
     "control-c": ">=0.0.9",
     "date-time-string": ">=0.0.9",
-    "log-manager": ">=0.0.9",
+    "log-manager": ">=0.0.10",
     "log-writer": ">=0.0.9"
   },
   "repository": {
