@@ -6,7 +6,7 @@
   // http create server. server on 'request'
   var server = http.createServer(function request(req, res) {
     res.on('close', function close() {});
-    res.on('finish', function finish() {});
+    res.on('finish', function finish() {}); // --count
     // res.writeHead(statusCode, [statusMessage], [headers])
     // res.writeHead(200, {
     //   'Content-Length': body.length,
