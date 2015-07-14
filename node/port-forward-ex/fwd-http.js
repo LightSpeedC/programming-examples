@@ -60,28 +60,32 @@ var fwdHttp = this.fwdHttp = function () {
         }
 
         var x = url.parse(cliReq.url);
-        loginfo(ctx, ctx.color + ';30;5', cliReq.method,
-            x.hostname + ':' + (x.port || 80));
+        log.info.apply(log, logArgs(ctx, ctx.color + ';30;5', cliReq.method,
+            x.hostname + ':' + (x.port || 80)));
 
         // request headers 要求ヘッダ
         var reqHeaders = {};
         for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
           reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
-        logdebug(ctx, ctx.color + ';30;5', 'headr',
-          (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60));
+        log.trace.apply(log, logArgs(ctx, ctx.color + ';30;5', 'headr',
+          (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60)));
 
         var host = PROXY_HOST ? PROXY_HOST : x.hostname;
         var port = PROXY_PORT ? PROXY_PORT : x.port;
 
         for (var i = 0, n = filters.length; i < n; ++i) {
           if (x.hostname.match(filters[i].rex)) {
-            log.info(x.hostname, 'match', filters[i]);
+            log.info.apply(log, logArgs(ctx, ctx.color, 'http', x.hostname + ' match', filters[i]));
             host = filters[i].host;
             port = filters[i].port;
             break;
           }
         }
         // TODO host & port == null -> ...
+        if (host == null && port == null) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, new Error('host & port == null')));
+          cliSoc.destroy();
+        }
 
         var options = {host: host, port: port, path: cliReq.url,
                        method: cliReq.method, headers: reqHeaders, agent: cliSoc.$agent};
@@ -104,16 +108,20 @@ var fwdHttp = this.fwdHttp = function () {
         cliReq.pipe(svrReq);
         svrReq.on('error', function (err) {
           ctx.status = 'ng';
-          logwarn(ctx, ctx.color, 'send svrReq', err);
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'send svrReq', err));
         });
         cliReq.on('error', function (err) {
           ctx.status = 'ng';
-          logwarn(ctx, ctx.color, 'send cliReq', err);
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'send cliReq', err));
         });
         var svrRes = yield genChan;
 
         //log.info('svrRes', Object.getOwnPropertyNames(svrRes).join(', '));
-        svrRes.socket.on('error', function (err) { log.fatal('fwdHttp svrRes.socket.on error:', err); });
+        var svrSoc = svrRes.socket;
+        if (!svrSoc.$setError) {
+          svrSoc.$setError = true;
+          svrSoc.on('error', function (err) { log.fatal('fwdHttp svrRes.socket.on error:', err); });
+        }
 
         svrRes.on('error', function (err) { log.fatal('fwdHttp svrRes.on error:', err); });
         ctx.status = 'ok';
@@ -135,8 +143,7 @@ var fwdHttp = this.fwdHttp = function () {
         // サーバ応答を、クライアント応答へ流す
         svrRes.pipe(cliRes);
         svrRes.on('end', function () {
-          --numConnections;
-          delete ctxConnections[ctx.socketId];
+          deleteCtx(ctx);
         });
         return;
 
@@ -146,7 +153,7 @@ var fwdHttp = this.fwdHttp = function () {
 
     // server on error
     server.on('error', function (err) {
-      log.warn('fwdHttp server on error:', err);
+      log.warn('\x1b[%sm%s\x1b[m fwdHttp server on error:', PORT_COLOR, config.servicePort, err);
     });
 
     server.listen(config.servicePort, function listening() {
@@ -159,7 +166,7 @@ var fwdHttp = this.fwdHttp = function () {
             var ctx = ctxConnections[i];
             var reqStr = '';
             if (ctx.send && ctx.send[0]) reqStr = ctx.send[0];
-            loginfo(ctx, ctx.color, '====', [ctx.status, seconds(ctx.updateTime), reqStr].join(' '));
+            log.info.apply(log, logArgs(ctx, ctx.color, '====', [ctx.status, seconds(ctx.updateTime), reqStr].join(' ')));
             ++count;
           }
           if (count === 0)
@@ -184,28 +191,32 @@ var fwdHttp = this.fwdHttp = function () {
 
       // コネクト要求のURLは server:port 形式
       var x = url.parse('https://' + cliReq.url);
-      loginfo(ctx, ctx.color, 'https', cliReq.url);
+      log.info.apply(log, logArgs(ctx, ctx.color, 'https', cliReq.url));
 
       // request headers 要求ヘッダ
       var reqHeaders = {};
       for (var i = 0; i < cliReq.rawHeaders.length; i += 2)
         reqHeaders[cliReq.rawHeaders[i]] = cliReq.rawHeaders[i + 1];
 
-      logdebug(ctx, ctx.color, 'headr',
-        (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60));
+      log.trace.apply(log, logArgs(ctx, ctx.color, 'heads',
+        (cliReq.headers['user-agent'] || cliReq.headers['host'] || '').substr(0, 60)));
 
       var host = PROXY_HOST ? PROXY_HOST : x.hostname;
       var port = PROXY_PORT ? PROXY_PORT : x.port || 443;
 
       for (var i = 0, n = filters.length; i < n; ++i) {
         if (x.hostname.match(filters[i].rex)) {
-          log.info(x.hostname, 'match', filters[i]);
+          log.info.apply(log, logArgs(ctx, ctx.color, 'https', x.hostname + ' match', filters[i]));
           host = filters[i].host;
           port = filters[i].port;
           break;
         }
       }
       // TODO host & port == null -> ...
+        if (host == null && port == null) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, new Error('host & port == null')));
+          cliSoc.destroy();
+        }
 
       // proxy or direct
       if (host || port) {
@@ -216,14 +227,15 @@ var fwdHttp = this.fwdHttp = function () {
         var svrReq = http.request(options);
 
         if (cliSoc.$serverRequested)
-          logwarn(ctx, ctx.color, 'https', 'server requested! twice!');
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'https', 'server requested! twice!'));
         cliSoc.$serverRequested = true;
 
         var svrSoc = null;
         svrReq.on('connect', function onSvrConn(svrRes, svrSoc2, svrHead) {
           svrSoc = svrSoc2;
-          // svrSoc.on('error', function (err) { log.fatal('fwdHttp svrSoc2.on error (connect):', err); }); // dup svrSc2
-          svrSoc.on('error', funcOnSocErr(ctx, 'svrSc2', cliReq.url));
+          svrSoc.on('error', function (err) {
+            log.warn.apply(log, logArgs(ctx, ctx.color, 'svrSc2', cliReq.url, err));
+          });
           svrRes.on('error', function (err) { log.fatal('fwdHttp svrRes.on error (connect):', err); });
           cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
           if (cliHead && cliHead.length) svrSoc.write(cliHead);
@@ -232,15 +244,22 @@ var fwdHttp = this.fwdHttp = function () {
           cliSoc.pipe(svrSoc);
           svrSoc.on('end', function () {
             if (!cliSoc.$serverRequested)
-              logwarn(ctx, ctx.color, 'https', 'server request false! twice!');
+              log.warn.apply(log, logArgs(ctx, ctx.color, 'https', 'server request false! twice!'));
             cliSoc.$serverRequested = false;
-            --numConnections;
-            delete ctxConnections[ctx.socketId];
+            deleteCtx(ctx)
           }); // soc on end
         }); // on connect
-        svrReq.on('error', funcOnSocErr(ctx, 'svrRq2', cliReq.url));
-        cliReq.on('error', funcOnSocErr(ctx, 'cliRq2', cliReq.url));
-        cliSoc.on('error', funcOnSocErr(ctx, 'cliSc2', cliReq.url));
+        svrReq.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'svrRq2', cliReq.url, err));
+          deleteCtx(ctx);
+          cliSoc.destroy(); //@@@@@@@@@@@@@@@@@@@@@@
+        });
+        cliReq.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'cliRq2', cliReq.url, err));
+        });
+        cliSoc.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'cliSc2', cliReq.url, err));
+        });
         svrReq.end();
       } // if PROXY_HOST
       else {
@@ -248,22 +267,29 @@ var fwdHttp = this.fwdHttp = function () {
         ctx.send = [x.hostname + ':' + (x.port || 443)];
         var svrSoc = net.connect(x.port || 443, x.hostname, function onSvrConn() {
           cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
-          if (cliHead && cliHead.length) svrSoc.write(cliHead);
-          cliSoc.pipe(svrSoc);
+//          if (cliHead && cliHead.length) svrSoc.write(cliHead);
+//          cliSoc.pipe(svrSoc);
         });
+        if (cliHead && cliHead.length) svrSoc.write(cliHead);
+        cliSoc.pipe(svrSoc);
         svrSoc.pipe(cliSoc);
-        svrSoc.on('error', funcOnSocErr(ctx, 'svrSc3', cliReq.url));
-        svrSoc.on('end', function () {
-          --numConnections;
-          delete ctxConnections[ctx.socketId];
+        svrSoc.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'svrSc3', cliReq.url, err));
         });
-        cliReq.on('error', funcOnSocErr(ctx, 'cliRq3', cliReq.url));
-        cliSoc.on('error', funcOnSocErr(ctx, 'cliSc3', cliReq.url));
+        svrSoc.on('end', function () {
+          deleteCtx(ctx)
+        });
+        cliReq.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'cliRq3', cliReq.url, err));
+        });
+        cliSoc.on('error', function (err) {
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'cliSc3', cliReq.url, err));
+        });
       } // else PROXY_HOST
 
       cliSoc.removeAllListeners('error');
       cliSoc.on('error', function onCliSocErr(err) {
-        logwarn(ctx, ctx.color, 'https', err, cliReq.url);
+        log.warn.apply(log, logArgs(ctx, ctx.color, 'https', cliReq.url, err));
       });
 
     });
@@ -271,6 +297,7 @@ var fwdHttp = this.fwdHttp = function () {
     log.info('\x1b[%sm%s\x1b[m config: \x1b[44m%s\x1b[m', PORT_COLOR, config.servicePort,
       [config.servicePort, config.proxyUrl]);
 
+    // server on 'connection'
     server.on('connection', function onConn(cliSoc) {
       // http Agent エージェント
       cliSoc.$agent = new http.Agent({keepAlive: true});
@@ -280,12 +307,6 @@ var fwdHttp = this.fwdHttp = function () {
         log.warn('agent err', err);
       });
     });
-
-    function funcOnSocErr(ctx, msg, url) {
-      return function onSocErr(err) {
-        logwarn(ctx, ctx.color, msg, err, url);
-      };
-    }
 
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
@@ -299,7 +320,7 @@ var fwdHttp = this.fwdHttp = function () {
               if (i === 0 ||
                   low.startsWith('user-agent:') ||
                   low.startsWith('server:')) {
-                logtrace(ctx, color, msg, str.substr(0, 90));
+                log.trace.apply(log, logArgs(ctx, color, msg, str.substr(0, 90)));
                 if (i === 0) ctx[msg] = [];
                 ctx[msg].push(str);
               }
@@ -321,7 +342,7 @@ var fwdHttp = this.fwdHttp = function () {
                 if (i === 0 ||
                     low.startsWith('user-agent:') ||
                     low.startsWith('server:')) {
-                  logtrace(ctx, color, msg, str.substr(0, 90));
+                  log.trace.apply(log, logArgs(ctx, color, msg, str.substr(0, 90)));
                   if (i === 0) ctx[msg] = [];
                   ctx[msg].push(str);
                 }
@@ -333,34 +354,25 @@ var fwdHttp = this.fwdHttp = function () {
           buff = null;
         }
       } catch (err) {
-        logwarn(ctx, color, msg, err, buff ? 'write' : 'read');
+        log.warn.apply(log, logArgs(ctx, color, msg, err, buff ? 'write' : 'read'));
       }
       writer.end();
     }
 
-    function logdebug(ctx, color, msg1, msg2) {
-     log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
-    }
-
-    function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err %s %s', 
+    // logArgs(ctx, color, msg1, err, msg2)
+    function logArgs(ctx, color, msg1, err, msg2) {
+      return ['\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s %s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
-        seconds(ctx.startTime), rpad(msg1, 5), err,
-        msg2 ? ' ' + msg2 : '');
+        seconds(ctx.startTime), rpad(msg1, 6), err,
+        msg2 ? msg2 : ''];
     }
 
-    function loginfo(ctx, color, msg1, msg2) {
-     log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
-    }
-
-    function logtrace(ctx, color, msg1, msg2) {
-     log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
+    // deleteCtx(ctx)
+    function deleteCtx(ctx) {
+      if (ctxConnections[ctx.socketId]) {
+        --numConnections;
+        delete ctxConnections[ctx.socketId];
+      }
     }
 
   }

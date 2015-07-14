@@ -41,7 +41,7 @@ var fwd = this.fwd = function () {
         ctxConnections[socketId] = ctx;
         try {
           ctx.status = 'ok';
-          logdebug(ctx, ctx.color + ';30;5', '++++', 'connected!');
+          log.debug.apply(log, logArgs(ctx, ctx.color + ';30;5', '++++', 'connected!'));
           var svrSoc = net.connect(PROXY_PORT, PROXY_HOST); // 'connect' event ignored
           //svrSoc.on('error', function (err) { log.fatal('fwd svrSoc.on error(0):', err); });
           //cliSoc.on('error', function (err) { log.fatal('fwd cliSoc.on error(0):', err); });
@@ -49,11 +49,11 @@ var fwd = this.fwd = function () {
                  soc2soc(ctx, cliSoc, svrSoc, 'send', ctx.color + ';30;5')];
         } catch (err) {
           ctx.status = 'ng';
-          logwarn(ctx, ctx.color, 'c<>s', err);
+          log.warn.apply(log, logArgs(ctx, ctx.color, 'c<>s', err));
         }
         --numConnections;
         delete ctxConnections[ctx.socketId];
-        logdebug(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx.send[0] + '\x1b[m');
+        log.debug.apply(log, logArgs(ctx, ctx.color, '----', 'disconnect \x1b[90m' + ctx.send[0] + '\x1b[m'));
         cliSoc.end(); svrSoc.end();
       }); // aa
     }); // net create server and on 'connection'
@@ -69,7 +69,7 @@ var fwd = this.fwd = function () {
             var ctx = ctxConnections[i];
             var reqStr = '';
             if (ctx.send && ctx.send[0]) reqStr = ctx.send[0];
-            loginfo(ctx, ctx.color, '====', [ctx.status, seconds(ctx.updateTime), reqStr].join(' '));
+            log.info.apply(log, logArgs(ctx, ctx.color, '====', [ctx.status, seconds(ctx.updateTime), reqStr].join(' ')));
             ++count;
           }
           if (count === 0)
@@ -87,15 +87,12 @@ var fwd = this.fwd = function () {
 
     // server on error
     server.on('error', function (err) {
-      log.warn('fwdHttp server on error:', err);
+      log.warn('\x1b[%sm%s\x1b[m fwdHttp server on error:', PORT_COLOR, config.servicePort, err);
     });
 
     // thread: reader -> writer
     function * soc2soc(ctx, reader, writer, msg, color) {
       var chan = aa().stream(reader), buff = null, count = 0;
-      //reader.on('error', function (err) {
-      //  logwarn(ctx, color, msg, err, buff ? 'write(1)' : 'read(1)');
-      //});
       try {
         while(buff = yield chan) {
           ctx.updateTime = Date.now();
@@ -105,7 +102,7 @@ var fwd = this.fwd = function () {
               if (i === 0 ||
                   low.startsWith('user-agent:') ||
                   low.startsWith('server:')) {
-                logtrace(ctx, color, msg, str.substr(0, 90));
+                log.trace.apply(log, logArgs(ctx, color, msg, str.substr(0, 90)));
                 if (i === 0) ctx[msg] = [];
                 ctx[msg].push(str);
               }
@@ -127,7 +124,7 @@ var fwd = this.fwd = function () {
                 if (i === 0 ||
                     low.startsWith('user-agent:') ||
                     low.startsWith('server:')) {
-                  logtrace(ctx, color, msg, str.substr(0, 90));
+                  log.trace.apply(log, logArgs(ctx, color, msg, str.substr(0, 90)));
                   if (i === 0) ctx[msg] = [];
                   ctx[msg].push(str);
                 }
@@ -139,34 +136,16 @@ var fwd = this.fwd = function () {
           buff = null;
         }
       } catch (err) {
-        logwarn(ctx, color, msg, err, buff ? 'write' : 'read');
+        log.warn.apply(log, logArgs(ctx, color, msg, err, buff ? 'write' : 'read'));
       }
       writer.end();
     }
 
-    function logdebug(ctx, color, msg1, msg2) {
-     log.debug('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
-    }
-
-    function logwarn(ctx, color, msg1, err, msg2) {
-      log.warn('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s err %s %s', 
+    function logArgs(ctx, color, msg1, err, msg2) {
+      return ['\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s %s', 
         PORT_COLOR, config.servicePort, ctx.color, zz(numConnections), zzz(ctx.socketId),
-        seconds(ctx.startTime), rpad(msg1, 5), err,
-        msg2 ? ' ' + msg2 : '');
-    }
-
-    function loginfo(ctx, color, msg1, msg2) {
-     log.info('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
-    }
-
-    function logtrace(ctx, color, msg1, msg2) {
-     log.trace('\x1b[%sm%s\x1b[m \x1b[%sm%s#%s %s\x1b[m %s %s',
-       PORT_COLOR, config.servicePort, color, zz(numConnections), zzz(ctx.socketId),
-       seconds(ctx.startTime), rpad(msg1, 5), msg2);
+        seconds(ctx.startTime), rpad(msg1, 6), err,
+        msg2 ? msg2 : ''];
     }
 
   }
