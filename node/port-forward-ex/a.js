@@ -213,7 +213,7 @@
       soc1.$agent = new http.Agent({keepAlive: true})
       log.trace.apply(log, logs({socketId:'----'}, 'soc1', 'connection'));
       soc1.on('error', function (err) {
-        log.warn.apply(log, logs({socketId:'----'}, 'soc1', 'connection socket err', err));
+        log.warn.apply(log, logs({socketId:'----'}, 'soc1', 'err', err, 'connection socket err'));
       });
     });
 
@@ -286,7 +286,7 @@
     //======================================================================
     // server on 'clientError'
     server.on('clientError', function clientError(err, soc1) {
-      log.warn.apply(log, logs({socketId:'----'}, 'srvr', 'clientError', err));
+      log.warn.apply(log, logs({socketId:'----'}, 'srvr', 'err', err, 'clientError'));
     });
 
     //======================================================================
