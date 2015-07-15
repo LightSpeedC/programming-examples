@@ -252,7 +252,7 @@
       var hostport = req1.url.split(':'), host = hostport[0], port = hostport[1] || 443;
 
       var soc2 = net.connect(port, host, function connect() {
-        log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
+        log.debug.apply(log, logs(ctx, 'soc2', 'connected'));
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
