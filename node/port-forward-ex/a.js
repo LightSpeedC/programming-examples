@@ -315,10 +315,10 @@
   }
 
   startHttpForward(9990);
-  startHttpForward(9999);
-  startHttpForward(8888);
-  //startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
-  //startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
+  //startHttpForward(9999);
+  //startHttpForward(8888);
+  startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
+  startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
   startHttpForward(9998);
 
 })();
