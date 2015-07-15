@@ -240,8 +240,8 @@
   } // startFwdHttp
 
   startHttpForward(9990);
-  startPortForward(9999, {proxyUrl: 'http://localhost:9990'});
-  startPortForward(8888, {proxyUrl: 'http://localhost:9990'});
+  startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
+  startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
   startHttpForward(9998);
 
 })();
