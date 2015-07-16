@@ -4,6 +4,7 @@
   var http = require('http');
   var net = require('net');
   var url = require('url');
+  var ControlC = require('control-c');
 
   var logFile = 'log/a-%s.log';
   var logLevel = 'debug';
@@ -13,6 +14,18 @@
   var numConnections = 0;
   var ctxConnections = {};
   var socketIdSeq = parseInt('1000', 36);
+
+  //======================================================================
+  ControlC(
+    function () {
+      for (var i in ctxConnections)
+        log.info.apply(log, logs(ctxConnections[i], '===>', ctxConnections[i].targetInfo));
+    },
+    function () { log.info.apply(log, logs({socketId:'----'}, 'bbbb')); }
+  );
+
+  //======================================================================
+  function logs(ctx) { return logArgs(ctx, 'ctrl', ctx.servicePort, arguments); }
 
   //======================================================================
   function Context() {
@@ -45,18 +58,20 @@
     // net create server. server on 'connetion'
     var server = net.createServer(function connetion(soc1) {
       var ctx = new Context();
+      ctx.targetInfo = x.hostname + ':' + x.port;
+      ctx.servicePort = servicePort;
 
-      log.debug.apply(log, logs(ctx, 'soc1', 'connected'));
+      log.trace.apply(log, logs(ctx, 'soc1', 'connected'));
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var num = 2;
       soc1.on('error', function portsoc1err(err) { // client disconnect!?
         log.warn.apply(log, logs(ctx, 'soc1', 'err', err));
       });
       soc1.on('end', function portsoc1end() {
-        log.debug.apply(log, logs(ctx, 'soc1', 'end', --num));
+        log.trace.apply(log, logs(ctx, 'soc1', 'end', --num));
         if (num === 0) ctx.remove();
       });
 
@@ -71,7 +86,7 @@
         log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
       });
       soc2.on('end', function portsoc2end() {
-        log.debug.apply(log, logs(ctx, 'soc2', 'end', --num));
+        log.trace.apply(log, logs(ctx, 'soc2', 'end', --num));
         if (num === 0) ctx.remove();
       });
       soc2.pipe(soc1);
@@ -106,11 +121,14 @@
     // http create server. server on 'request'
     var server = http.createServer(function request(req1, res1) {
       var ctx = new Context();
+      var x = url.parse(req1.url);
+      ctx.targetInfo = x.hostname + ':' + (x.port || 80);
+      ctx.servicePort = servicePort;
 
       var soc1 = req1.connection;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpsoc1err(err) {
@@ -122,7 +140,6 @@
       soc1.on('error', httpsoc1err);
       soc1.$errorHandlers.push(httpsoc1err);
 
-      var x = url.parse(req1.url);
       log.trace.apply(log, logs(ctx, 'req1', 'conn', req1.method, req1.url));
 
       var num = 3;
@@ -175,7 +192,7 @@
 
         var soc2 = req2.connection;
         if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
-        else log.warn.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
+        else log.trace.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
         var handler;
         function httpsoc2err(err) {
@@ -233,9 +250,11 @@
       function logs(ctx) { return logArgs(ctx, 'htps', servicePort, arguments); }
 
       var ctx = new Context();
+      ctx.targetInfo = req1.url;
+      ctx.servicePort = servicePort;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpssoc1err(err) { // client disconnect!?
@@ -260,7 +279,7 @@
       var hostport = req1.url.split(':'), host = hostport[0], port = hostport[1] || 443;
 
       var soc2 = net.connect(port, host, function connect() {
-        log.debug.apply(log, logs(ctx, 'soc2', 'connected'));
+        log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
@@ -316,8 +335,11 @@
 
   //======================================================================
   function logArgs(ctx, box, servicePort, args) {
-    servicePort = '\x1b[' + (41 + (servicePort % 6)) + 'm' + servicePort + '\x1b[m';
-    return ['%s %s %s', servicePort, toStr36(ctx.socketId), box, numConnections].concat([].slice.call(args, 1));
+    return ['%s %s %s', toColor(servicePort), toStr36(ctx.socketId), box, numConnections].concat([].slice.call(args, 1));
+  }
+
+  function toColor(x) {
+    return typeof x === 'number'? x = '\x1b[' + (41 + (x % 6)) + 'm' + x + '\x1b[m' : x;
   }
 
   function toStr36(x) {
