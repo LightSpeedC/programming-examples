@@ -49,7 +49,7 @@
       log.debug.apply(log, logs(ctx, 'soc1', 'connected'));
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', soc1.$socketId));
+      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var num = 2;
       soc1.on('error', function portsoc1err(err) { // client disconnect!?
@@ -65,7 +65,7 @@
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketIdSeq;
-      else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', soc2.$socketId));
+      else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
       soc2.on('error', function portsoc2err(err) { // can not connect target!?
         log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
@@ -110,7 +110,7 @@
       var soc1 = req1.connection;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', soc1.$socketId));
+      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpsoc1err(err) {
@@ -175,7 +175,7 @@
 
         var soc2 = req2.connection;
         if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
-        else log.warn.apply(log, logs(ctx, 'soc2', 'reused!', soc2.$socketId));
+        else log.warn.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
         var handler;
         function httpsoc2err(err) {
@@ -235,7 +235,7 @@
       var ctx = new Context();
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', soc1.$socketId));
+      else log.warn.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpssoc1err(err) { // client disconnect!?
@@ -264,7 +264,7 @@
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
-      else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', soc2.$socketId));
+      else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
       soc2.on('error', function (err) { // can not connect target!?
         log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
@@ -316,10 +316,12 @@
 
   //======================================================================
   function logArgs(ctx, box, servicePort, args) {
-    var sid = ctx.socketId;
-    if (typeof sid === 'number') sid = '\x1b[' + (41 + (sid % 6)) + 'm' + sid.toString(36) + '\x1b[m';
     servicePort = '\x1b[' + (41 + (servicePort % 6)) + 'm' + servicePort + '\x1b[m';
-    return ['%s %s %s', servicePort, sid, box, numConnections].concat([].slice.call(args, 1));
+    return ['%s %s %s', servicePort, toStr36(ctx.socketId), box, numConnections].concat([].slice.call(args, 1));
+  }
+
+  function toStr36(x) {
+    return typeof x === 'number'? x = '\x1b[' + (41 + (x % 6)) + 'm' + x.toString(36) + '\x1b[m' : x;
   }
 
   startHttpForward(9990);
