@@ -10,6 +10,7 @@
   var logLevel = 'debug';
   var log = require('log-manager').setWriter(new require('log-writer')(logFile)).getLogger();
   log.setLevel(logLevel);
+  var IS_TRACE = log.isTrace();
 
   var numConnections = 0;
   var ctxConnections = {};
@@ -61,23 +62,23 @@
       ctx.targetInfo = x.hostname + ':' + x.port;
       ctx.servicePort = servicePort;
 
-      log.trace.apply(log, logs(ctx, 'soc1', 'connected'));
+      IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'connected'));
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var num = 2;
       soc1.on('error', function portsoc1err(err) { // client disconnect!?
         log.warn.apply(log, logs(ctx, 'soc1', 'err', err));
       });
       soc1.on('end', function portsoc1end() {
-        log.trace.apply(log, logs(ctx, 'soc1', 'end', --num));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'end', --num));
         if (num === 0) ctx.remove();
         soc2.end();
       });
 
       var soc2 = net.connect(x.port, x.hostname, function connect() {
-        log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketIdSeq;
@@ -87,7 +88,7 @@
         log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
       });
       soc2.on('end', function portsoc2end() {
-        log.trace.apply(log, logs(ctx, 'soc2', 'end', --num));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'end', --num));
         if (num === 0) ctx.remove();
         soc1.end();
       });
@@ -136,7 +137,7 @@
       var soc1 = req1.connection;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpsoc1err(err) {
@@ -148,7 +149,7 @@
       soc1.on('error', httpsoc1err);
       soc1.$errorHandlers.push(httpsoc1err);
 
-      log.trace.apply(log, logs(ctx, 'req1', 'conn', req1.method, req1.url));
+      IS_TRACE && log.trace.apply(log, logs(ctx, 'req1', 'conn', req1.method, req1.url));
 
       var num = 3;
       res1.on('close', function close() {});
@@ -175,7 +176,7 @@
       if (req1.headers['proxy-connection'])
         headers['connection'] = req1.headers['proxy-connection'];
 
-      // log.trace.apply(log, logs(ctx, 'req2', req1.method, x.hostname, x.port || 80));
+      // IS_TRACE && log.trace.apply(log, logs(ctx, 'req2', req1.method, x.hostname, x.port || 80));
       var options = {
         method:req1.method,
         host:x.hostname,
@@ -185,7 +186,7 @@
         headers:headers};
 
       log.debug.apply(log, logs(ctx, 'req2', options.method, options.host, options.port));
-      // log.trace.apply(log, logs(ctx, 'head', headers));
+      // IS_TRACE && log.trace.apply(log, logs(ctx, 'head', headers));
 
       var req2 = http.request(options, function response(res2) {
         res1.writeHead(res2.statusCode, res2.statusMessage, res2.headers);
@@ -197,14 +198,14 @@
           log.warn.apply(log, logs(ctx, 'res2', 'err', err));
         });
         res2.on('end', function httpres2end(err) {
-          log.trace.apply(log, logs(ctx, 'res2', 'end', --num));
+          IS_TRACE && log.trace.apply(log, logs(ctx, 'res2', 'end', --num));
           if (num === 0) ctx.remove();
           res1.end();
         });
 
         var soc2 = req2.connection;
         if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
-        else log.trace.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
+        else IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
         var handler;
         function httpsoc2err(err) {
@@ -222,7 +223,7 @@
         log.warn.apply(log, logs(ctx, 'req1', 'err', err));
       });
       req1.on('end', function httpreq1end(err) {
-        log.trace.apply(log, logs(ctx, 'req1', 'end', --num));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'req1', 'end', --num));
         if (num === 0) ctx.remove();
         req2.end();
       });
@@ -235,7 +236,7 @@
         log.warn.apply(log, logs(ctx, 'req2', 'err', err));
       });
       req2.on('end', function httpreq2end(err) {
-        log.trace.apply(log, logs(ctx, 'req2', 'end', --num));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'req2', 'end', --num));
         if (num === 0) ctx.remove();
         req1.end();
       });
@@ -244,7 +245,7 @@
     //======================================================================
     // server on 'connection' / socket
     server.on('connection', function connection(soc1) {
-      log.trace.apply(log, logs({socketId:'----'}, 'soc1', 'connection'));
+      IS_TRACE && log.trace.apply(log, logs({socketId:'----'}, 'soc1', 'connection'));
       if (soc1.$agent)
         log.error.apply(log, logs({socketId:'----'}, 'soc1', 'err', new Error(), 'connection socket err'));
       soc1.$agent = new http.Agent({keepAlive: true});
@@ -271,7 +272,7 @@
       ctx.servicePort = servicePort;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
-      else log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+      else IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
 
       var handler;
       function httpssoc1err(err) { // client disconnect!?
@@ -284,7 +285,7 @@
       soc1.$errorHandlers.push(httpssoc1err);
 
       function httpssoc1end() {
-        log.trace.apply(log, logs(ctx, 'soc1', 'end'));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'end'));
         soc2.end();
       }
       if (!soc1.$endHandlers) soc1.$endHandlers = [];
@@ -299,7 +300,7 @@
       var hostport = req1.url.split(':'), host = hostport[0], port = hostport[1] || 443;
 
       var soc2 = net.connect(port, host, function connect() {
-        log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
         soc1.write('HTTP/1.0 200 Connection established\r\n\r\n');
       });
 
@@ -310,7 +311,7 @@
         log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
       });
       soc2.on('end', function () {
-        log.trace.apply(log, logs(ctx, 'soc2', 'end'));
+        IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'end'));
         ctx.remove();
         soc1.end();
       });
