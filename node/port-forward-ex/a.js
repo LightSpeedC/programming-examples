@@ -91,8 +91,14 @@
         if (num === 0) ctx.remove();
         soc1.end();
       });
-      soc1.on('data', function (chunk) { soc2.write(chunk); });
-      soc2.on('data', function (chunk) { soc1.write(chunk); });
+      soc1.on('data', function (chunk) {
+        try { soc2.write(chunk); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write')); }
+      });
+      soc2.on('data', function (chunk) {
+        try { soc1.write(chunk); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write')); }
+      });
     });
 
     //======================================================================
@@ -183,8 +189,10 @@
 
       var req2 = http.request(options, function response(res2) {
         res1.writeHead(res2.statusCode, res2.statusMessage, res2.headers);
-        //res2.pipe(res1);
-        res2.on('data', function (chunk) { res1.write(chunk); });
+        res2.on('data', function (chunk) {
+          try { res1.write(chunk); }
+          catch (err) { log.warn.apply(log, logs(ctx, 'res1', 'err', err, 'write')); }
+        });
         res2.on('error', function httpres2err(err) {
           log.warn.apply(log, logs(ctx, 'res2', 'err', err));
         });
@@ -218,7 +226,10 @@
         if (num === 0) ctx.remove();
         req2.end();
       });
-      req1.on('data', function (chunk) { req2.write(chunk); });
+      req1.on('data', function (chunk) {
+        try { req2.write(chunk); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'req2', 'err', err, 'write')); }
+      });
 
       req2.on('error', function httpreq2err(err) { // can not connect target!?
         log.warn.apply(log, logs(ctx, 'req2', 'err', err));
@@ -226,6 +237,7 @@
       req2.on('end', function httpreq2end(err) {
         log.trace.apply(log, logs(ctx, 'req2', 'end', --num));
         if (num === 0) ctx.remove();
+        req1.end();
       });
     });
 
@@ -273,7 +285,7 @@
 
       function httpssoc1end() {
         log.trace.apply(log, logs(ctx, 'soc1', 'end'));
-        soc1.end();
+        soc2.end();
       }
       if (!soc1.$endHandlers) soc1.$endHandlers = [];
       while (handler = soc1.$endHandlers.shift()) {
@@ -304,8 +316,14 @@
       });
 
       if (head1 && head1.length) soc2.write(head1);
-      soc1.on('data', function (chunk) { soc2.write(chunk); });
-      soc2.on('data', function (chunk) { soc1.write(chunk); });
+      soc1.on('data', function (chunk) {
+        try { soc2.write(chunk); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write')); }
+      });
+      soc2.on('data', function (chunk) {
+        try { soc1.write(chunk); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write')); }
+      });
     });
 
     //======================================================================
