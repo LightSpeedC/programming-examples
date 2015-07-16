@@ -210,11 +210,19 @@
     //======================================================================
     // server on 'connection' / socket
     server.on('connection', function connection(soc1) {
-      soc1.$agent = new http.Agent({keepAlive: true})
       log.trace.apply(log, logs({socketId:'----'}, 'soc1', 'connection'));
-      soc1.on('error', function (err) {
+      if (soc1.$agent)
+        log.error.apply(log, logs({socketId:'----'}, 'soc1', 'err', new Error(), 'connection socket err'));
+      soc1.$agent = new http.Agent({keepAlive: true});
+
+      function connsoc1err(err) {
         log.warn.apply(log, logs({socketId:'----'}, 'soc1', 'err', err, 'connection socket err'));
-      });
+      }
+      if (soc1.$errorHandlers)
+        log.error.apply(log, logs({socketId:'----'}, 'soc1', 'err', new Error(), 'connection socket err'));
+      soc1.$errorHandlers = [];
+      soc1.$errorHandlers.push(connsoc1err);
+      soc1.on('error', connsoc1err);
     });
 
     //======================================================================
