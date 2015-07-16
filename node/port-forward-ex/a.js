@@ -69,7 +69,7 @@
 
       var num = 2;
       soc1.on('error', function portsoc1err(err) { // client disconnect!?
-        log.warn.apply(log, logs(ctx, 'soc1', 'err', err));
+        log.warn.apply(log, logs(ctx, 'soc1', 'err', err, ctx.targetInfo));
       });
       soc1.on('end', function portsoc1end() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'end', --num));
@@ -85,7 +85,7 @@
       else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
       soc2.on('error', function portsoc2err(err) { // can not connect target!?
-        log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
+        log.warn.apply(log, logs(ctx, 'soc2', 'err', err, ctx.targetInfo));
       });
       soc2.on('end', function portsoc2end() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'end', --num));
@@ -94,11 +94,11 @@
       });
       soc1.on('data', function (chunk) {
         try { soc2.write(chunk); }
-        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write')); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write', ctx.targetInfo)); }
       });
       soc2.on('data', function (chunk) {
         try { soc1.write(chunk); }
-        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write')); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write', ctx.targetInfo)); }
       });
     });
 
@@ -141,7 +141,7 @@
 
       var handler;
       function httpsoc1err(err) {
-        log.warn.apply(log, logs(ctx, 'soc1', 'err', err));
+        log.warn.apply(log, logs(ctx, 'soc1', 'err', err, ctx.targetInfo));
       }
       if (!soc1.$errorHandlers) soc1.$errorHandlers = [];
       while (handler = soc1.$errorHandlers.shift())
@@ -192,10 +192,10 @@
         res1.writeHead(res2.statusCode, res2.statusMessage, res2.headers);
         res2.on('data', function (chunk) {
           try { res1.write(chunk); }
-          catch (err) { log.warn.apply(log, logs(ctx, 'res1', 'err', err, 'write')); }
+          catch (err) { log.warn.apply(log, logs(ctx, 'res1', 'err', err, 'write', ctx.targetInfo)); }
         });
         res2.on('error', function httpres2err(err) {
-          log.warn.apply(log, logs(ctx, 'res2', 'err', err));
+          log.warn.apply(log, logs(ctx, 'res2', 'err', err, ctx.targetInfo));
         });
         res2.on('end', function httpres2end(err) {
           IS_TRACE && log.trace.apply(log, logs(ctx, 'res2', 'end', --num));
@@ -209,7 +209,7 @@
 
         var handler;
         function httpsoc2err(err) {
-          log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
+          log.warn.apply(log, logs(ctx, 'soc2', 'err', err, ctx.targetInfo));
         }
         if (!soc2.$errorHandlers) soc2.$errorHandlers = [];
         while (handler = soc2.$errorHandlers.shift())
@@ -220,22 +220,22 @@
       });
 
       req1.on('error', function httpreq1err(err) {
-        log.warn.apply(log, logs(ctx, 'req1', 'err', err));
+        log.warn.apply(log, logs(ctx, 'req1', 'err', err, ctx.targetInfo));
       });
-      req1.on('end', function httpreq1end(err) {
+      req1.on('end', function httpreq1end() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'req1', 'end', --num));
         if (num === 0) ctx.remove();
         req2.end();
       });
       req1.on('data', function (chunk) {
         try { req2.write(chunk); }
-        catch (err) { log.warn.apply(log, logs(ctx, 'req2', 'err', err, 'write')); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'req2', 'err', err, 'write', ctx.targetInfo)); }
       });
 
       req2.on('error', function httpreq2err(err) { // can not connect target!?
-        log.warn.apply(log, logs(ctx, 'req2', 'err', err));
+        log.warn.apply(log, logs(ctx, 'req2', 'err', err, ctx.targetInfo));
       });
-      req2.on('end', function httpreq2end(err) {
+      req2.on('end', function httpreq2end() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'req2', 'end', --num));
         if (num === 0) ctx.remove();
         req1.end();
@@ -276,7 +276,7 @@
 
       var handler;
       function httpssoc1err(err) { // client disconnect!?
-        log.warn.apply(log, logs(ctx, 'soc1', 'err', err));
+        log.warn.apply(log, logs(ctx, 'soc1', 'err', err, ctx.targetInfo));
       }
       if (!soc1.$errorHandlers) soc1.$errorHandlers = [];
       while (handler = soc1.$errorHandlers.shift())
@@ -308,7 +308,7 @@
       else log.fatal.apply(log, logs(ctx, 'soc2', 'reused!', toStr36(soc2.$socketId)));
 
       soc2.on('error', function (err) { // can not connect target!?
-        log.warn.apply(log, logs(ctx, 'soc2', 'err', err));
+        log.warn.apply(log, logs(ctx, 'soc2', 'err', err, ctx.targetInfo));
       });
       soc2.on('end', function () {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'end'));
@@ -319,11 +319,11 @@
       if (head1 && head1.length) soc2.write(head1);
       soc1.on('data', function (chunk) {
         try { soc2.write(chunk); }
-        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write')); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write', ctx.targetInfo)); }
       });
       soc2.on('data', function (chunk) {
         try { soc1.write(chunk); }
-        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write')); }
+        catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write', ctx.targetInfo)); }
       });
     });
 
