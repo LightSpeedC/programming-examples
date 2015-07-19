@@ -1,0 +1,25 @@
+﻿// http://kb.seeck.jp/archives/4639
+// http://www.server-world.info/query?os=CentOS_6&p=initial_conf&f=3
+# vi /etc/sysconfig/network-scripts/ifcfg-eth0
+ONBOOT="yes"
+
+# /etc/rc.d/init.d/network start
+
+# yum -y update
+
+# yum -y install perl
+(v7の時)# yum -y net-tools
+# yum -y gcc
+# yum -y install wget
+# yum -y install git
+(vmware-tools)
+
+$ git clone git://github.com/creationix/nvm.git ~/.nvm
+$ source ~/.nvm/nvm.sh
+$ nvm ls
+$ nvm ls-remote
+$ nvm install 2.4.0
+
+# yum -y install postgresql   
+(9.2.13?)#
+
