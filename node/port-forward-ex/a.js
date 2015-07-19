@@ -19,10 +19,13 @@
   //======================================================================
   ControlC(
     function () {
+      var n = 0;
       for (var i in ctxConnections)
-        log.info.apply(log, logs(ctxConnections[i], '===>', ctxConnections[i].targetInfo));
+        log.info.apply(log, logs(ctxConnections[i], '===>', ++n, ctxConnections[i].targetInfo));
+      if (n === 0)
+        log.info.apply(log, logs({socketId:'----', servicePort:'----'}, '===>', 0, 'no connections'));
     },
-    function () { log.info.apply(log, logs({socketId:'----'}, 'bbbb')); }
+    function () { log.info.apply(log, logs({socketId:'----', servicePort:'----'}, '====')); }
   );
 
   //======================================================================
