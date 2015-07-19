@@ -1,0 +1,35 @@
+index.html
+
+<script src="next-tick.js"></script>
+<script src="mini-promise.js"></script>
+<script src="mini-xhr.js"></script>
+
+<script>
+console.log('ok1?');
+
+nextTick(function () { console.log('OK: nextTick'); });
+
+new MiniPromise(function (res, rej) { res(123); })
+.then(function (val) { console.log('OK:', val); },
+      function (err) { console.log('NG:', err); });
+
+new MiniXHR().get('echo')
+.then(function (data) { console.log('echo: ', data); });
+
+new MiniXHR().post('echo', 'str1')
+.then(function (data) { console.log('echo: str1: ', data); });
+
+new MiniXHR().post('echo', {x:1,y:2})
+.then(function (data) { console.log('echo: {x:1,y:2}: ', JSON.parse(data)); });
+new MiniXHR().post('echo', [1,2,3])
+.then(function (data) { console.log('echo: [1,2,3]: ', JSON.parse(data)); });
+new MiniXHR().post('echo', 123)
+.then(function (data) { console.log('echo: 123: ', JSON.parse(data)); });
+new MiniXHR().post('echo', true)
+.then(function (data) { console.log('echo: true: ', JSON.parse(data)); });
+new MiniXHR().post('echo', 'str')
+.then(function (data) { console.log('echo: "str": ', JSON.parse(data)); });
+
+console.log('ok2?');
+</script>
+
