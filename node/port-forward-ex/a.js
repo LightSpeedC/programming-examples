@@ -133,6 +133,18 @@
     //======================================================================
     function logs(ctx) { return logArgs(ctx, 'http', servicePort, arguments); }
 
+    var filters = [];
+    if (configOptions)
+      for (var key in configOptions.filters) {
+        var rex = new RegExp(key.replace(/,/g, ';').split(';').map(function (host) {
+          return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
+        }).join('|'));
+        //log.info([key, rex, configOptions.filters[key]]);
+        filters.push({rex:rex,
+          host:configOptions.filters[key] ? url.parse(configOptions.filters[key]).hostname           : null,
+          port:configOptions.filters[key] ? Number(url.parse(configOptions.filters[key]).port) || 80 : null})
+      }
+
     //======================================================================
     // http create server. server on 'request'
     var server = http.createServer(function request(req1, res1) {
@@ -400,9 +412,14 @@
     //'\\d+.\\d+.\\d+.\\d+': null,
     '*': 'http://localhost:9998'};
 
+  var localFilters = {
+    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  null,
+    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          null,
+    '*': 'http://localhost:9998'};
+
   startHttpForward(9990);
-  //startHttpForward(9999);
-  //startHttpForward(8888);
+  //startHttpForward(9999, {filters: filters});
+  //startHttpForward(8888, {filters: filters});
   startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
   startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
   startHttpForward(9998);
