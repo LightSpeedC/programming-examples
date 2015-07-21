@@ -51,7 +51,7 @@
     log.info.apply(log, logs({socketId:'----'}, '@@@@', 'start opt', servicePort, configOptions));
 
     var proxyUrl = configOptions.proxyUrl;
-    if (proxy && proxyUrl.indexOf('://') < 0) proxyUrl = 'http://' + proxyUrl;
+    if (proxyUrl && proxyUrl.indexOf('://') < 0) proxyUrl = 'http://' + proxyUrl;
     if (proxyUrl)
       var x = url.parse(proxyUrl);
     else
