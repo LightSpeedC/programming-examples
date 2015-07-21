@@ -27,8 +27,12 @@ $ nvm ls-remote
 $ nvm install 2.4.0
 
 
-# wget http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-# rpm -ivh pgdg-centos94-9.4-1.noarch.rpm
+xx# wget http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+xx# rpm -ivh pgdg-centos94-9.4-1.noarch.rpm
+xx(9.2.13?)#XXXX# yum -y install postgresql
 
-(9.2.13?)#XXXX# yum -y install postgresql   
-
+# rpm -ivh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
+# yum -y install postgresql94-server postgresql94-devel
+# service postgresql-9.4 initdb
+# service postgresql-9.4 start
+# chkconfig postgresql-9.4 on
