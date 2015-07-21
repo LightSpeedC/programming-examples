@@ -393,6 +393,13 @@
     return typeof x === 'number'? x = '\x1b[' + (41 + (x % 6)) + 'm' + x.toString(36) + '\x1b[m' : x;
   }
 
+  var filters = {
+    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  'http://localhost:9990',
+    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          'http://localhost:9990',
+    '172.16.\\d+.\\d+;172.17.\\d+.\\d+;rssv*;*.group': 'http://localhost:9998',
+    //'\\d+.\\d+.\\d+.\\d+': null,
+    '*': 'http://localhost:9998'};
+
   startHttpForward(9990);
   //startHttpForward(9999);
   //startHttpForward(8888);
