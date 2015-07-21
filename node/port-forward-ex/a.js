@@ -50,8 +50,10 @@
   function startPortForward(servicePort, configOptions) {
     log.info.apply(log, logs({socketId:'----'}, '@@@@', 'start opt', servicePort, configOptions));
 
-    if (configOptions.proxyUrl)
-      var x = url.parse(configOptions.proxyUrl);
+    var proxyUrl = configOptions.proxyUrl;
+    if (proxy && proxyUrl.indexOf('://') < 0) proxyUrl = 'http://' + proxyUrl;
+    if (proxyUrl)
+      var x = url.parse(proxyUrl);
     else
       throw new Error('configOptions.proxyUrl must be specified');
 
