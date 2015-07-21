@@ -9,7 +9,7 @@ ONBOOT="yes"
 
 
 (v7の時)# yum -y net-tools
-# yum -y install perl gcc wget git
+# yum -y install perl gcc wget git svn
 
 (vmware-tools)
 # mount /dev/cdrom /mnt
@@ -32,7 +32,20 @@ xx# rpm -ivh pgdg-centos94-9.4-1.noarch.rpm
 xx(9.2.13?)#XXXX# yum -y install postgresql
 
 # rpm -ivh http://yum.postgresql.org/9.4/redhat/rhel-7-x86_64/pgdg-centos94-9.4-1.noarch.rpm
-# yum -y install postgresql94-server postgresql94-devel
+# yum -y install postgresql94-server postgresql94-devel postgresql94-contrib
 # service postgresql-9.4 initdb
 # service postgresql-9.4 start
 # chkconfig postgresql-9.4 on
+
+# yum -y install pgxnclient
+# pgxn --version
+
+???# ln -s /usr/pgsql-9.4 /usr/local/pgsql
+# vi .bash_profile
+export PATH=/usr/pgsql-9.4/bin:$PATH
+export PATH=/usr/local/pgsql/bin:$PATH
+
+
+$ git clone git://github.com/plv8/plv8 plv8
+$ cd plv8
+$ make
