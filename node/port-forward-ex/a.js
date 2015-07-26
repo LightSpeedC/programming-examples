@@ -191,6 +191,7 @@
       // res1.end([data], [encoding = 'utf8'])
       // res1.addTrailers(headers)
 
+      // TODO req1.headers[] -> req1.rawHeaders[]
       var headers = {};
       for (var i in req1.headers) headers[i] = req1.headers[i];
       delete headers['proxy-connection'];
@@ -205,6 +206,15 @@
         agent:soc1.$agent,
         path:req1.url,
         headers:headers};
+
+      for (var i = 0, n = filters.length; i < n; ++i) {
+        if (x.hostname.match(filters[i].rex)) {
+          log.info.apply(log, logs(ctx, 'req2', x.hostname + ' match', filters[i]));
+          if (filters[i].host) options.host = filters[i].host;
+          if (filters[i].port) options.port = filters[i].port;
+          break;
+        }
+      }
 
       log.debug.apply(log, logs(ctx, 'req2', options.method, options.host, options.port));
       // IS_TRACE && log.trace.apply(log, logs(ctx, 'head', headers));
@@ -417,6 +427,7 @@
   var localFilters = {
     '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  null,
     'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          null,
+    'rssv066*':                                        null,
     '*': 'http://localhost:9998'};
 
   startHttpForward(9990);
