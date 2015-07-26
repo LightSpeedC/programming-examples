@@ -418,23 +418,19 @@
   }
 
   var filters = {
-    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  'http://localhost:9990',
-    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          'http://localhost:9990',
+    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  null,
+    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          null,
+    'rssv066*':                                        null,
+    '172.17.66.\\d+;172.17.65.\\d+':                   null,
     '172.16.\\d+.\\d+;172.17.\\d+.\\d+;rssv*;*.group': 'http://localhost:9998',
     //'\\d+.\\d+.\\d+.\\d+': null,
     '*': 'http://localhost:9998'};
 
-  var localFilters = {
-    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  null,
-    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          null,
-    'rssv066*':                                        null,
-    '*': 'http://localhost:9998'};
-
   startHttpForward(9990);
-  //startHttpForward(9999, {filters: filters});
-  //startHttpForward(8888, {filters: filters});
-  startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
-  startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
+  startHttpForward(9999, {filters: filters});
+  startHttpForward(8888, {filters: filters});
+  //startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
+  //startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
   startHttpForward(9998);
 
 })();
