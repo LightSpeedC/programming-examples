@@ -142,6 +142,7 @@
           return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
         }).join('|'));
         //log.info([key, rex, config.filters[key]]);
+        log.info.apply(log, logs({socketId:'----'}, 'filt', config.filters[key], rex));
         filters.push({rex:rex,
           host:config.filters[key] ? url.parse(config.filters[key]).hostname           : null,
           port:config.filters[key] ? Number(url.parse(config.filters[key]).port) || 80 : null})
@@ -338,6 +339,17 @@
 
       log.debug.apply(log, logs(ctx, 'soc1', 'CONNECT', req1.url));
       var hostport = req1.url.split(':'), host = hostport[0], port = hostport[1] || 443;
+      var isConnect = true;
+
+      for (var i = 0, n = filters.length; i < n; ++i) {
+        if (host.match(filters[i].rex)) {
+          log.info.apply(log, logs(ctx, 'soc2', host + ' match', filters[i]));
+          //if (filters[i].host) host = filters[i].host;
+          //if (filters[i].port) port = filters[i].port;
+          isConnect = false;
+          break;
+        }
+      }
 
       var soc2 = net.connect(port, host, function connect() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
@@ -418,10 +430,10 @@
   }
 
   var filters = {
-    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  null,
-    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          null,
-    'rssv066*':                                        null,
-    '172.17.66.\\d+;172.17.65.\\d+':                   null,
+    '127.\\d+.\\d+.\\d+;192.168.\\d+.\\d+;localhost':  'http://localhost:9990',
+    'nx-*;t-*;x-*;rsb00*;b000*;kok*-*;*.dev':          'http://localhost:9990',
+    'rssv066*':                                        'http://localhost:9990',
+    '172.17.66.\\d+;172.17.65.\\d+':                   'http://localhost:9990',
     '172.16.\\d+.\\d+;172.17.\\d+.\\d+;rssv*;*.group': 'http://localhost:9998',
     //'\\d+.\\d+.\\d+.\\d+': null,
     '*': 'http://localhost:9998'};
