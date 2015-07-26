@@ -47,15 +47,15 @@
 
   //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // start port forward
-  function startPortForward(servicePort, configOptions) {
-    log.info.apply(log, logs({socketId:'----'}, '@@@@', 'start opt', servicePort, configOptions));
+  function startPortForward(servicePort, config) {
+    log.info.apply(log, logs({socketId:'----'}, '@@@@', 'start opt', servicePort, config));
 
-    var proxyUrl = configOptions.proxyUrl;
+    var proxyUrl = config.proxyUrl;
     if (proxyUrl && proxyUrl.indexOf('://') < 0) proxyUrl = 'http://' + proxyUrl;
     if (proxyUrl)
       var x = url.parse(proxyUrl);
     else
-      throw new Error('configOptions.proxyUrl must be specified');
+      throw new Error('config.proxyUrl must be specified');
 
     //======================================================================
     function logs(ctx) { return logArgs(ctx, 'port', servicePort, arguments); }
@@ -130,21 +130,21 @@
 
   //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // start http forward
-  function startHttpForward(servicePort, configOptions) {
+  function startHttpForward(servicePort, config) {
 
     //======================================================================
     function logs(ctx) { return logArgs(ctx, 'http', servicePort, arguments); }
 
     var filters = [];
-    if (configOptions)
-      for (var key in configOptions.filters) {
+    if (config)
+      for (var key in config.filters) {
         var rex = new RegExp(key.replace(/,/g, ';').split(';').map(function (host) {
           return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
         }).join('|'));
-        //log.info([key, rex, configOptions.filters[key]]);
+        //log.info([key, rex, config.filters[key]]);
         filters.push({rex:rex,
-          host:configOptions.filters[key] ? url.parse(configOptions.filters[key]).hostname           : null,
-          port:configOptions.filters[key] ? Number(url.parse(configOptions.filters[key]).port) || 80 : null})
+          host:config.filters[key] ? url.parse(config.filters[key]).hostname           : null,
+          port:config.filters[key] ? Number(url.parse(config.filters[key]).port) || 80 : null})
       }
 
     //======================================================================
