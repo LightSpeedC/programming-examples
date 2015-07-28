@@ -1,4 +1,4 @@
 pushd %~dp0
-iojs a
+iojs a %*
 pause
 popd
