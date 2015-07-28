@@ -439,10 +439,14 @@
     '*': 'http://localhost:9998'};
 
   startHttpForward(9990);
-  startHttpForward(9999, {filters: filters});
-  startHttpForward(8888, {filters: filters});
-  //startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
-  //startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
+  if (process.argv[2] !== 'PORT') {
+    startHttpForward(9999, {filters: filters});
+    startHttpForward(8888, {filters: filters});
+  }
+  else {
+    startPortForward(9999, {proxyUrl: 'http://localhost:9998'});
+    startPortForward(8888, {proxyUrl: 'http://localhost:9998'});
+  }
   startHttpForward(9998);
 
 })();
