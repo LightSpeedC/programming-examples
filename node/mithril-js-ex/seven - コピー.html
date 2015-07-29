@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Don't break the chain</title>
+  </head>
+  <body>
+    <script src="/js/mithril.js"></script>
+    <script>
+    //app goes here
+
+//our app's namespace
+var chain = {};
+
+//create a helper utility that we can use in the view
+chain.seven = function(subject) {
+  var output = [];
+  for (var i = 0; i < 7; i++) output.push(subject(i));
+  return output;
+};
+
+//model goes here
+
+//controller goes here
+
+//view
+//chain.view = function(ctrl) {
+//  return m("table", chain.seven(function() {
+//    return m("tr", chain.seven(function() {
+//      return m("td", [
+//        m("input[type=checkbox]")
+//      ]);
+//    });
+//  });
+//};
+
+//chain.view = function(ctrl) {
+//  return m("table", chain.seven(function(y) {
+//    return m("tr", chain.seven(function(x) {
+//      return m("td", [
+//        m("input[type=checkbox]", chain.checks(ctrl, chain.indexAt(x, y)))
+//      ]);
+//    }));
+//  }));
+//};
+
+chain.view = function(ctrl) {
+  return m("table", chain.seven(function(y) {
+    return m("tr", chain.seven(function(x) {
+      var index = chain.indexAt(x, y)
+      return m("td", chain.highlights(index), [
+        m("input[type=checkbox]", chain.checks(ctrl, index))
+      ]);
+    }));
+  }));
+};
+
+chain.indexAt = function(x, y) {
+  return y * 7 + x;
+}
+
+chain.highlights = function(index) {
+  return {
+    style: {
+      background: chain.dateAt(index).getTime() == chain.today().getTime() ? "silver" : ""
+    }
+  };
+};
+
+//a list model API
+chain.save = function(list) {
+   localStorage["chain-app.list"] = JSON.stringify(list);
+};
+chain.load = function() {
+  return JSON.parse(localStorage["chain-app.list"] || "[]");
+};
+
+//a date model API
+chain.today = function() {
+  var now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+}
+chain.resetDate = function() {
+  return localStorage["chain-app.start-date"] = chain.today().getTime();
+}
+chain.startDate = function() {
+  return new Date(parseInt(localStorage["chain-app.start-date"] || chain.resetDate()));
+}
+chain.dateAt = function(index) {
+  var date = new Date(chain.startDate());
+  date.setDate(date.getDate() + index);
+  return date;
+}
+
+var today = chain.today() //today at midnight
+
+var startDate = chain.startDate(); //start date is today
+
+var isToday = chain.dateAt(3).getTime() === chain.today() //is three days from now the same as today? Should be false
+
+//reset
+var newStartDate = chain.resetDate(); //new start date is today
+
+
+chain.controller = function() {
+  var list = chain.load();
+
+  this.isChecked = function(index) {
+    return list[index]
+  };
+  this.check = function(index, status) {
+    if (chain.dateAt(index).getTime() <= chain.today().getTime()) {
+      list[index] = status;
+      chain.save(list);
+    }
+  };
+};
+
+chain.checks = function(ctrl, index) {
+    return {
+        onclick: function() {
+            ctrl.check(index, this.checked);
+        },
+        checked: ctrl.isChecked(index)
+    };
+}
+
+//render it
+//m.module(document.body, {controller: function() {}, view: chain.view});
+
+//call this at the end of the code to initialize the `chain` app
+m.module(document.body, chain);
+
+    </script>
+  </body>
+</html>

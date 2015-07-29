@@ -1,0 +1,55 @@
+<!doctype html>
+<title>Todo app</title>
+<script src="/js/mithril.min.js"></script>
+<div>--------------------------------</div>
+<div>pages example</div>
+<div id="example">loading...</div>
+<div>--------------------------------</div>
+<script>
+//app goes here
+
+//model
+var Page = {
+  //list: function () { return m.prop([{url: "url0", title: "title0"}]); }
+  list: function() {
+    return m.request({method: "GET", url: "pages.json", data: {x:1,y:2}});
+  }
+};
+
+var Demo = {
+  //controller
+  controller: function() {
+    var pages = Page.list();
+    var self = this;
+    return {
+      pages: pages,
+      rotate: function() {
+        pages().push(pages().shift());
+      },
+      loadPages2: function () {
+        Page.list = self.pages = pages = m.request({method: "GET", url: "pages2.json"});
+        m.redraw(true);
+      }
+    }
+  },
+
+  //view
+  view: function(ctrl) {
+    return m("div", [
+      ctrl.pages().map(function(page) {
+        return [m("a", {href: page.url}, page.title), m("br")];
+      }),
+      m("button", {onclick: ctrl.rotate}, "Rotate links"),
+      m("br"),
+      m("button", {onclick: ctrl.loadPages2}, "Load pages2")
+    ]);
+  }
+};
+
+
+//initialize
+m.mount(document.getElementById("example"), Demo);
+
+</script>
+
+end of index.html
