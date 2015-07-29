@@ -1,0 +1,8 @@
+m.startComputation();
+m.endComputation();
+
+m.redraw(true);
+
+m.prop();
+
+

@@ -1,0 +1,134 @@
+<!-- http://codezine.jp/article/detail/8815 -->
+<!DOCTYPE html>
+<html dir="ltr" prefix="fb: http://www.facebook.com/2008/fbml">
+<head>
+<meta charset="UTF-8">
+<script src="/js/mithril.js"></script>
+</head>
+<body>
+<div id="contents"></div>
+
+<script>
+
+/*
+ * Modelを定義
+ * ページ内の文言データを管理
+ */
+var PageModel = function() {
+
+    this.data = m.prop({});
+
+    this.fetch = function(){
+        var that = this;
+        m.request({method: "GET", url: "page.json"}).then(function(resp){
+            that.data(resp);
+        });
+        return this;
+    };
+
+    this.get = function(){
+        return this.data;
+    };
+};
+
+/*
+ * Modelを定義
+ * Todoのアイテムデータ管理
+ */
+var ItemModel = function() {
+
+    this.data = m.prop({});
+
+    this.get = function(){
+        return this.data;
+    };
+
+    this.update = function(data){
+        this.data(data);
+        return this;
+    };
+};
+
+/*
+ * Modelを定義
+ * Todoのリストデータを管理
+ */
+var ListModel = function() {
+
+    this.data = [];
+
+    this.get = function(){
+        return this.data;
+    };
+
+    this.add = function(item){
+        if(!item.text && item.text === ""){
+            return false;
+        }
+        this.get().push(item);
+    };
+};
+
+/*
+ * controller定義
+ */
+var myCtrl = function() {
+    var that = this;
+
+    //pageModel
+    var pageModel = new PageModel().fetch();
+    this.pageData = pageModel.get();
+
+    //listModel
+    var listModel = new ListModel();
+    this.listData = listModel.get();
+
+    //itemModel
+    var itemModel = new ItemModel();
+    this.itemData = itemModel.get();
+
+    //inputの"onchange"時に実行する関数
+    this.onChangeInput = function(value){
+        itemModel.update({ text: value });
+    };
+
+    //追加ボタンの"onclick"時に実行する関数
+    this.onSubmit = function(){
+        listModel.add(that.itemData());
+    };
+};
+
+/*
+ * viewを定義
+ */
+var myView = function(ctrl) {
+    return [
+        m("h1", ctrl.pageData().title),
+        m("p", ctrl.pageData().description),
+        m("br"),
+        m("hr"),
+        m("h2", "Todo登録"),
+        m("div",[
+            m("input", {onchange: m.withAttr("value", ctrl.onChangeInput)}),
+            m("button", {onclick: m.withAttr("value", ctrl.onSubmit)}, "追加")
+        ]),
+        m("br"),
+        m("hr"),
+        m("h2", "Todo一覧"),
+        m('ul', [
+            ctrl.listData.map(function(item, index) {
+                return m("li", item.text);
+            })
+        ])
+    ];
+};
+
+//レンダリング開始
+m.mount(document.getElementById("contents"), {
+    controller: myCtrl,
+    view: myView
+});
+
+</script>
+</body>
+</html>

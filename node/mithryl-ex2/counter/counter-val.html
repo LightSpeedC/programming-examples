@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Mithril.js counter val</title>
+
+<!-- your local  -->
+<script src="/js/mithril.min.js"></script>
+
+<!-- cdnjs -->
+<!-- <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script> -->
+
+<!-- jsDelivr -->
+<!-- <script src="//cdn.jsdelivr.net/mithril/0.2.0/mithril.min.js"></script> -->
+
+<div id="app"></div>
+
+<script>
+
+m.mount(document.getElementById('app'), {
+  controller: function () {
+    var ctrl = this;
+    ctrl.counter = 0;
+    var timer = setInterval(function () {
+      ctrl.counter++;
+      m.redraw(true);
+
+      if (ctrl.counter >= 10)
+        clearInterval(timer);
+    }, 1000);
+  },
+  view: function (ctrl) {
+    return 'count: ' + ctrl.counter;
+    // return m('div', 'count: ' + ctrl.counter);
+    // or return {tag: 'div', attrs: {}, children: 'count: ' + ctrl.counter};
+  }
+});
+
+</script>

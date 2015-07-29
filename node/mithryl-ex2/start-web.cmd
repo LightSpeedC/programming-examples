@@ -1,0 +1,4 @@
+start python -m SimpleHTTPServer 8002
+rem start python3 -m http.server 8003
+start http://localhost:8002/
+pause
