@@ -4,13 +4,13 @@
 
 <script src="/js/mithril.min.js"></script>
 
-<div id="app"></div>
+<div id="counter-app"></div>
 
-<div id="out"></div>
+<div id="console-app"></div>
 
 <script>
 
-var PrintApp = {
+var ConsoleApp = {
 	controller: function () {
 		var ctrl = this;
 		ctrl.list = [];
@@ -59,8 +59,8 @@ var CounterApp = {
 	}
 };
 
-m.mount(document.getElementById("app"), CounterApp);
+m.mount(document.getElementById("counter-app"), CounterApp);
 
-m.mount(document.getElementById("out"), PrintApp);
+m.mount(document.getElementById("console-app"), ConsoleApp);
 
 </script>
