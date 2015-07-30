@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Mithril.js tweet</title>
+<script src="/js/mithril.min.js"></script>
+
+<div id="app"></div>
+
+<script>
+
+var App = {
+	controller: function AppController() {
+		this.list = [];
+		this.data = m.prop('');
+	},
+	view: function (ctrl) {
+		return [
+			m('input', {onchange: m.withAttr('value', ctrl.data), value: ctrl.data()}),
+			m("button[type=button]", {onclick: function() {
+				ctrl.list.push(ctrl.data());
+				ctrl.data('');
+			}}, "add"),
+			m('pre', ctrl.list.map(function(item) {
+				return m('div', item);
+			}))
+		];
+	}
+};
+
+m.mount(document.getElementById("app"), App);
+
+</script>
