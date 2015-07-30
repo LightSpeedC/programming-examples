@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Mithril.js print</title>
+
+<script src="/js/mithril.min.js"></script>
+
+<div id="app"></div>
+
+<div id="out"></div>
+
+<script>
+
+var PrintApp = {
+	controller: function () {
+		var ctrl = this;
+		ctrl.list = [];
+		ctrl.push = function (msg) {
+			ctrl.list.push(msg);
+			if (ctrl.list.length > 10) ctrl.list.shift();
+		};
+
+		window.console = function (console) {
+			var c = {};
+			for (var p in console)
+				if (typeof console[p] === 'function')
+					c[p] = function (p, f) {
+						return function () {
+							f.apply(console, arguments);
+							ctrl.push(p + ': ' + [].slice.call(arguments).join(' '));
+							m.redraw(true);
+						}
+					}(p, console[p]);
+			return c;
+		} (console);
+
+		console.log('console.log used');
+	},
+	view: function (ctrl) {
+		return m('pre', [
+			ctrl.list.map(function (item) {
+				return m('div', item);
+			})
+		]);
+	}
+};
+
+var CounterApp = {
+	controller: function () {
+		var ctrl = this;
+		ctrl.counter = 0;
+		setInterval(function () {
+			ctrl.counter++;
+			console.log('counter: ' + ctrl.counter);
+			m.redraw(true);
+		}, 1000);
+	},
+	view: function (ctrl) {
+		return 'count: ' + ctrl.counter;
+	}
+};
+
+m.mount(document.getElementById("app"), CounterApp);
+
+m.mount(document.getElementById("out"), PrintApp);
+
+</script>

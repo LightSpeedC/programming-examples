@@ -3,5 +3,7 @@
   {"title": "ex02 counter min",  "url": "/ex02-counter/counter-min.html"},
   {"title": "ex02 counter val",  "url": "/ex02-counter/counter-val.html"},
   {"title": "ex02 counter prop", "url": "/ex02-counter/counter-prop.html"},
-  {"title": "ex03 input value",  "url": "/ex03-input-value/input-value.html"}
+  {"title": "ex03 input value",  "url": "/ex03-input-value/input-value.html"},
+  {"title": "ex04 nest app",     "url": "/ex04-compornent-nest/nest-app.html"},
+  {"title": "ex05 print",        "url": "/ex05-print/print.html"}
 ]
