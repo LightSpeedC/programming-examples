@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
-<title>Mithril.js counter 0</title>
+<title>Mithril.js links</title>
 
 <!-- your local  -->
 <script src="/js/mithril.min.js"></script>
@@ -15,68 +15,17 @@
 
 <script>
 
-/*
-var mod = {};
-
-// Model
-mod.Counter = function () {
-  this.counter = m.prop(0);
-}
-
-// View Model
-mod.vm = function () {
-  var vm = {};
-  vm.init = function () {
-    vm.data = new mod.Counter();
-  };
-  return vm;
-}();
-
-mod.controller = function () {
-  mod.vm.init();
-  this.xxx = mod.vm.data;
-};
-
-mod.view = function (ctrl) {
-  return m('div', ["count: " + ctrl.xxx.counter()]);
-};
-
-setInterval(function () {
-  var counter = mod.vm.data.counter;
-  counter(counter() + 1);
-  //m.redraw(true);
-  m.startComputation();
-  m.endComputation();
-}, 1000);
-
-m.mount(document.getElementById("contents"), {
-    controller: function () {
-      var counter = this.counter = m.prop(0);
-      setInterval(function () {
-        counter(counter() + 1);
-        m.redraw(true);
-      }, 1000);
-    },
-    view: function (ctrl) {
-      return m('div', ["count: " + ctrl.counter()]);
-    }
-});
-
-*/
-
 m.mount(document.getElementById("app"), {
-  controller: function () {
-    var ctrl = this;
-    this.counter = 0;
-    setInterval(function () {
-      ctrl.counter++;
-      m.redraw(true);
-    }, 1000);
-  },
-  view: function (ctrl) {
-    return {tag: 'div', attrs: {}, children:["count: " + ctrl.counter]}
-    //return m('div', ["count: " + ctrl.counter]);
-  }
+	controller: function () {
+		this.list = m.request({method: 'GET', url: 'links.json'});
+	},
+	view: function (ctrl) {
+		return m('div', [
+			ctrl.list().map(function (item) {
+				return m('h3', [m('a', {href: item.url}, item.title)]);
+			})
+		]);
+	}
 });
 
 </script>
