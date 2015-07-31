@@ -11,12 +11,13 @@
 <script>
 
 var ConsoleApp = {
-	controller: function () {
+	controller: function (args) {
 		var ctrl = this;
+		ctrl.limit = args && args.limit ? args.limit : 10;
 		ctrl.list = [];
 		ctrl.push = function (msg) {
 			ctrl.list.push({key:Date.now()+':'+Math.random(), msg:msg});
-			if (ctrl.list.length > 10) ctrl.list.shift();
+			if (ctrl.list.length > ctrl.limit) ctrl.list.shift();
 		};
 
 		window.console = function (console) {
@@ -44,7 +45,7 @@ var ConsoleApp = {
 	}
 };
 
-m.mount(document.getElementById("console-app"), ConsoleApp);
+m.mount(document.getElementById("console-app"), m.component(ConsoleApp, {limit: 20}));
 
 var CounterApp = {
 	controller: function () {
