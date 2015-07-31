@@ -1,0 +1,40 @@
+{
+	"tag": "top",
+	"attrs": {},
+	"children": [
+		{
+			"tag": "node-1",
+			"attrs": {},
+			"children": [
+				{
+					"tag": "node-1-1",
+					"attrs": {},
+					"children": []
+				},
+				{
+					"tag": "node-1-1",
+					"attrs": {},
+					"children": []
+				}
+			]
+		},
+		{
+			"tag": "node-2",
+			"attrs": {},
+			"children": [
+				{
+					"tag": "node-2-1",
+					"attrs": {},
+					"children": []
+				},
+				{
+					"tag": "node-2-1",
+					"attrs": {},
+					"children": []
+				}
+			]
+		}
+	]
+}
+
+

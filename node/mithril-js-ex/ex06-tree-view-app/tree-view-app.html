@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Language" content="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tree view app - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.js"></script>
+
+<div id="console-app"></div>
+
+<div id="tree-view-app"></div>
+
+<script src="console-app.js"></script>
+
+<script>
+
+window.onload = function () {
+
+	m.mount(document.getElementById("console-app"), m.component(ConsoleApp, {limit: 10}));
+
+	for (var i = 0; i < 10; ++i)
+		console.log('');
+
+	var TreeViewApp = {
+		controller: function () {
+			var ctrl = this;
+			ctrl.treeViewData = m.request({method: 'GET', url: 'tree-view-data.json?' + Date.now()});
+			ctrl.deepView = function (node, level, indent) {
+				if (!node) return [];
+				if (!level) level = 0;
+				if (!indent) indent = '';
+				return [
+					m('tr', [indent, m('td', {onclick: function (){
+						node.hide = !node.hide;
+						console.log('clicked:', node.tag, node.hide ? 'off' : 'ON')
+					}}, node.tag)]),
+					m('div', {key: node.tag, style: {display: node.hide ? 'none': 'block'}},
+						node.children.map(function (node) {
+							return ctrl.deepView(node, level + 1, [m('td', '. . .'), indent]);
+						})
+					)
+				];
+			};
+		},
+		view: function (ctrl) {
+			return [m('table', {border: 0}, [
+				ctrl.deepView(ctrl.treeViewData())
+			]),
+			m('a', {href: 'tree-view-data.json'}, 'tree-view-data.json')];
+		}
+	};
+
+	m.mount(document.getElementById("tree-view-app"), TreeViewApp);
+
+}
+
+</script>
+
+top や node をクリックしてみてください。
