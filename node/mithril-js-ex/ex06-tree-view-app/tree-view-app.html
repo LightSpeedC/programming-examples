@@ -41,11 +41,12 @@ window.onload = function () {
 						node.hide = !node.hide;
 						console.log('clicked:', node.tag, node.hide ? 'off' : 'ON')
 					}}, node.tag)]),
+					node.children.length > 0 ?
 					m('div', {key: node.tag, style: {display: node.hide ? 'none': 'block'}},
 						node.children.map(function (node) {
 							return ctrl.deepView(node, level + 1, [m('td', '. . .'), indent]);
 						})
-					)
+					) : ''
 				];
 			};
 		},
