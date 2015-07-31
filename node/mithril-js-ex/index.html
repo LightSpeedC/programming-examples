@@ -22,7 +22,7 @@ m.mount(document.getElementById("app"), {
 	view: function (ctrl) {
 		return m('div', [
 			ctrl.list().map(function (item) {
-				return m('h3', [m('a', {href: item.url}, item.title)]);
+				return m('h4', [m('a', {href: item.url}, item.title)]);
 			})
 		]);
 	}
