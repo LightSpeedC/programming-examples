@@ -15,7 +15,7 @@ var ConsoleApp = {
 		var ctrl = this;
 		ctrl.list = [];
 		ctrl.push = function (msg) {
-			ctrl.list.push(msg);
+			ctrl.list.push({key:Date.now()+':'+Math.random(), msg:msg});
 			if (ctrl.list.length > 10) ctrl.list.shift();
 		};
 
@@ -38,11 +38,13 @@ var ConsoleApp = {
 	view: function (ctrl) {
 		return m('pre', [
 			ctrl.list.map(function (item) {
-				return m('div', item);
+				return m('div', {key:item.key}, item.msg);
 			})
 		]);
 	}
 };
+
+m.mount(document.getElementById("console-app"), ConsoleApp);
 
 var CounterApp = {
 	controller: function () {
@@ -60,7 +62,5 @@ var CounterApp = {
 };
 
 m.mount(document.getElementById("counter-app"), CounterApp);
-
-m.mount(document.getElementById("console-app"), ConsoleApp);
 
 </script>
