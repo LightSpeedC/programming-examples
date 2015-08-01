@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<script src="mithril.min.js"></script>
+
+<div id="$counterApp"></div>
+
+<script>
+
+var counter = 0;
+
+setInterval(function () {
+	counter++;
+	m.redraw(true);
+}, 1000);
+
+m.mount($counterApp, {view: function () {
+	return [
+		['count: ', counter],
+		m('div', 'count: ', counter),
+		m('div', ['count: ', counter]),
+		m('div', [['count: '], [[[counter]]]])
+	];
+}});
+
+</script>
