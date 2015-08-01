@@ -2,7 +2,7 @@
 <meta charset="UTF-8">
 <title>counter prop - Mithril.js</title>
 <script src="mithril.min.js"></script>
-<div id="counter-app"></div>
+<div id="$counterApp"></div>
 <script>
 var CounterApp = {
   controller: function () {
@@ -17,5 +17,5 @@ var CounterApp = {
     return m('div', 'count: ' + ctrl.counter());
   }
 };
-m.mount(document.getElementById('counter-app'), CounterApp);
+m.mount($counterApp, CounterApp);
 </script>
