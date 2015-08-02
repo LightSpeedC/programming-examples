@@ -3,27 +3,36 @@
 <title>counter prop - Mithril.js</title>
 
 <script src="mithril.min.js"></script>
+<script src="mithril.ie.polyfill.min.js"></script>
 
-<div id="$counterApp"></div>
+<body>
+<div id="$counterElement"></div>
+</body>
 
 <script>
 
-var CounterApp = {
-  controller: function () {
-    var ctrl = this;
+//コンポーネント定義
+var counterComponent = {
+	//コントローラ
+	controller: function () {
+		var ctrl = this;
 
-    ctrl.counter = m.prop(0);
+		//カウンター
+		ctrl.counter = m.prop(0);
 
-    setInterval(function () {
-      ctrl.counter(ctrl.counter() + 1);
-      m.redraw(true);
-    }, 1000);
-  },
-  view: function (ctrl) {
-    return m('div', 'count: ' + ctrl.counter());
-  }
+		//タイマーでカウントアップ
+		setInterval(function () {
+			ctrl.counter(ctrl.counter() + 1);
+			m.redraw(true);
+		}, 1000);
+	},
+	//ビュー
+	view: function (ctrl) {
+		return m('div', 'count: ' + ctrl.counter());
+	}
 };
 
-m.mount($counterApp, CounterApp);
+//HTML要素にコンポーネントをマウント
+m.mount($counterElement, counterComponent);
 
 </script>
