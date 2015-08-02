@@ -1,25 +1,41 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
-<script src="mithril.min.js"></script>
 
-<div id="$counterApp"></div>
+<script src="mithril.min.js"></script>
+<script src="mithril.ie.polyfill.js"></script>
+
+<body>
+<div id="$counterElement"></div>
+</body>
 
 <script>
 
+//カウンター
 var counter = 0;
 
-setInterval(function () {
-	counter++;
-	m.redraw(true);
-}, 1000);
+//コンポーネント定義
+var counterComponent = {
+	//コントローラ
+	controller: function () {
+		setInterval(function () {
+			counter++;
+			m.redraw(true);
+		}, 1000);
+	},
+	//ビュー
+	view: function () {
+		//return 'count: ' + counter;
+		//return [m('div', 'count: '), m('div', counter)];
+		return [
+			'count: ' + counter,
+			m('div', 'count: ' + counter),
+			m('div', ['count: ' + counter]),
+			m('div', [['count: '], [[[counter]]]])
+		];
+	}
+};
 
-m.mount($counterApp, {view: function () {
-	return [
-		['count: ', counter],
-		m('div', 'count: ', counter),
-		m('div', ['count: ', counter]),
-		m('div', [['count: '], [[[counter]]]])
-	];
-}});
+//HTML要素にコンポーネントをマウント
+m.mount($counterElement, counterComponent);
 
 </script>
