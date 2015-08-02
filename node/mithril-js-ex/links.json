@@ -7,6 +7,8 @@
   {"title": "ex04 nest app",     "url": "/ex04-compornent-nest/nest-app.html"},
   {"title": "ex05 console app",  "url": "/ex05-console-app/console-app.html"},
   {"title": "ex06 tree view app","url": "/ex06-tree-view-app/tree-view-app.html"},
-  {"title": "qiita counter-min.html",  "url": "/js/counter-min.html"},
-  {"title": "qiita counter-prop.html", "url": "/js/counter-prop.html"}
+  {"title": "qiita counter-min.html",        "url": "/js/counter-min.html"},
+  {"title": "qiita counter-variation.html",  "url": "/js/counter-variation.html"},
+  {"title": "qiita counter-prop.html",       "url": "/js/counter-prop.html"},
+  {"title": "qiita todo-app.html",           "url": "/js/todo-app.html"}
 ]
