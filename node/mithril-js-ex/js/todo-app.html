@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>ToDo App - Mithril.js</title>
+
+<script src="mithril.min.js"></script>
+<script src="mithril.ie.polyfill.js"></script>
+
+<body>
+<div id="$todoElement"></div>
+</body>
+
+<script>
+
+//コンポーネント定義
+var todoComponent = function () {
+	'use strict';
+
+	//モデル: Todoクラスは2つのプロパティ(description : string, done : boolean)を持つ
+	function Todo(data) {
+		this.description = m.prop(data.description);
+		this.done = m.prop(false);
+	};
+
+	//モデル: TodoListクラスはTodoオブジェクトの配列
+	var TodoList = Array;
+
+	//コントローラ・オブジェクトctrlは
+	//表示されているTodoのリスト(list)を管理し、
+	//作成が完了する前のTodoの説明(description)を格納したり、
+	//Todoを作成して追加(add)が可能かどうかを判定し、
+	//Todoが追加された後にテキスト入力をクリアする
+
+	//このアプリケーションは、todoComponentコンポーネントでコントローラとビューを定義する
+	var todoComponent = {
+
+		//コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
+		//この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
+		controller: function (listArg) {
+			var ctrl = this;
+
+			//アクティブなToDoのリスト
+			ctrl.list = new TodoList();
+
+			//引数に渡されたtodo説明リストからToDoのリストに追加
+			if (listArg) {
+				listArg.forEach(function (desc) {
+					ctrl.list.push(new Todo({description: desc}));
+				});
+			}
+
+			//新しいToDoを作成する前の、入力中のToDoの名前を保持するスロット
+			ctrl.description = m.prop('');
+
+			//ToDoをリストに登録し、ユーザが使いやすいようにdescriptionフィールドをクリアする
+			ctrl.add = function () {
+				if (ctrl.description()) {
+					ctrl.list.push(new Todo({description: ctrl.description()}));
+					ctrl.description('');
+				}
+			};
+
+			//Enterキーに対応
+			ctrl.configInput = function (elem, isInit) {
+				elem.focus();
+				if (isInit) return;
+				elem.onkeypress = function (e) {
+					if ((e || event).keyCode !== 13) return true;
+					setTimeout(function () {
+						ctrl.add();
+						m.redraw(true);
+						elem.focus();
+					}, 0);
+					return true; // elem.onchange();
+				};
+			};
+
+			/*
+			// キーインのチェック(Enter)
+			ctrl.onkeypressInput = function (e) {
+				m.redraw.strategy('none');
+				if ((e || event).keyCode !== 13) return true;
+				var elem = this;
+				setTimeout(function () {
+					ctrl.add();
+					m.redraw(true);
+					elem.focus();
+				}, 0);
+				return true; // elem.onchange();
+			};
+			*/
+
+		},
+
+		//ビュー
+		view: function (ctrl) {
+			return [
+				m('input', makeAttrsOn('onchange', 'value', ctrl.description, {config: ctrl.configInput})),
+				m('button', {onclick: ctrl.add}, 'Add'),
+				m('table', [ctrl.list.map(function(todo) {
+					return m('tr', [
+						m('td', [
+							m('input[type=checkbox]', makeAttrsOn('onclick', 'checked', todo.done))
+						]),
+						m('td', {style: {textDecoration: todo.done() ? 'line-through' : 'none'}}, todo.description())
+					]);
+				})])
+			];
+		}
+	};
+
+	//HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function makeAttrsOn(onEventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs[onEventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	return todoComponent;
+
+}();
+
+//アプリケーションの初期化
+//HTML要素にコンポーネントをマウント
+m.mount($todoElement, m.component(todoComponent, ['first task', 'second task']));
+//m.mount($todoElement, todoComponent);
+
+</script>
