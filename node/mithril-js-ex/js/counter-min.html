@@ -1,19 +1,29 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
+<title>counter minimum - Mithril.js</title>
 
 <script src="mithril.min.js"></script>
+<script src="mithril.ie.polyfill.js"></script>
+
+<body></body>
 
 <script>
 
+//カウンター
 var counter = 0;
 
+//タイマーでカウントアップ
 setInterval(function () {
 	counter++;
 	m.redraw(true);
 }, 1000);
 
-m.mount(document, {view: function () {
+//ビュー
+function view() {
 	return 'count: ' + counter;
-}});
+}
+
+//HTML要素にコンポーネントをマウント
+m.mount(document.body, {view: view});
 
 </script>
