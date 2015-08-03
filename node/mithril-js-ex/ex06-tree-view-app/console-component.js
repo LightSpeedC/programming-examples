@@ -1,5 +1,9 @@
 if (typeof console === 'undefined')
-	window.console = {log: function () {}, info: function () {}, warn: function () {}, error: function () {}};
+	this.console = this.console || {
+		log: function () {},
+		info: function () {},
+		warn: function () {},
+		error: function () {}};
 
 this.consoleComponent = {
 	controller: function (args) {
