@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Language" content="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>console component - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.js"></script>
+
+
+<body>
+<div id="$consoleElement"></div>
+</body>
+
+<script src="console-component.js"></script>
+
+<script>
+
+m.mount($consoleElement, consoleComponent);
+console.log('this is test1');
+console.log('this is test2');
+
+</script>
+
