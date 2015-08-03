@@ -41,7 +41,7 @@ var TreeViewComponent = {
 				console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
 			}
 			return [
-				m('tr', {style: {display: hide ? 'none': 'block'}},
+				m('tr', hide ? {style: {display: 'none'}} : {},
 						[indent, m('td', {colspan: 3 - level, onclick: onclick, ondblclick: onclick}, node.tag)]),
 				node.children.map(function (node2) {
 					return ctrl.deepView(node2, level + 1, [m('td', '. . .'), indent], hide || node.hide);
