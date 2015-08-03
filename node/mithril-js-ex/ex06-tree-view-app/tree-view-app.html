@@ -36,15 +36,13 @@ var TreeViewComponent = {
 			if (!node) return [];
 			if (!level) level = 0;
 			if (!indent) indent = '';
+			var onclick = function () {
+				node.hide = !node.hide;
+				console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
+			}
 			return [
 				m('tr', {style: {display: hide ? 'none': 'block'}},
-						[indent, m('td', {colspan: 3 - level, onclick: function (){
-							node.hide = !node.hide;
-							console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
-						}, ondblclick: function () {
-							node.hide = !node.hide;
-							console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
-						}}, node.tag)]),
+						[indent, m('td', {colspan: 3 - level, onclick: onclick, ondblclick: onclick}, node.tag)]),
 				node.children.map(function (node2) {
 					return ctrl.deepView(node2, level + 1, [m('td', '. . .'), indent], hide || node.hide);
 				})
