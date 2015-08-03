@@ -1,10 +1,10 @@
-this.ConsoleApp = {
+var ConsoleApp = {
 	controller: function (args) {
 		var ctrl = this;
 		ctrl.limit = args && args.limit ? args.limit : 10;
 		ctrl.list = [];
 		ctrl.push = function (msg) {
-			ctrl.list.push({key:Date.now()+':'+Math.random(), msg:msg});
+			ctrl.list.push({key:(new Date() - 0)+':'+Math.random(), msg:msg});
 			if (ctrl.list.length > ctrl.limit) ctrl.list.shift();
 		};
 
@@ -20,9 +20,10 @@ this.ConsoleApp = {
 						}
 					}(p, console[p]);
 			return c;
-		} (console);
+		} (window.console);
 
-		console.log('console.log used');
+		if (console && console.log)
+			console.log('console.log used');
 	},
 	view: function (ctrl) {
 		return m('pre', [
