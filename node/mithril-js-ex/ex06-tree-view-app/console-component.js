@@ -1,4 +1,4 @@
-var ConsoleApp = {
+var ConsoleComponent = {
 	controller: function (args) {
 		var ctrl = this;
 		ctrl.limit = args && args.limit ? args.limit : 10;
