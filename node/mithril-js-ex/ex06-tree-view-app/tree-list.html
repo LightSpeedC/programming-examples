@@ -16,7 +16,7 @@
 
 <body>
 <div id="$consoleElement"></div>
-<div id="$kojinJohoElement"></div>
+<div id="$treeListElement"></div>
 </body>
 
 <script src="console-component.js"></script>
@@ -24,13 +24,13 @@
 m.mount($consoleElement, m.component(consoleComponent, {limit: 10}));
 </script>
 
-<script src="kojin-joho.js"></script>
+<script src="tree-list.js"></script>
 <script>
-m.mount($kojinJohoElement, {
+m.mount($treeListElement, {
 	controller: function () {
 		this.comps = [
-			m.component(kojinJohoComponent, '世帯情報1', 'setai-tree.json', 'setai-list.json'),
-			m.component(kojinJohoComponent, '世帯情報2', 'setai-tree.json', 'setai-list.json')];
+			m.component(treeListComponent, '世帯情報1', 'setai-tree.json', 'setai-list.json'),
+			m.component(treeListComponent, '世帯情報2', 'setai-tree.json', 'setai-list.json')];
 		this.ctrls = this.comps.map(function (comp) { return new comp.controller(); });
 		this.views = this.comps.map(function (comp) { return comp.view; });
 	},

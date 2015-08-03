@@ -14,7 +14,7 @@ if (!Array.prototype.reduce)
 for (var i = 0; i < 10; ++i)
 	console.log('');
 
-this.kojinJohoComponent = {
+this.treeListComponent = {
 	controller: function (title, treeUrl, listUrl) {
 		var ctrl = this;
 		ctrl.title = title;
