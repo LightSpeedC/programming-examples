@@ -1,5 +1,6 @@
-if (typeof console === 'undefined')
-	this.console = this.console || {
+var w = this;
+if (typeof w.console === 'undefined')
+	w.console = this.console || {
 		log: function () {},
 		info: function () {},
 		warn: function () {},
@@ -15,7 +16,7 @@ this.consoleComponent = {
 			if (ctrl.list.length > ctrl.limit) ctrl.list.shift();
 		};
 
-		window.console = function (console) {
+		w.console = function (console) {
 			var c = {};
 			for (var p in console)
 				if (typeof console[p] === 'function')
@@ -23,20 +24,22 @@ this.consoleComponent = {
 						return function () {
 							f && f.apply(console, arguments);
 							ctrl.push(p + ': ' + [].slice.call(arguments).join(' '));
-							//m.redraw(true);
 						}
 					}(p, console[p]);
 			return c;
-		} (window.console);
+		} (w.console);
 
 		if (console && console.log)
 			console.log('console.log used');
 	},
 	view: function (ctrl) {
-		return m('pre', [
-			ctrl.list.map(function (item) {
-				return m('div', {key:item.key}, item.msg);
-			})
-		]);
+		return [
+			m('h3', 'console'),
+			m('pre', [
+				ctrl.list.map(function (item) {
+					return m('div', {key:item.key}, item.msg);
+				})
+			])
+		];
 	}
 };
