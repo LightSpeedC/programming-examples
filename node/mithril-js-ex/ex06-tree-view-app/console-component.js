@@ -1,4 +1,7 @@
-var ConsoleComponent = {
+if (typeof console === 'undefined')
+	window.console = {log: function () {}, info: function () {}, warn: function () {}, error: function () {}};
+
+var consoleComponent = {
 	controller: function (args) {
 		var ctrl = this;
 		ctrl.limit = args && args.limit ? args.limit : 10;
@@ -14,7 +17,7 @@ var ConsoleComponent = {
 				if (typeof console[p] === 'function')
 					c[p] = function (p, f) {
 						return function () {
-							f.apply(console, arguments);
+							f && f.apply(console, arguments);
 							ctrl.push(p + ': ' + [].slice.call(arguments).join(' '));
 							m.redraw(true);
 						}
