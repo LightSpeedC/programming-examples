@@ -16,54 +16,50 @@
 
 <body>
 <div id="$consoleElement"></div>
-<div id="tree-view-app"></div>
+<div id="$treeViewElement"></div>
 </body>
 
 <script src="console-component.js"></script>
 
 <script>
 
-//window.onload = function () {
+m.mount($consoleElement, m.component(consoleComponent, {limit: 10}));
 
-// m.mount($consoleElement, m.component(ConsoleApp, {limit: 10}));
+for (var i = 0; i < 10; ++i)
+	console.log('');
 
-//	for (var i = 0; i < 10; ++i)
-//		console.log('');
+var TreeViewComponent = {
+	controller: function () {
+		var ctrl = this;
+		ctrl.treeViewData = m.request({method: 'GET', url: 'tree-view-data.json?' + (new Date() - 0)});
+		ctrl.deepView = function (node, level, indent, hide) {
+			if (!node) return [];
+			if (!level) level = 0;
+			if (!indent) indent = '';
+			return [
+				m('tr', {style: {display: hide ? 'none': 'block'}},
+						[indent, m('td', {colspan: 3 - level, onclick: function (){
+							node.hide = !node.hide;
+							console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
+						}, ondblclick: function () {
+							node.hide = !node.hide;
+							console.log('clicked: ' + node.tag + ' ' + (node.hide ? 'off': 'ON!!!'));
+						}}, node.tag)]),
+				node.children.map(function (node2) {
+					return ctrl.deepView(node2, level + 1, [m('td', '. . .'), indent], hide || node.hide);
+				})
+			];
+		};
+	},
+	view: function (ctrl) {
+		return [m('table', {border: 1, cellspacing: 1, cellpadding: 1}, [
+			ctrl.deepView(ctrl.treeViewData())
+		]),
+		m('a', {href: 'tree-view-data.json'}, 'tree-view-data.json')];
+	}
+};
 
-	var TreeViewApp = {
-		controller: function () {
-			var ctrl = this;
-			ctrl.treeViewData = m.request({method: 'GET', url: 'tree-view-data.json?' + (new Date() - 0)});
-			ctrl.deepView = function (node, level, indent, hide) {
-				if (!node) return [];
-				if (!level) level = 0;
-				if (!indent) indent = '';
-				return [
-					m('tr', {style: {display: hide ? 'none': 'block'}},
-							[indent, m('td', {colspan: 3 - level, onclick: function (){
-								node.hide = !node.hide;
-								console.log('clicked: ' + node.tag + ' ' + node.hide ? 'off': 'ON!!!');
-							}, ondblclick: function () {
-								node.hide = !node.hide;
-								console.log('clicked: ' + node.tag + ' ' + node.hide ? 'off': 'ON!!!');
-							}}, node.tag)]),
-					node.children.map(function (node2) {
-						return ctrl.deepView(node2, level + 1, [m('td', '. . .'), indent], hide || node.hide);
-					})
-				];
-			};
-		},
-		view: function (ctrl) {
-			return [m('table', {border: 1, cellspacing: 1, cellpadding: 1}, [
-				ctrl.deepView(ctrl.treeViewData())
-			]),
-			m('a', {href: 'tree-view-data.json'}, 'tree-view-data.json')];
-		}
-	};
-
-	m.mount(document.getElementById("tree-view-app"), TreeViewApp);
-
-//}
+m.mount($treeViewElement, TreeViewComponent);
 
 </script>
 
