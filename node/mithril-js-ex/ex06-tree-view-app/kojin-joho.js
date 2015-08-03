@@ -31,7 +31,9 @@ this.kojinJohoComponent = {
 			}
 			ctrl.depth = getDepth(ctrl.tree(), 1);
 		});
-		ctrl.deepView = function (node, list, level, indent, hide) {
+	},
+	view: function (ctrl) {
+		function deepView(node, list, level, indent, hide) {
 			if (!node) return [];
 			if (!level) level = 0;
 			if (!indent) indent = '';
@@ -53,18 +55,16 @@ this.kojinJohoComponent = {
 				]),
 				!node.children ? '' :
 				node.children.map(function (child) {
-					return ctrl.deepView(child, list, level + 1, [m('td', '. . .'), indent], hide || node.hide);
+					return deepView(child, list, level + 1, [m('td', '. . .'), indent], hide || node.hide);
 				})
 			];
-		};
-	},
-	view: function (ctrl) {
+		}
 		return [
 			m('h1', {onclick: function () { ctrl.hide = !ctrl.hide; }},
 					ctrl.title + (ctrl.hide ? '▼' : '△')),
 			m('div', ctrl.hide ? {style: {display: 'none'}} : {}, [
 				m('table', {border: 1, cellspacing: 1, cellpadding: 1, bgcolor: '#eeffff'}, [
-					ctrl.deepView(ctrl.tree(), ctrl.list())
+					deepView(ctrl.tree(), ctrl.list())
 				]),
 				'データ・ダウンロード: ',
 				m('a', {href: ctrl.treeUrl}, ctrl.treeUrl), ', ',
