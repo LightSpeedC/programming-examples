@@ -42,13 +42,13 @@ for (var i = 0; i < 10; ++i)
 	console.log('');
 
 var kojinJohoComponent = {
-	controller: function (title, treeUrl, dataUrl) {
+	controller: function (title, treeUrl, listUrl) {
 		var ctrl = this;
 		ctrl.title = title;
 		ctrl.treeUrl = treeUrl;
-		ctrl.dataUrl = dataUrl;
+		ctrl.listUrl = listUrl;
 		ctrl.tree = m.request({method: 'GET', url: treeUrl + '?' + Date.now()});
-		ctrl.data = m.request({method: 'GET', url: dataUrl + '?' + Date.now()});
+		ctrl.list = m.request({method: 'GET', url: listUrl + '?' + Date.now()});
 		ctrl.tree.then(function () {
 			function getDepth(node, level) {
 				if (!node || !node.children) return level;
@@ -58,7 +58,7 @@ var kojinJohoComponent = {
 			}
 			ctrl.depth = getDepth(ctrl.tree(), 1);
 		});
-		ctrl.deepView = function (node, data, level, indent, hide) {
+		ctrl.deepView = function (node, list, level, indent, hide) {
 			if (!node) return [];
 			if (!level) level = 0;
 			if (!indent) indent = '';
@@ -73,14 +73,14 @@ var kojinJohoComponent = {
 							!node.children ? {colspan: ctrl.depth - level} :
 							{colspan: ctrl.depth - level, onclick: onclick, ondblclick: onclick},
 							node.name + (!node.children ? '' : node.hide ? '▼' : '△')),
-					data.map(function (elem) {
+					list.map(function (elem) {
 						if (node.item) return m('td', elem[node.item] ? elem[node.item] : '-');
 						else return m('td', '-');
 					})
 				]),
 				!node.children ? '' :
 				node.children.map(function (child) {
-					return ctrl.deepView(child, data, level + 1, [m('td', '. . .'), indent], hide || node.hide);
+					return ctrl.deepView(child, list, level + 1, [m('td', '. . .'), indent], hide || node.hide);
 				})
 			];
 		};
@@ -91,11 +91,11 @@ var kojinJohoComponent = {
 					ctrl.title + (ctrl.hide ? '▼' : '△')),
 			m('div', ctrl.hide ? {style: {display: 'none'}} : {}, [
 				m('table', {border: 1, cellspacing: 1, cellpadding: 1, bgcolor: '#eeffff'}, [
-					ctrl.deepView(ctrl.tree(), ctrl.data())
+					ctrl.deepView(ctrl.tree(), ctrl.list())
 				]),
 				'データ・ダウンロード: ',
 				m('a', {href: ctrl.treeUrl}, ctrl.treeUrl), ', ',
-				m('a', {href: ctrl.dataUrl}, ctrl.dataUrl)
+				m('a', {href: ctrl.listUrl}, ctrl.listUrl)
 			])
 		];
 	}
@@ -104,8 +104,8 @@ var kojinJohoComponent = {
 m.mount($kojinJohoElement, {
 	controller: function () {
 		this.comps = [
-			m.component(kojinJohoComponent, '世帯情報1', 'setai-tree.json', 'setai-data.json'),
-			m.component(kojinJohoComponent, '世帯情報2', 'setai-tree.json', 'setai-data.json')];
+			m.component(kojinJohoComponent, '世帯情報1', 'setai-tree.json', 'setai-list.json'),
+			m.component(kojinJohoComponent, '世帯情報2', 'setai-tree.json', 'setai-list.json')];
 		this.ctrls = this.comps.map(function (comp) { return new comp.controller(); });
 		this.views = this.comps.map(function (comp) { return comp.view; });
 	},
