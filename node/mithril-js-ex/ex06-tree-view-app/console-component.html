@@ -22,9 +22,11 @@
 
 <script>
 
-m.mount($consoleElement, consoleComponent);
+m.mount($consoleElement, m.component(consoleComponent, {limit: 20}));
+// m.mount($consoleElement, consoleComponent);
 console.log('this is test1');
 console.log('this is test2');
+m.redraw(true);
 
 </script>
 
