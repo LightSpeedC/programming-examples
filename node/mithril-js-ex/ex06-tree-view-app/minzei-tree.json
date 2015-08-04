@@ -1,6 +1,5 @@
 {
 	"name": "個人住民税情報",
-	"item": "name",
 	"children": [
 		{"name": "課税年度", "item": "TK101"},
 		{"name": "総所得金額等", "item": "TK102"},

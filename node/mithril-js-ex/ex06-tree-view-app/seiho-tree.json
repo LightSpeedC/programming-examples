@@ -1,6 +1,5 @@
 {
 	"name": "生活保護情報",
-	"item": "name",
 	"children": [
 		{"name": "支給開始年月日", "item": "TK901"},
 		{"name": "支給終了年月日", "item": "TK902"},

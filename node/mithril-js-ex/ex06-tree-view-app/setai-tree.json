@@ -1,6 +1,5 @@
 {
 	"name": "個人情報",
-	"item": "name",
 	"children": [
 		{
 			"name": "世帯主との続柄コード",
