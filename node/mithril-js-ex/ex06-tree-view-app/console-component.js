@@ -1,10 +1,9 @@
 var w = this;
-if (typeof w.console === 'undefined')
-	w.console = this.console || {
-		log: function () {},
-		info: function () {},
-		warn: function () {},
-		error: function () {}};
+w.console = w.console || {
+	log: function () {},
+	info: function () {},
+	warn: function () {},
+	error: function () {}};
 
 this.consoleComponent = {
 	controller: function (args) {
