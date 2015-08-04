@@ -41,6 +41,12 @@ this.treeListComponent = {
 				node.hide = !node.hide;
 				console.log('clicked: ' + node.name + ' ' + (node.hide ? 'off': 'ON!!!'));
 			}
+			function getItem(elem, item, defaultValue) {
+				item.split(':').forEach(function (index) {
+					if (elem) elem = elem[index];
+				});
+				return elem || defaultValue;
+			}
 			return [
 				m('tr', hide ? {style: {display: 'none'}} : {}, [
 					indent,
@@ -49,7 +55,7 @@ this.treeListComponent = {
 							{colspan: ctrl.depth - level, onclick: onclick, ondblclick: onclick},
 							node.name + (!node.children ? '' : node.hide ? '▼' : '△')),
 					list.map(function (elem) {
-						if (node.item) return m('td', elem[node.item] ? elem[node.item] : '-');
+						if (node.item) return m('td', getItem(elem, node.item, '-'));
 						else return m('td', '-');
 					})
 				]),

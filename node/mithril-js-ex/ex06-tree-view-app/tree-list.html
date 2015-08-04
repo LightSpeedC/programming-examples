@@ -31,7 +31,8 @@ m.mount($treeListElement, {
 		this.comps = [
 			m.component(treeListComponent, '世帯情報', 'setai-tree.json', 'setai-list.json'),
 			m.component(treeListComponent, '住民税情報 2014', 'minzei-tree.json', 'minzei-list-2014.json'),
-			m.component(treeListComponent, '住民税情報 2015', 'minzei-tree.json', 'minzei-list-2015.json')
+			m.component(treeListComponent, '住民税情報 2015', 'minzei-tree.json', 'minzei-list-2015.json'),
+			m.component(treeListComponent, '生活保護情報', 'seiho-tree.json', 'seiho-list.json')
 		];
 		this.ctrls = this.comps.map(function (comp) { return new comp.controller(); });
 		this.views = this.comps.map(function (comp) { return comp.view; });
