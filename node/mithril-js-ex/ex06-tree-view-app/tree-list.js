@@ -66,7 +66,10 @@ this.treeListComponent = {
 			];
 		}
 		return [
-			m('h1', {onclick: function () { ctrl.hide = !ctrl.hide; }},
+			m('h1', {onclick: function () {
+						ctrl.hide = !ctrl.hide;
+						console.log('clicked: ' + ctrl.title);
+					}},
 					ctrl.title + (ctrl.hide ? '▼' : '△')),
 			m('div', ctrl.hide ? {style: {display: 'none'}} : {}, [
 				m('table', {border: 1, cellspacing: 1, cellpadding: 1, bgcolor: '#eeffff'}, [
