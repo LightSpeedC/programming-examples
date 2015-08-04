@@ -29,8 +29,10 @@ m.mount($consoleElement, m.component(consoleComponent, {limit: 10}));
 m.mount($treeListElement, {
 	controller: function () {
 		this.comps = [
-			m.component(treeListComponent, '世帯情報1', 'setai-tree.json', 'setai-list.json'),
-			m.component(treeListComponent, '世帯情報2', 'setai-tree.json', 'setai-list.json')];
+			m.component(treeListComponent, '世帯情報', 'setai-tree.json', 'setai-list.json'),
+			m.component(treeListComponent, '住民税情報 2014', 'minzei-tree.json', 'minzei-list-2014.json'),
+			m.component(treeListComponent, '住民税情報 2015', 'minzei-tree.json', 'minzei-list-2015.json')
+		];
 		this.ctrls = this.comps.map(function (comp) { return new comp.controller(); });
 		this.views = this.comps.map(function (comp) { return comp.view; });
 	},
