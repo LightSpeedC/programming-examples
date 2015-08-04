@@ -14,6 +14,13 @@ if (!Array.prototype.reduce)
 for (var i = 0; i < 10; ++i)
 	console.log('');
 
+function range(n) {
+	var arr = Array(n);
+	for (var i = 0; i < n; ++i)
+		arr[i] = i;
+	return arr;
+}
+
 this.treeListComponent = {
 	controller: function (title, treeUrl, listUrl) {
 		var ctrl = this;
@@ -29,7 +36,7 @@ this.treeListComponent = {
 					return getDepth(child, level + 1);
 				}).reduce(function (a, b) { return a > b ? a : b; });
 			}
-			ctrl.depth = getDepth(ctrl.tree(), 1);
+			ctrl.depth = Math.max(getDepth(ctrl.tree(), 1), 5);
 		});
 	},
 	view: function (ctrl) {
@@ -49,19 +56,21 @@ this.treeListComponent = {
 			}
 			return [
 				m('tr', hide ? {style: {display: 'none'}} : {}, [
-					indent,
+					//indent,
+					range(level).map(function () { return m('td'); }),
 					m('td',
 							!node.children ? {colspan: ctrl.depth - level} :
 							{colspan: ctrl.depth - level, onclick: onclick, ondblclick: onclick},
 							node.name + (!node.children ? '' : node.hide ? '▼' : '△')),
 					list.map(function (elem) {
-						if (node.item) return m('td', getItem(elem, node.item, '-'));
-						else return m('td', '-');
+						var s = null;
+						if (node.item) s = getItem(elem, node.item, null);
+						return m('td', s ? {} : {bgcolor: '#cccccc'}, s ? s : '-');
 					})
 				]),
 				!node.children ? '' :
 				node.children.map(function (child) {
-					return deepView(child, list, level + 1, [m('td', '. . .'), indent], hide || node.hide);
+					return deepView(child, list, level + 1, [m('td', ' '), indent], hide || node.hide);
 				})
 			];
 		}
@@ -73,6 +82,14 @@ this.treeListComponent = {
 					ctrl.title + (ctrl.hide ? '▼' : '△')),
 			m('div', ctrl.hide ? {style: {display: 'none'}} : {}, [
 				m('table', {border: 1, cellspacing: 1, cellpadding: 1, bgcolor: '#eeffff'}, [
+					m('tr', {bgcolor: '#cceecc'}, [
+						range(ctrl.depth).map(function (i) {
+							return m('th', '階層' + (i + 1));
+						}),
+						ctrl.list().map(function (elem) {
+							return m('th', elem.name);
+						})
+					]),
 					deepView(ctrl.tree(), ctrl.list())
 				]),
 				'データ・ダウンロード: ',
