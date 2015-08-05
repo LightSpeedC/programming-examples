@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Language" content="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>console component - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.js"></script>
+
+
+<body>
+<div id="$elem1"></div>
+<div id="$elem2"></div>
+<div id="$elem3"></div>
+</body>
+
+<script src="console-component.js"></script>
+
+<script>
+var labelComponent = {
+	controller: function (label) {
+		this.label = label + ':';
+	},
+	view: function (ctrl) {
+		return ctrl.label;
+	}
+};
+
+//HTML要素のイベントと値にプロパティを接続するユーティリティ
+function makeAttrsOn(onEventName, propName, propFunc, attrs) {
+	attrs = attrs || {};
+	attrs[onEventName] = m.withAttr(propName, propFunc);
+	attrs[propName] = propFunc();
+	return attrs;
+}
+
+var textComponent = {
+	controller: function (value) {
+		this.value = m.prop(value);
+	},
+	view: function (ctrl) {
+		return m('input', makeAttrsOn('onchange', 'value', ctrl.value));
+	}
+};
+
+var components = {
+	controller: function (comps) {
+		var ctrl = this;
+		ctrl.comps = comps;
+		ctrl.ctrls = ctrl.comps.map(function (comp) {
+			if (!comp.controller) return {};
+			return new comp.controller(); });
+		ctrl.views = ctrl.comps.map(function (comp) { return comp.view; });
+	},
+	view: function (ctrl) {
+		return ctrl.views.map(function (view, i) { return view(ctrl.ctrls[i]); });
+	}
+};
+
+var labelTextComponent = {
+	controller: function (label, value) {
+		var ctrl = this;
+		ctrl.comps = [
+			m.component(labelComponent, label),
+			m.component(textComponent, value)];
+		ctrl.comp = m.component(components, ctrl.comps);
+		ctrl.ctrl = new ctrl.comp.controller();
+		ctrl.view = ctrl.comp.view;
+	},
+	view: function (ctrl) {
+		return ctrl.view(ctrl.ctrl);
+	}
+};
+
+m.mount($elem1, m.component(labelTextComponent, 'label1', 'value1'));
+m.mount($elem2, m.component(labelTextComponent, 'label2', 'value2'));
+m.mount($elem3, m.component(components, [
+	m.component(labelTextComponent, 'label333', 'value333'),
+	{view: function () { return m('br'); }},
+	m.component(labelTextComponent, 'label44444', 'value44444')]));
+
+</script>
+
