@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Language" content="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>console component - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.js"></script>
+
+
+<body>
+<div id="$textListElement1"></div>
+<div id="$textListElement2"></div>
+</body>
+
+<script src="text-list-component.js"></script>
+
+<script>
+
+var setLog1 = m.prop(function () {});
+var setLog2 = m.prop(function () {});
+
+m.mount($textListElement1, m.component(textListComponent, {setLog: setLog1}));
+m.mount($textListElement2, m.component(textListComponent, {title: 'text list 2', setLog: setLog2}));
+
+var log1 = setLog1();
+var log2 = setLog2();
+log1('test1');
+log2('test11');
+log1('test2');
+log2('test22');
+m.redraw(true);
+
+</script>
