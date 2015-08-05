@@ -20,15 +20,13 @@
 <div id="$elem3"></div>
 </body>
 
-<script src="console-component.js"></script>
-
 <script>
 var labelComponent = {
 	controller: function (label) {
 		this.label = label + ':';
 	},
 	view: function (ctrl) {
-		return ctrl.label;
+		return m('td', ctrl.label);
 	}
 };
 
@@ -45,45 +43,82 @@ var textComponent = {
 		this.value = m.prop(value);
 	},
 	view: function (ctrl) {
-		return m('input', makeAttrsOn('onchange', 'value', ctrl.value));
+		return m('td', [m('input', makeAttrsOn('onchange', 'value', ctrl.value))]);
 	}
 };
 
 var components = {
 	controller: function (comps) {
 		var ctrl = this;
-		ctrl.comps = comps;
-		ctrl.ctrls = ctrl.comps.map(function (comp) {
-			if (!comp.controller) return {};
-			return new comp.controller(); });
-		ctrl.views = ctrl.comps.map(function (comp) { return comp.view; });
+		ctrl.children = comps.map(function (comp) {
+			return {comp: comp, view: comp.view,
+				ctrl: !comp.controller ? {} : new comp.controller()}
+		});
 	},
 	view: function (ctrl) {
-		return ctrl.views.map(function (view, i) { return view(ctrl.ctrls[i]); });
+			return ctrl.children.map(function (child) {
+				return child.view(child.ctrl); });
 	}
 };
 
 var labelTextComponent = {
 	controller: function (label, value) {
 		var ctrl = this;
-		ctrl.comps = [
+		ctrl.children = [
 			m.component(labelComponent, label),
-			m.component(textComponent, value)];
-		ctrl.comp = m.component(components, ctrl.comps);
-		ctrl.ctrl = new ctrl.comp.controller();
-		ctrl.view = ctrl.comp.view;
+			m.component(textComponent, value)]
+			.map(function (comp) {
+				return {comp: comp, view: comp.view,
+					ctrl: !comp.controller ? {} : new comp.controller()}
+			});
 	},
 	view: function (ctrl) {
-		return ctrl.view(ctrl.ctrl);
+		return m('tr', [
+			ctrl.children.map(function (child) {
+				return child.view(child.ctrl); })
+		]);
 	}
 };
 
-m.mount($elem1, m.component(labelTextComponent, 'label1', 'value1'));
-m.mount($elem2, m.component(labelTextComponent, 'label2', 'value2'));
-m.mount($elem3, m.component(components, [
-	m.component(labelTextComponent, 'label333', 'value333'),
-	{view: function () { return m('br'); }},
-	m.component(labelTextComponent, 'label44444', 'value44444')]));
+var labelTextComponent2 = {
+	controller: function (label, value) {
+		var ctrl = this;
+		ctrl.children = [
+			m.component(labelComponent, label),
+			m.component(textComponent, value)]
+			.map(function (comp) {
+				return {comp: comp, view: comp.view,
+					ctrl: !comp.controller ? {} : new comp.controller()}
+			});
+	},
+	view: function (ctrl) {
+			return ctrl.children.map(function (child) {
+				return child.view(child.ctrl); });
+	}
+};
+
+var form1Component = {
+	controller: function (label, value) {
+		var ctrl = this;
+		ctrl.children = [
+			m.component(labelTextComponent, 'label333', 'value333'),
+			m.component(labelTextComponent, 'label44444', 'value44444')]
+			.map(function (comp) {
+				return {comp: comp, view: comp.view,
+					ctrl: !comp.controller ? {} : new comp.controller()}
+			});
+	},
+	view: function (ctrl) {
+		return m('table', {border: 0, bgcolor: '#ddffdd'}, [
+			ctrl.children.map(function (child) {
+				return child.view(child.ctrl); })
+		]);
+	}
+};
+
+//m.mount($elem1, m.component(labelTextComponent, 'label1', 'value1'));
+//m.mount($elem2, m.component(labelTextComponent, 'label2', 'value2'));
+m.mount($elem3, form1Component);
 
 </script>
 
