@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Basic App - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
+
+<body>
+<div id="$basicElement"></div>
+</body>
+
+<script>
+
+//コンポーネント定義
+var basicComponent = function () {
+	'use strict';
+
+	//コンポーネントでコントローラとビューを定義する
+	var basicComponent = {
+
+		//コントローラ
+		controller: function (args) {
+			var ctrl = this;
+
+			//入力中の名前を保持するスロット
+			ctrl.name = m.prop(args && args.name || '');
+
+			//focus対応, keydown対応
+			ctrl.config = function (elem, isInit) {
+				elem.focus();
+				if (isInit) return;
+
+				var doSometimes = makeSometimes();
+
+				function setName() { ctrl.name(elem.value); }
+
+				elem.onkeydown = function (e) {
+					doSometimes(setName);
+					return true;
+				};
+			};
+
+		},
+
+		//ビュー
+		view: function (ctrl) {
+			return [
+				m('h1', '基本アプリ'),
+				m('label', '名前： '),
+				m('input', makeAttrsOn('onchange', 'value', ctrl.name,
+					{placeholder: 'ここに名前を入力', config: ctrl.config})),
+				m('hr'),
+				m('h2', ['こんにちは ', ctrl.name(), '!'])
+			];
+		}
+	};
+
+	//HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function makeAttrsOn(onEventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs[onEventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	//時々実行して、m.redraw()する関数を作成
+	function makeSometimes() {
+		var progress = false;
+
+		function doSometimes(fn) {
+			if (progress) return;
+			progress = true;
+			setTimeout(function () {
+				fn();
+				progress = false;
+				m.redraw(true);
+			}, 50);
+		}
+
+		return doSometimes;
+	}
+
+	return basicComponent;
+
+}();
+
+//アプリケーションの初期化
+//HTML要素にコンポーネントをマウント
+//m.mount($basicElement, m.component(basicComponent, {name: 'なまえ'}));
+m.mount($basicElement, basicComponent);
+
+// 参考: AngularJS - The Basics
+// https://angularjs.org/
+
+</script>
