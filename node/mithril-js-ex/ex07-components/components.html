@@ -15,9 +15,7 @@
 
 
 <body>
-<div id="$elem1"></div>
-<div id="$elem2"></div>
-<div id="$elem3"></div>
+<div id="$formElement"></div>
 </body>
 
 <script>
@@ -47,78 +45,49 @@ var textComponent = {
 	}
 };
 
+function doView(view) { return view(); }
+function makeView(comp) {
+	return comp.view.bind(null, !comp.controller ? {} : new comp.controller());
+}
+
 var components = {
 	controller: function (comps) {
 		var ctrl = this;
-		ctrl.children = comps.map(function (comp) {
-			return {comp: comp, view: comp.view,
-				ctrl: !comp.controller ? {} : new comp.controller()}
-		});
+		ctrl.views = comps.map(makeView);
 	},
 	view: function (ctrl) {
-			return ctrl.children.map(function (child) {
-				return child.view(child.ctrl); });
+		return ctrl.views.map(doView);
 	}
 };
 
 var labelTextComponent = {
 	controller: function (label, value) {
 		var ctrl = this;
-		ctrl.children = [
+		ctrl.views = [
 			m.component(labelComponent, label),
 			m.component(textComponent, value)]
-			.map(function (comp) {
-				return {comp: comp, view: comp.view,
-					ctrl: !comp.controller ? {} : new comp.controller()}
-			});
+			.map(makeView);
 	},
 	view: function (ctrl) {
-		return m('tr', [
-			ctrl.children.map(function (child) {
-				return child.view(child.ctrl); })
-		]);
-	}
-};
-
-var labelTextComponent2 = {
-	controller: function (label, value) {
-		var ctrl = this;
-		ctrl.children = [
-			m.component(labelComponent, label),
-			m.component(textComponent, value)]
-			.map(function (comp) {
-				return {comp: comp, view: comp.view,
-					ctrl: !comp.controller ? {} : new comp.controller()}
-			});
-	},
-	view: function (ctrl) {
-			return ctrl.children.map(function (child) {
-				return child.view(child.ctrl); });
+		return m('tr', ctrl.views.map(doView));
 	}
 };
 
 var form1Component = {
 	controller: function (label, value) {
 		var ctrl = this;
-		ctrl.children = [
+		ctrl.views = [
 			m.component(labelTextComponent, 'label333', 'value333'),
 			m.component(labelTextComponent, 'label44444', 'value44444')]
-			.map(function (comp) {
-				return {comp: comp, view: comp.view,
-					ctrl: !comp.controller ? {} : new comp.controller()}
-			});
+			.map(makeView);
 	},
 	view: function (ctrl) {
 		return m('table', {border: 0, bgcolor: '#ddffdd'}, [
-			ctrl.children.map(function (child) {
-				return child.view(child.ctrl); })
+			ctrl.views.map(doView)
 		]);
 	}
 };
 
-//m.mount($elem1, m.component(labelTextComponent, 'label1', 'value1'));
-//m.mount($elem2, m.component(labelTextComponent, 'label2', 'value2'));
-m.mount($elem3, form1Component);
+m.mount($formElement, form1Component);
 
 </script>
-
