@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>ToDo App - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
+
+<body>
+<div id="$todoElement"></div>
+</body>
+
+<script>
+
+//コンポーネント定義
+var todoComponent = function () {
+	'use strict';
+
+	//モデル: Todoクラスは2つのプロパティ(description : string, done : boolean)を持つ
+	function Todo(data) {
+		this.description = m.prop(data.description);
+		this.done = m.prop(false);
+		this.key = (new Date() - 0) + ':' + Math.random();
+	};
+
+	//モデル: TodoListクラスはTodoオブジェクトの配列
+	var TodoList = Array;
+
+	//コントローラ・オブジェクトctrlは
+	//表示されているTodoのリスト(list)を管理し、
+	//作成が完了する前のTodoの説明(description)を格納したり、
+	//Todoを作成して追加(add)が可能かどうかを判定し、
+	//Todoが追加された後にテキスト入力をクリアする
+
+	//このアプリケーションは、todoComponentコンポーネントでコントローラとビューを定義する
+	var todoComponent = {
+
+		//コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
+		//この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
+		controller: function (listArg) {
+			var ctrl = this;
+
+			//アクティブなToDoのリスト
+			ctrl.list = new TodoList();
+
+			//引数に渡されたtodo説明リストからToDoのリストに追加
+			if (listArg) {
+				listArg.forEach(function (desc) {
+					ctrl.list.push(new Todo({description: desc}));
+				});
+			}
+
+			//新しいToDoを作成する前の、入力中のToDoの名前を保持するスロット
+			ctrl.description = m.prop('');
+
+			//ToDoをリストに登録し、ユーザが使いやすいようにdescriptionフィールドをクリアする
+			ctrl.add = function () {
+				if (ctrl.description()) {
+					ctrl.list.push(new Todo({description: ctrl.description()}));
+					ctrl.description('');
+				}
+			};
+
+			//Enterキーに対応
+			ctrl.configInput = function (elem, isInit) {
+				elem.focus();
+				if (isInit) return;
+				elem.onkeypress = function (e) {
+					if ((e || event).keyCode !== 13) return true;
+					setTimeout(function () {
+						ctrl.add();
+						m.redraw(true);
+						elem.focus();
+					}, 0);
+					return true; // elem.onchange();
+				};
+			};
+
+			//完了の数
+			ctrl.countDone = function () {
+				return ctrl.list.filter(function (todo) {
+					return todo.done();
+				}).length;
+			};
+
+			//未了の数
+			ctrl.countUndone = function () {
+				return ctrl.list.filter(function (todo) {
+					return !todo.done();
+				}).length;
+			};
+
+			//完了タスクを全て削除
+			ctrl.removeAllDone = function () {
+				ctrl.list = ctrl.list.filter(function (todo) {
+					return !todo.done();
+				});
+			};
+
+			//全て完了/未了
+			ctrl.checkAll = function () {
+				var state = ctrl.countUndone() !== 0;
+				ctrl.list.forEach(function (todo) { todo.done(state); });
+			};
+
+			//削除
+			ctrl.removeTodo = function (todoToRemove) {
+				ctrl.list = ctrl.list.filter(function (todo) {
+					return todo !== todoToRemove;
+				});
+			};
+
+			//表示モード
+			ctrl.mode = 0; //0:ALL, 1:DONE, 2:UNDONE
+
+		},
+
+		//ビュー
+		view: function (ctrl) {
+			return [
+				m('h1', 'ToDoアプリ'),
+				m('input', makeAttrsOn('onchange', 'value', ctrl.description,
+					{required: true, placeholder: '新しいタスクを入力', config: ctrl.configInput})),
+				m('button', {onclick: ctrl.add}, '追加'),
+				m('div', [
+					m('button', {onclick: ctrl.checkAll}, '全て完了/未了'),
+					m('button', {onclick: function () { ctrl.mode = 0; }},
+						[(ctrl.mode === 0 ? '●': '') + '全て', m('span', ctrl.list.length)]),
+					m('button', {onclick: function () { ctrl.mode = 2; }},
+						[(ctrl.mode === 2 ? '●': '') + '未了', m('span', ctrl.countUndone())]),
+					m('button', {onclick: function () { ctrl.mode = 1; }},
+						[(ctrl.mode === 1 ? '●': '') + '完了', m('span', ctrl.countDone())]),
+					m('button', {onclick: ctrl.removeAllDone}, '完了タスクを全て削除')
+				]),
+				m('table', [ctrl.list.map(function(todo) {
+					var attrs = {key: todo.key};
+					if (ctrl.mode === 1 && !todo.done() ||
+						ctrl.mode === 2 &&  todo.done())
+							attrs.style = {display: 'none'};
+					return m('tr', attrs, [
+						m('td', [
+							m('input[type=checkbox]', makeAttrsOn('onclick', 'checked', todo.done))
+						]),
+						m('td', {width: '80%', style: {textDecoration: todo.done() ? 'line-through' : 'none'}}, todo.description()),
+						m('td', [m('button', {type: 'reset', onclick: ctrl.removeTodo.bind(null, todo)}, '削除')])
+					]);
+				})])
+			];
+		}
+	};
+
+	//HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function makeAttrsOn(onEventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs[onEventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	return todoComponent;
+
+}();
+
+//アプリケーションの初期化
+//HTML要素にコンポーネントをマウント
+m.mount($todoElement, m.component(todoComponent, ['first task', 'second task']));
+//m.mount($todoElement, todoComponent);
+
+// 参考: AngularJS チュートリアル - ToDoアプリをつくろう
+// http://8th713.github.io/LearnAngularJS/#/
+
+</script>
