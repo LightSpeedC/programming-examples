@@ -1,0 +1,27 @@
+express-ex>express -e ex03-express-ejs
+
+   create : ex03-express-ejs
+   create : ex03-express-ejs/package.json
+   create : ex03-express-ejs/app.js
+   create : ex03-express-ejs/public
+   create : ex03-express-ejs/public/javascripts
+   create : ex03-express-ejs/public/stylesheets
+   create : ex03-express-ejs/public/stylesheets/style.css
+   create : ex03-express-ejs/public/images
+   create : ex03-express-ejs/routes
+   create : ex03-express-ejs/routes/index.js
+   create : ex03-express-ejs/routes/users.js
+   create : ex03-express-ejs/views
+   create : ex03-express-ejs/views/index.ejs
+   create : ex03-express-ejs/views/error.ejs
+   create : ex03-express-ejs/bin
+   create : ex03-express-ejs/bin/www
+
+   install dependencies:
+     > cd ex03-express-ejs && npm install
+
+   run the app:
+     > SET DEBUG=ex03-express-ejs:* & npm start
+
+
+express-ex>
