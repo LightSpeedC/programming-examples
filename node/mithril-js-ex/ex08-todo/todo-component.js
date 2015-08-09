@@ -29,7 +29,7 @@ this.todoComponent = function () {
 			//アクティブなToDoのリスト
 			ctrl.list = new TodoList();
 
-			//引数に渡されたtodoデータリストからToDoのリストに追加
+			//引数に渡されたtodoデータリストlistからToDoのリストに追加
 			if (args && args.list) {
 				args.list.forEach(function (data) {
 					ctrl.list.push(new Todo(data));
@@ -58,34 +58,30 @@ this.todoComponent = function () {
 
 			//Enterキーに対応
 			ctrl.configInput = function (elem, isInit) {
-				if (isInit) return;
 				elem.focus();
+				if (isInit) return;
 				elem.onkeypress = function (e) {
-					if ((e || event).keyCode !== 13) return true;
-					setTimeout(function () {
-						ctrl.add();
-						m.redraw(true);
-						elem.focus();
-					}, 0);
-					return true; // elem.onchange();
+					if ((e || event).keyCode === 13)
+						m_delay(function () { ctrl.add(); /*elem.focus();*/ });
+					return true;
 				};
 			};
 
-			//完了の数
+			//完了タスクの数
 			ctrl.countDone = function () {
 				return ctrl.list.filter(function (todo) {
 					return todo.done();
 				}).length;
 			};
 
-			//未了の数
+			//未了タスクの数
 			ctrl.countUndone = function () {
 				return ctrl.list.filter(function (todo) {
 					return !todo.done();
 				}).length;
 			};
 
-			//完了タスクを全て削除
+			//完了タスクを全て削除(未了タスクを残す)
 			ctrl.removeAllDone = function () {
 				ctrl.list = ctrl.list.filter(function (todo) {
 					return !todo.done();
@@ -110,10 +106,17 @@ this.todoComponent = function () {
 
 			//編集モード
 			ctrl.todoEdit = null;
-			ctrl.toggleEdit = function (todo) { ctrl.todoEdit = ctrl.todoEdit ? null : todo; };
+			ctrl.toggleEdit = function (todo) {
+				ctrl.todoEdit = ctrl.todoEdit ? null : todo;
+			};
 			ctrl.configEdit = function (elem, isInit) {
 				elem.focus();
 				if (isInit) return;
+				elem.onkeypress = function (e) {
+					if ((e || event).keyCode === 13)
+						m_delay(ctrl.toggleEdit);
+					return true;
+				};
 			};
 
 		},
@@ -122,21 +125,25 @@ this.todoComponent = function () {
 		view: function (ctrl) {
 			return [
 				m('h1', 'ToDoアプリ'),
-				m('input', m_connect('onchange', 'value', ctrl.description,
-					{placeholder: '新しいタスクを入力', config: ctrl.configInput})),
-				m('button', {onclick: ctrl.add}, '追加'),
+				m('div', ['タスク: ',
+					m('input', m_connect('onchange', 'value', ctrl.description,
+						{autofocus: true,
+						 placeholder: '新しいタスクを入力',
+						 config: ctrl.configInput})),
+					m('button[type=submit]', {onclick: ctrl.add}, '追加')
+				]),
 				m('hr'),
 				m('div', ['表示: ',
-					m('button', {onclick: function () { ctrl.mode = 0; }},
+					m('button[type=button]', {onclick: function () { ctrl.mode = 0; }},
 						[(ctrl.mode === 0 ? '★': '') + '全て', m('span', ctrl.list.length)]),
-					m('button', {onclick: function () { ctrl.mode = 2; }},
+					m('button[type=button]', {onclick: function () { ctrl.mode = 2; }},
 						[(ctrl.mode === 2 ? '★': '') + '未了', m('span', ctrl.countUndone())]),
-					m('button', {onclick: function () { ctrl.mode = 1; }},
+					m('button[type=button]', {onclick: function () { ctrl.mode = 1; }},
 						[(ctrl.mode === 1 ? '★': '') + '完了', m('span', ctrl.countDone())])
 				]),
 				m('div', ['操作: ',
-					m('button', {onclick: ctrl.checkAll}, '全て完了/未了'),
-					m('button', {onclick: ctrl.removeAllDone}, '完了タスクを全て削除')
+					m('button[type=button]', {onclick: ctrl.checkAll}, '全て完了/未了'),
+					m('button[type=button]', {onclick: ctrl.removeAllDone}, '完了タスクを全て削除')
 				]),
 				m('hr'),
 				m('table', [ctrl.list.map(function(todo) {
@@ -145,18 +152,22 @@ this.todoComponent = function () {
 						ctrl.mode === 2 &&  todo.done())
 							attrs.style = {display: 'none'};
 					return m('tr', attrs, [
-						m('td', [m('button', {type: 'reset', onclick: ctrl.removeTodo.bind(null, todo)}, '削除')]),
+						m('td', [
+							m('button[type=reset]', {onclick: ctrl.removeTodo.bind(null, todo)}, '削除')
+						]),
 						m('td', [
 							m('input[type=checkbox]', m_connect('onclick', 'checked', todo.done))
 						]),
 						todo === ctrl.todoEdit ?
 							//編集
-							m('input', m_connect('onchange', 'value', todo.description,
-								{onblur: ctrl.toggleEdit, config: ctrl.configEdit})) :
+							m('td', [
+								m('input', m_connect('onchange', 'value', todo.description,
+									{onblur: ctrl.toggleEdit, config: ctrl.configEdit}))
+							]) :
 							//表示
 							m('td',
 								{style: {textDecoration: todo.done() ? 'line-through' : 'none'},
-								ondblclick: ctrl.toggleEdit.bind(null, todo)},
+								 ondblclick: ctrl.toggleEdit.bind(null, todo)},
 								todo.description())
 					]);
 				})]),
@@ -171,6 +182,14 @@ this.todoComponent = function () {
 		attrs[onEventName] = m.withAttr(propName, propFunc);
 		attrs[propName] = propFunc();
 		return attrs;
+	}
+
+	//遅延実行および再描画
+	function m_delay(fn) {
+		setTimeout(function () {
+			fn();
+			m.redraw(true);
+		}, 0);
 	}
 
 	return todoComponent;
