@@ -1,5 +1,8 @@
 <!doctype html>
 <script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
+<script src="/js/misc-ie8-polyfill.js"></script>
+<body></body>
 <script>
 //this application only has one component: todo
 var todo = {};
@@ -47,8 +50,7 @@ todo.controller = function() {
 
 //here's the view
 todo.view = function() {
-  return m("html", [
-    m("body", [
+  return [
       m("input", {onchange: m.withAttr("value", todo.vm.description), value: todo.vm.description()}),
       m("button", {onclick: todo.vm.add}, "Add"),
       m("table", [
@@ -61,10 +63,9 @@ todo.view = function() {
           ])
         })
       ])
-    ])
-  ]);
+    ];
 };
 
 //initialize the application
-m.mount(document, todo);
+m.mount(document.body, todo);
 </script>
