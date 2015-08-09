@@ -1,0 +1,28 @@
+express-ex>express ex02-express-jade
+
+   create : ex02-express-jade
+   create : ex02-express-jade/package.json
+   create : ex02-express-jade/app.js
+   create : ex02-express-jade/public/javascripts
+   create : ex02-express-jade/public/stylesheets
+   create : ex02-express-jade/public/stylesheets/style.css
+   create : ex02-express-jade/public
+   create : ex02-express-jade/public/images
+   create : ex02-express-jade/routes
+   create : ex02-express-jade/routes/index.js
+   create : ex02-express-jade/routes/users.js
+   create : ex02-express-jade/views
+   create : ex02-express-jade/views/index.jade
+   create : ex02-express-jade/views/layout.jade
+   create : ex02-express-jade/views/error.jade
+   create : ex02-express-jade/bin
+   create : ex02-express-jade/bin/www
+
+   install dependencies:
+     > cd ex02-express-jade && npm install
+
+   run the app:
+     > SET DEBUG=ex02-express-jade:* & npm start
+
+
+express-ex>
