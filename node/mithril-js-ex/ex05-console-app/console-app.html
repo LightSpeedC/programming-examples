@@ -3,12 +3,17 @@
 <title>Mithril.js print</title>
 
 <script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
+<script src="/js/misc-ie8-polyfill.js"></script>
 
-<div id="counter-app"></div>
-
-<div id="console-app"></div>
+<body>
+<div id="$counterElement"></div>
+<div id="$consoleElement"></div>
+</body>
 
 <script>
+
+this.console = this.console || {log: function () {}};
 
 var ConsoleApp = {
 	controller: function (args) {
@@ -45,7 +50,7 @@ var ConsoleApp = {
 	}
 };
 
-m.mount(document.getElementById("console-app"), m.component(ConsoleApp, {limit: 20}));
+m.mount($consoleElement, m.component(ConsoleApp, {limit: 20}));
 
 var CounterApp = {
 	controller: function () {
@@ -62,6 +67,6 @@ var CounterApp = {
 	}
 };
 
-m.mount(document.getElementById("counter-app"), CounterApp);
+m.mount($counterElement, CounterApp);
 
 </script>

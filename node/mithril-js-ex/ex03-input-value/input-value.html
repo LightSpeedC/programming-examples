@@ -2,8 +2,9 @@
 <meta charset="UTF-8">
 <title>Mithril.js tweet</title>
 <script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
 
-<div id="app"></div>
+<body><div id="$app"></div></body>
 
 <script>
 
@@ -26,6 +27,7 @@ var App = {
 	}
 };
 
-m.mount(document.getElementById("app"), App);
+//document.getElementById("app")
+m.mount($app, App);
 
 </script>
