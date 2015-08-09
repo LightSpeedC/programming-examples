@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <meta charset="UTF-8">
 <script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
+<body></body>
 <script>
 var counter = 0;
 setInterval(function () {
 	counter++;
 	m.redraw(true);
 }, 1000);
-m.mount(document, {view: function () {
+m.mount(document.body, {view: function () {
 	return 'count: ' + counter;
 }});
 </script>

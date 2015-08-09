@@ -4,6 +4,7 @@
 
 <!-- your local  -->
 <script src="/js/mithril.min.js"></script>
+<script src="/js/mithril.ie.polyfill.min.js"></script>
 
 <!-- cdnjs -->
 <!-- <script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script> -->
@@ -11,11 +12,12 @@
 <!-- jsDelivr -->
 <!-- <script src="//cdn.jsdelivr.net/mithril/0.2.0/mithril.min.js"></script> -->
 
-<div id="app"></div>
+<body><div id="$app"></div></body>
 
 <script>
 
-m.mount(document.getElementById('app'), {
+//document.getElementById('$app');
+m.mount($app, {
   controller: function () {
     var ctrl = this;
     ctrl.counter = m.prop(0);
