@@ -1,0 +1,21 @@
+{
+  "name": "design-mui-ex",
+  "version": "0.0.0",
+  "description": "design MUI examples",
+  "main": "app.js",
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "keywords": [
+    "mithril"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
