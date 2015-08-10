@@ -4,6 +4,7 @@
   "description": "mithril.js examples",
   "main": "app.js",
   "dependencies": {
+    "debug": "^2.2.0",
     "express": "^4.13.3"
   },
   "scripts": {
