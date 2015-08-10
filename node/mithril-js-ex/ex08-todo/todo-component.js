@@ -107,7 +107,16 @@ this.todoComponent = function () {
 			//編集モード
 			ctrl.todoEdit = null;
 			ctrl.toggleEdit = function (todo) {
-				ctrl.todoEdit = ctrl.todoEdit ? null : todo;
+				if (ctrl.todoEdit) {
+					if (!ctrl.todoEdit.description())
+						ctrl.todoEdit.description(ctrl.saveDescriptionToEdit);
+					ctrl.todoEdit = null;
+				}
+				else {
+					ctrl.todoEdit = todo;
+					if (todo)
+						ctrl.saveDescriptionToEdit = todo.description();
+				}
 			};
 			ctrl.configEdit = function (elem, isInit) {
 				elem.focus();
@@ -151,25 +160,26 @@ this.todoComponent = function () {
 					if (ctrl.mode === 1 && !todo.done() ||
 						ctrl.mode === 2 &&  todo.done())
 							attrs.style = {display: 'none'};
-					return m('tr', attrs, [
-						m('td', [
-							m('button[type=reset]', {onclick: ctrl.removeTodo.bind(null, todo)}, '削除')
-						]),
-						m('td', [
-							m('input[type=checkbox]', m_connect('onclick', 'checked', todo.done))
-						]),
-						todo === ctrl.todoEdit ?
+					return m('tr', attrs,
+						todo === ctrl.todoEdit ? [
 							//編集
+							m('td', {colspan:2}),
 							m('td', [
 								m('input', m_connect('onchange', 'value', todo.description,
 									{onblur: ctrl.toggleEdit, config: ctrl.configEdit}))
-							]) :
+							])] : [
 							//表示
+							m('td', [
+								m('button[type=reset]', {onclick: ctrl.removeTodo.bind(null, todo)}, '削除')
+							]),
+							m('td', [
+								m('input[type=checkbox]', m_connect('onclick', 'checked', todo.done))
+							]),
 							m('td',
 								{style: {textDecoration: todo.done() ? 'line-through' : 'none'},
 								 ondblclick: ctrl.toggleEdit.bind(null, todo)},
-								todo.description())
-					]);
+								todo.description())]
+					);
 				})]),
 				m('div', '※ダブルクリックで編集')
 			];
