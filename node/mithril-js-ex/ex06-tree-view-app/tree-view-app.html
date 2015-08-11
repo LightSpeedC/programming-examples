@@ -11,12 +11,14 @@
 <title>tree view app - Mithril.js</title>
 
 <script src="/js/mithril.min.js"></script>
-<script src="/js/mithril.ie.polyfill.js"></script>
+<script src="/js/es5-shim.min.js"></script>
 
 
 <body>
 <div id="$consoleElement"></div>
 <div id="$treeViewElement"></div>
+<div>top や node をクリックしてみてください。</div>
+<a href="/">home</a>
 </body>
 
 <script src="console-component.js"></script>
@@ -60,5 +62,3 @@ var TreeViewComponent = {
 m.mount($treeViewElement, TreeViewComponent);
 
 </script>
-
-top や node をクリックしてみてください。

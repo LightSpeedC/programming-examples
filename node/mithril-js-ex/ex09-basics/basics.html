@@ -3,10 +3,11 @@
 <title>Basic App - Mithril.js</title>
 
 <script src="/js/mithril.min.js"></script>
-<script src="/js/mithril.ie.polyfill.min.js"></script>
+<script src="/js/es5-shim.min.js"></script>
 
 <body>
 <div id="$basicElement"></div>
+<a href="/">home</a>
 </body>
 
 <script>
@@ -47,7 +48,7 @@ var basicComponent = function () {
 			return [
 				m('h1', '基本アプリ'),
 				m('label', '名前： '),
-				m('input', makeAttrsOn('onchange', 'value', ctrl.name,
+				m('input', m_connect('onchange', 'value', ctrl.name,
 					{placeholder: 'ここに名前を入力', config: ctrl.config})),
 				m('hr'),
 				m('h2', ['こんにちは ', ctrl.name(), '!'])
@@ -56,7 +57,7 @@ var basicComponent = function () {
 	};
 
 	//HTML要素のイベントと値にプロパティを接続するユーティリティ
-	function makeAttrsOn(onEventName, propName, propFunc, attrs) {
+	function m_connect(onEventName, propName, propFunc, attrs) {
 		attrs = attrs || {};
 		attrs[onEventName] = m.withAttr(propName, propFunc);
 		attrs[propName] = propFunc();

@@ -11,12 +11,14 @@
 <title>tree list - Mithril.js</title>
 
 <script src="/js/mithril.min.js"></script>
-<script src="/js/mithril.ie.polyfill.min.js"></script>
+<script src="/js/es5-shim.min.js"></script>
 
 
 <body>
 <div id="$consoleElement"></div>
 <div id="$treeListElement"></div>
+<div>項目をクリックしてみてください。</div>
+<a href="/">home</a>
 </body>
 
 <script src="console-component.js"></script>
@@ -42,5 +44,3 @@ m.mount($treeListElement, {
 	}
 });
 </script>
-
-項目をクリックしてみてください。

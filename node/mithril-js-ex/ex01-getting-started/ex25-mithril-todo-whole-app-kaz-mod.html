@@ -1,7 +1,6 @@
 <!doctype html>
 <script src="/js/mithril.min.js"></script>
-<script src="/js/mithril.ie.polyfill.min.js"></script>
-<script src="/js/misc-ie8-polyfill.js"></script>
+<script src="/js/es5-shim.min.js"></script>
 <body></body>
 <script>
 //this application only has one component: todo
@@ -62,7 +61,8 @@ todo.view = function() {
             m("td", {style: {textDecoration: task.done() ? "line-through" : "none"}}, task.description()),
           ])
         })
-      ])
+      ]),
+      m('a', {href: '/'}, 'home')
     ];
 };
 
