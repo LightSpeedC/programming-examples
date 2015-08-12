@@ -214,9 +214,9 @@ module.exports = {
     // pointer-events shim for floating labels
     if (util.supportsPointerEvents() === false) {
       jqLite.on(document, 'click', function(ev) {
-        var targetEl = ev.target;
+        var targetEl = (ev || event).target;
 
-        if (targetEl.tagName === 'LABEL' &&
+        if (targetEl && targetEl.tagName === 'LABEL' &&
             jqLite.hasClass(targetEl, floatingLabelClass)) {
           var inputEl = targetEl.previousElementSibling;
           if (jqLite.hasClass(inputEl, formControlClass)) inputEl.focus();
@@ -705,7 +705,10 @@ function jqLiteOn(element, type, callback, useCapture) {
   useCapture = (useCapture === undefined) ? false : useCapture;
 
   // add to DOM
+  if (element.addEventListener)
   element.addEventListener(type, callback, useCapture);
+  else
+  element.attachEvent('on' + type, callback, useCapture);
 
   // add to cache
   var cache = element._muiEventCache = element._muiEventCache || {};
@@ -797,7 +800,7 @@ function jqLiteReady(fn) {
   var done = false,
       top = true,
       doc = document,
-      win = doc.defaultView,
+      win = doc.defaultView || window,
       root = doc.documentElement,
       add = doc.addEventListener ? 'addEventListener' : 'attachEvent',
       rem = doc.addEventListener ? 'removeEventListener' : 'detachEvent',
@@ -1456,8 +1459,10 @@ module.exports = {
     var doc = document;
 
     // markup elements available when method is called
+    if (doc.getElementsByClassName) {
     var elList = doc.getElementsByClassName(btnClass);
     for (var i=elList.length - 1; i >= 0; i--) initialize(elList[i]);
+    }
 
     // listen for new elements
     util.onNodeInserted(function(el) {
