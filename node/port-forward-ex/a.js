@@ -102,6 +102,9 @@
         soc1.end();
       }
       soc2.on('end', portsoc2end);
+      soc2.pipe(soc1);
+      soc1.pipe(soc2);
+/*
       soc1.on('data', function (chunk) {
         try { soc2.write(chunk); }
         catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write', ctx.targetInfo)); }
@@ -110,6 +113,7 @@
         try { soc1.write(chunk); }
         catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write', ctx.targetInfo)); }
       });
+*/
     });
 
     //======================================================================
@@ -309,11 +313,14 @@
       function logs(ctx) { return logArgs(ctx, 'htps', servicePort, arguments); }
 
       var ctx = new Context();
-      ctx.targetInfo = req1.url;
+      var x = url.parse('https://' + req1.url), host = x.hostname, port = x.port || 443;
+      ctx.targetInfo = host + ':' + port;
       ctx.servicePort = servicePort;
 
       if (!soc1.$socketId) soc1.$socketId = ctx.socketId;
       else IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'reused!', toStr36(soc1.$socketId)));
+
+      var soc2;
 
       var handler;
       function httpssoc1err(err) { // client disconnect!?
@@ -328,7 +335,7 @@
 
       function httpssoc1end() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc1', 'end'));
-        soc2.end();
+        if (soc2) soc2.end();
       }
       if (!soc1.$endHandlers) soc1.$endHandlers = [];
       while (handler = soc1.$endHandlers.shift()) {
@@ -339,22 +346,63 @@
       soc1.$endHandlers.push(httpssoc1end);
 
       log.debug.apply(log, logs(ctx, 'soc1', 'CONNECT', req1.url));
-      var hostport = req1.url.split(':'), host = hostport[0], port = hostport[1] || 443;
-      var isConnect = true;
+      var useProxy = false;
+
+      // TODO req1.headers[] -> req1.rawHeaders[]
+      var headers = {};
+      for (var i in req1.headers) headers[i] = req1.headers[i];
+      delete headers['proxy-connection'];
+      if (req1.headers['proxy-connection'])
+        headers['connection'] = req1.headers['proxy-connection'];
 
       for (var i = 0, n = filters.length; i < n; ++i) {
         if (host.match(filters[i].rex)) {
           log.info.apply(log, logs(ctx, 'soc2', host + ' match', filters[i]));
-          //if (filters[i].host) host = filters[i].host;
-          //if (filters[i].port) port = filters[i].port;
-          isConnect = false;
+          if (filters[i].host) host = filters[i].host;
+          if (filters[i].port) port = filters[i].port;
+          useProxy = true;
           break;
         }
       }
 
-      var soc2 = net.connect(port, host, function connect() {
+      if (useProxy) {
+
+        var options = {
+          method:req1.method,
+          host:host,
+          port:port,
+          agent:soc1.$agent,
+          path:req1.url,
+          headers:headers};
+
+        var req2 = http.request(options);
+        req2.end();
+        req2.on('connect', function connect(res2, soc2a, head2) {
+          IS_TRACE && log.trace.apply(log, logs(ctx, 'req2', 'connected'));
+          soc2 = soc2a; // TODO
+          soc1.write('HTTP/1.1 200 Connection established\r\n\r\n');
+          if (head1 && head1.length) soc2.write(head1);
+          if (head2 && head2.length) soc1.write(head2);
+          soc2.pipe(soc1);
+          soc1.pipe(soc2);
+          soc2.on('end', function () { soc1.end(); });
+          soc2.on('error', function (err) {
+            log.warn.apply(log, logs(ctx, 'soc2', 'err', err, ctx.targetInfo));
+            soc1.end();
+          });
+        });
+        req2.on('error', function (err) {
+          log.warn.apply(log, logs(ctx, 'req2', 'err', err, ctx.targetInfo));
+          httpssoc2end();
+        });
+
+        return;
+      }
+
+      soc2 = net.connect(port, host, function connect() {
         IS_TRACE && log.trace.apply(log, logs(ctx, 'soc2', 'connected'));
         soc1.write('HTTP/1.0 200 Connection established\r\n\r\n');
+        if (head1 && head1.length) soc2.write(head1);
       });
 
       if (!soc2.$socketId) soc2.$socketId = ctx.socketId;
@@ -371,7 +419,9 @@
       }
       soc2.on('end', httpssoc2end);
 
-      if (head1 && head1.length) soc2.write(head1);
+      soc2.pipe(soc1);
+      soc1.pipe(soc2);
+/*
       soc1.on('data', function (chunk) {
         try { soc2.write(chunk); }
         catch (err) { log.warn.apply(log, logs(ctx, 'soc2', 'err', err, 'write', ctx.targetInfo)); }
@@ -380,6 +430,7 @@
         try { soc1.write(chunk); }
         catch (err) { log.warn.apply(log, logs(ctx, 'soc1', 'err', err, 'write', ctx.targetInfo)); }
       });
+*/
     });
 
     //======================================================================
