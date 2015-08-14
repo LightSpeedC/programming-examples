@@ -14,6 +14,7 @@
 
   var numConnections = 0;
   var ctxConnections = {};
+  var ctxDummy = {socketId:'----', servicePort:'----'};
   var socketIdSeq = parseInt('1000', 36);
 
   //======================================================================
@@ -23,9 +24,9 @@
       for (var i in ctxConnections)
         log.info.apply(log, logs(ctxConnections[i], '===>', ++n, ctxConnections[i].targetInfo));
       if (n === 0)
-        log.info.apply(log, logs({socketId:'----', servicePort:'----'}, '===>', 0, 'no connections'));
+        log.info.apply(log, logs(ctxDummy, '===>', 0, 'no connections'));
     },
-    function () { log.info.apply(log, logs({socketId:'----', servicePort:'----'}, '====')); }
+    function () { log.info.apply(log, logs(ctxDummy, '====')); }
   );
 
   //======================================================================
@@ -48,7 +49,7 @@
   //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   // start port forward
   function startPortForward(servicePort, config) {
-    log.info.apply(log, logs({socketId:'----'}, '@@@@', 'start opt', servicePort, config));
+    log.info.apply(log, logs(ctxDummy, '@@@@', 'start opt', servicePort, config));
 
     var proxyUrl = config.proxyUrl;
     if (proxyUrl && proxyUrl.indexOf('://') < 0) proxyUrl = 'http://' + proxyUrl;
@@ -114,13 +115,13 @@
     //======================================================================
     // server listen. server on 'listening'
     server.listen(servicePort, function listening() {
-      log.info.apply(log, logs({socketId:'----'}, 'srvr', 'listening', server.address()));
+      log.info.apply(log, logs(ctxDummy, 'srvr', 'listening', server.address()));
     });
 
     //======================================================================
     // server on 'error'
     server.on('error', function portsvrerr(err) {
-      log.warn.apply(log, logs({socketId:'----'}, 'srvr', 'err', err));
+      log.warn.apply(log, logs(ctxDummy, 'srvr', 'err', err));
     });
 
     //======================================================================
@@ -142,7 +143,7 @@
           return '^' + host.replace(/\./g, '\\.').replace(/\*/g, '.*') + '$';
         }).join('|'));
         //log.info([key, rex, config.filters[key]]);
-        log.info.apply(log, logs({socketId:'----'}, 'filt', config.filters[key], rex));
+        log.info.apply(log, logs(ctxDummy, 'filt', config.filters[key], rex));
         filters.push({rex:rex,
           host:config.filters[key] ? url.parse(config.filters[key]).hostname           : null,
           port:config.filters[key] ? Number(url.parse(config.filters[key]).port) || 80 : null})
@@ -285,16 +286,16 @@
     //======================================================================
     // server on 'connection' / socket
     server.on('connection', function connection(soc1) {
-      IS_TRACE && log.trace.apply(log, logs({socketId:'----'}, 'soc1', 'connection'));
+      IS_TRACE && log.trace.apply(log, logs(ctxDummy, 'soc1', 'connection'));
       if (soc1.$agent)
-        log.error.apply(log, logs({socketId:'----'}, 'soc1', 'err', new Error(), 'connection socket err'));
+        log.error.apply(log, logs(ctxDummy, 'soc1', 'err', new Error(), 'connection socket err'));
       soc1.$agent = new http.Agent({keepAlive: true});
 
       function connsoc1err(err) {
-        log.warn.apply(log, logs({socketId:'----'}, 'soc1', 'err', err, 'connection socket err'));
+        log.warn.apply(log, logs(ctxDummy, 'soc1', 'err', err, 'connection socket err'));
       }
       if (soc1.$errorHandlers)
-        log.error.apply(log, logs({socketId:'----'}, 'soc1', 'err', new Error(), 'connection socket err'));
+        log.error.apply(log, logs(ctxDummy, 'soc1', 'err', new Error(), 'connection socket err'));
       soc1.$errorHandlers = [];
       soc1.$errorHandlers.push(connsoc1err);
       soc1.on('error', connsoc1err);
@@ -384,25 +385,25 @@
     //======================================================================
     // server on 'upgrade' / HTTP UPGRADE
     server.on('upgrade', function upgrade(req1, soc1, head1) {
-      log.error.apply(log, logs({socketId:'----'}, 'soc1', 'UPGRADE', req1.url));
+      log.error.apply(log, logs(ctxDummy, 'soc1', 'UPGRADE', req1.url));
     });
 
     //======================================================================
     // server on 'error'
     server.on('error', function httpServerError(err) {
-      log.warn.apply(log, logs({socketId:'----'}, 'srvr', 'err', err));
+      log.warn.apply(log, logs(ctxDummy, 'srvr', 'err', err));
     });
 
     //======================================================================
     // server on 'clientError'
     server.on('clientError', function clientError(err, soc1) {
-      log.warn.apply(log, logs({socketId:'----'}, 'srvr', 'err', err, 'clientError'));
+      log.warn.apply(log, logs(ctxDummy, 'srvr', 'err', err, 'clientError'));
     });
 
     //======================================================================
     // server listen on 'listening'
     server.listen(servicePort, function listening() {
-      log.info.apply(log, logs({socketId:'----'}, 'srvr', 'listening', server.address()));
+      log.info.apply(log, logs(ctxDummy, 'srvr', 'listening', server.address()));
     });
 
     //======================================================================
