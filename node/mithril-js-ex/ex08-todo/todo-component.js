@@ -184,9 +184,11 @@ this.taskListComponent = function () {
 									task.title())]
 						);
 					})]),
-					m('div', '※ダブルクリックで編集')
-					, m('pre', JSON.stringify(taskList, null, '  ').split('\n').map(function (x) {
-						return m('div', x);
+					m('div', '※ダブルクリックで編集'),
+					//DEBUG表示
+					m('pre', {style:{color:'green', backgroundColor:'lightgray'}},
+						JSON.stringify(taskList, null, '  ').split('\n').map(function (x) {
+							return m('div', x);
 					}))
 				];
 			};
