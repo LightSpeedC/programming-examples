@@ -1,30 +1,30 @@
-//コンポーネント定義
+// コンポーネント定義
 this.taskListComponent = function () {
 	'use strict';
 
-	//モデル: Taskクラスは2つのプロパティ(title : string, done : boolean)を持つ
+	// モデル: Taskクラスは2つのプロパティ(title : string, done : boolean)を持つ
 	function Task(task) {
 		this.title = m.prop(task && task.title || '');
 		this.done  = m.prop(task && task.done  || false);
 		this.key = (new Date - 0) + Math.random();
 	}
 	Task.prototype.toJSON = function () {
-		return {title: this.title(), done: this.done()};
+		return {title: this.title, done: this.done};
 	};
 
-	//コントローラ・オブジェクトctrlは
-	//表示されているTaskのリスト(list)を管理し、
-	//作成が完了する前のTaskのタイトル(title)を格納したり、
-	//Taskを作成して追加(add)が可能かどうかを判定し、
-	//Taskが追加された後にテキスト入力をクリアする
+	// コントローラ・オブジェクトctrlは
+	// 表示されているTaskのリスト(list)を管理し、
+	// 作成が完了する前のTaskのタイトル(title)を格納したり、
+	// Taskを作成して追加(add)が可能かどうかを判定し、
+	// Taskが追加された後にテキスト入力をクリアする
 
-	//このアプリケーションは、taskListComponentコンポーネントでコントローラとビューを定義する
+	// このアプリケーションは、taskListComponentコンポーネントでコントローラとビューを定義する
 	var taskListComponent = {
 
-		//コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
-		//この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
+		// コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
+		// この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
 		controller: function (args) {
-			//アクティブなTaskのリスト
+			// アクティブなTaskのリスト
 			var taskList = [];
 
 			// Taskをタスクリストに追加
@@ -37,19 +37,19 @@ this.taskListComponent = function () {
 				list.forEach(addTask);
 			}
 
-			//引数に渡されたtaskデータリストlistからTaskのリストに追加
+			// 引数に渡されたtaskデータリストlistからTaskのリストに追加
 			if (args && args.list)
 				importList(args.list);
 
-			//引数に渡されたtaskデータリストurlからTaskのリストに追加
+			// 引数に渡されたtaskデータリストurlからTaskのリストに追加
 			if (args && args.url)
 				m.request({method: 'GET', url:args.url})
 					.then(importList);
 
-			//新しいTaskを作成する前の、入力中のTaskの名前を保持するスロット
+			// 新しいTaskを作成する前の、入力中のTaskの名前を保持するスロット
 			var titleInput = m.prop('');
 
-			//Taskをリストに登録し、ユーザが使いやすいようにtitleフィールドをクリアする
+			// Taskをリストに登録し、ユーザが使いやすいようにtitleフィールドをクリアする
 			function addTitleInput() {
 				if (titleInput()) {
 					addTask({title: titleInput()});
@@ -57,7 +57,7 @@ this.taskListComponent = function () {
 				}
 			}
 
-			//Enterキーに対応
+			// Enterキーに対応
 			function configTitleInput(elem, isInit) {
 				if (isInit) return;
 				elem.focus();
@@ -68,51 +68,51 @@ this.taskListComponent = function () {
 				};
 			}
 
-			//タスクが完了している?
+			// タスクが完了している?
 			function taskIsDone(task) {
 				return task.done();
 			}
 
-			//タスクが完了していない?
+			// タスクが完了していない?
 			function taskIsNotDone(task) {
 				return !task.done();
 			}
 
-			//完了タスクの数
+			// 完了タスクの数
 			function countDone() {
 				return taskList.filter(taskIsDone).length;
 			}
 
-			//未了タスクの数
+			// 未了タスクの数
 			function countUndone() {
 				return taskList.filter(taskIsNotDone).length;
 			}
 
-			//完了タスクを全て削除(未了タスクを残す)
+			// 完了タスクを全て削除(未了タスクを残す)
 			function removeAllDone() {
 				taskList = taskList.filter(taskIsNotDone);
 			}
 
-			//全て完了/未了
+			// 全て完了/未了
 			function checkAll() {
 				var state = countUndone() !== 0;
 				taskList.forEach(function (task) { task.done(state); });
 			}
 
-			//削除
+			// 削除
 			function removeTask(todoToRemove) {
 				taskList = taskList.filter(function (task) {
 					return task !== todoToRemove;
 				});
 			}
 
-			//表示モード
+			// 表示モード
 			var dispMode = 0; //0:ALL, 1:DONE, 2:UNDONE
 
-			//編集モード
+			// 編集モード
 			var taskToEdit; // 編集中のTask
 			var saveTitleToEdit; // 編集開始時のタイトル
-			//タスク編集モードをトグル
+			// タスク編集モードをトグル
 			function toggleEditTask(task) {
 				if (taskToEdit) {
 					if (!taskToEdit.title())
@@ -124,7 +124,7 @@ this.taskListComponent = function () {
 					if (task) saveTitleToEdit = task.title();
 				}
 			}
-			//編集するinputを構成
+			// 編集するinputを構成
 			function configEditTask(elem, isInit) {
 				if (isInit) return;
 				elem.focus();
@@ -195,13 +195,13 @@ this.taskListComponent = function () {
 
 		},
 
-		//ビュー
+		// ビュー
 		view: function (ctrl) {
 			return ctrl.view(ctrl);
 		}
 	};
 
-	//HTML要素のイベントと値にプロパティを接続するユーティリティ
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
 	function m_on(eventName, propName, propFunc, attrs) {
 		attrs = attrs || {};
 		attrs['on' + eventName] = m.withAttr(propName, propFunc);
@@ -209,7 +209,7 @@ this.taskListComponent = function () {
 		return attrs;
 	}
 
-	//遅延実行および再描画
+	// 遅延実行および再描画
 	function m_delay(fn) {
 		setTimeout(function () {
 			fn();
