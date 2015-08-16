@@ -13,30 +13,30 @@
 <script>
 
 var App = {
-    controller: function() {
-        this.list = [1, 2, 3];
-        //return {list: [1, 2, 3]}
-    },
-    view: function(ctrl) {
-        return m(".app", [
-            //pressing the button reverses the list
-            m("button[type=button]", {onclick: function() {ctrl.list.reverse()}}, "My App"),
+	controller: function() {
+		this.list = [1, 2, 3];
+		//return {list: [1, 2, 3]}
+	},
+	view: function(ctrl) {
+		return m(".app", [
+			//pressing the button reverses the list
+			m("button[type=button]", {onclick: function() {ctrl.list.reverse()}}, "My App"),
 
-            ctrl.list.map(function(item) {
-                //the key ensures the components aren't recreated from scratch, if they merely exchanged places
-                return m.component(MyComponent, {message: "Hello " + item, key: item})
-            })
-        ]);
-    }
+			ctrl.list.map(function(item) {
+				//the key ensures the components aren't recreated from scratch, if they merely exchanged places
+				return m.component(MyComponent, {message: "Hello " + item, key: item})
+			})
+		]);
+	}
 };
 
 var MyComponent = {
-    controller: function(args) {
-        return {greeting: args.message};
-    },
-    view: function(ctrl) {
-        return m("h2", ctrl.greeting);
-    }
+	controller: function(args) {
+		return {greeting: args.message};
+	},
+	view: function(ctrl) {
+		return m("h2", ctrl.greeting);
+	}
 };
 
 //document.getElementById("app")
