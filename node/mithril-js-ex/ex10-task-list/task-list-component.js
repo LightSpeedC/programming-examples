@@ -24,6 +24,10 @@ this.taskListComponent = function () {
 		// コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
 		// この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
 		controller: function (attrs) {
+
+			// DEBUGフラグ
+			var debug = m.prop(false);
+
 			// アクティブなTaskのリスト
 			var taskList = [];
 
@@ -184,8 +188,11 @@ this.taskListComponent = function () {
 									task.title())]
 						);
 					})]),
+					m('hr'),
 					m('div', '※ダブルクリックで編集'),
+					m('input[type=checkbox]', m_on('click', 'checked', debug)), 'DEBUG',
 					// DEBUG表示
+					!debug() ? [] :
 					m('pre', {style:{color:'green', backgroundColor:'lightgray'}},
 						JSON.stringify(taskList, null, '  ').split('\n').map(function (x) {
 							return m('div', x);
