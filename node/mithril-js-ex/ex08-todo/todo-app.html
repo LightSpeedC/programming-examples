@@ -6,7 +6,9 @@
 <script src="/js/es5-shim.min.js"></script>
 
 <body>
-<div id="$todoElement"></div>
+<div id="$todoElement1"></div>
+<div id="$todoElement2"></div>
+<div id="$todoElement3"></div>
 <hr>
 <a href="/">home</a>
 </body>
@@ -17,16 +19,16 @@
 
 //アプリケーションの初期化
 //HTML要素にコンポーネントをマウント
-m.mount($todoElement, m.component(taskListComponent, {url:'todo-list.json'}));
+m.mount($todoElement1, m.component(taskListComponent, {url:'todo-list.json'}));
 
-//m.mount($todoElement, m.component(taskListComponent, {list:[
-//	{done:false, title:'最初のタスク'},
-//	{done:false, title:'2番目のタスク'},
-//	{done:false, title:'3番目のタスク'},
-//	{done:true, title:'完了しているタスク'}
-//]}));
+m.mount($todoElement2, m.component(taskListComponent, {list:[
+	{done:false, title:'最初のタスク'},
+	{done:false, title:'2番目のタスク'},
+	{done:false, title:'3番目のタスク'},
+	{done:true, title:'完了しているタスク'}
+]}));
 
-//m.mount($todoElement, taskListComponent);
+m.mount($todoElement3, taskListComponent);
 
 // 参考: AngularJS チュートリアル - ToDoアプリをつくろう
 // http://8th713.github.io/LearnAngularJS/#/
