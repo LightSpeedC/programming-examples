@@ -1,58 +1,58 @@
 //コンポーネント定義
-this.todoComponent = function () {
+this.taskListComponent = function () {
 	'use strict';
 
-	//モデル: Todoクラスは2つのプロパティ(description : string, done : boolean)を持つ
-	function Todo(data) {
-		this.description = m.prop(data && data.description || '');
-		this.done        = m.prop(data && data.done || false);
+	//モデル: Taskクラスは2つのプロパティ(title : string, done : boolean)を持つ
+	function Task(task) {
+		this.title = m.prop(task && task.title || '');
+		this.done  = m.prop(task && task.done  || false);
 		this.key = (new Date() - 0) + ':' + Math.random();
 	};
 
-	//モデル: TodoListクラスはTodoオブジェクトの配列
-	var TodoList = Array;
+	//モデル: TaskListクラスはTaskオブジェクトの配列
+	var TaskList = Array;
 
 	//コントローラ・オブジェクトctrlは
-	//表示されているTodoのリスト(list)を管理し、
-	//作成が完了する前のTodoの説明(description)を格納したり、
-	//Todoを作成して追加(add)が可能かどうかを判定し、
-	//Todoが追加された後にテキスト入力をクリアする
+	//表示されているTaskのリスト(list)を管理し、
+	//作成が完了する前のTaskのタイトル(title)を格納したり、
+	//Taskを作成して追加(add)が可能かどうかを判定し、
+	//Taskが追加された後にテキスト入力をクリアする
 
-	//このアプリケーションは、todoComponentコンポーネントでコントローラとビューを定義する
-	var todoComponent = {
+	//このアプリケーションは、taskListComponentコンポーネントでコントローラとビューを定義する
+	var taskListComponent = {
 
 		//コントローラは、モデルの中のどの部分が、現在のページと関連するのかを定義している
 		//この場合は1つのコントローラ・オブジェクトctrlですべてを取り仕切っている
 		controller: function (args) {
 			var ctrl = this;
 
-			//アクティブなToDoのリスト
-			ctrl.list = new TodoList();
+			//アクティブなTaskのリスト
+			ctrl.list = new TaskList();
 
-			//引数に渡されたtodoデータリストlistからToDoのリストに追加
+			//引数に渡されたtaskデータリストlistからTaskのリストに追加
 			if (args && args.list) {
-				args.list.forEach(function (data) {
-					ctrl.list.push(new Todo(data));
+				args.list.forEach(function (task) {
+					ctrl.list.push(new Task(task));
 				});
 			}
 
-			//引数に渡されたtodoデータリストurlからToDoのリストに追加
+			//引数に渡されたtaskデータリストurlからTaskのリストに追加
 			if (args && args.url) {
 				m.request({method: 'GET', url:args.url}).then(function (list) {
-					list.forEach(function (data) {
-						ctrl.list.push(new Todo(data));
+					list.forEach(function (task) {
+						ctrl.list.push(new Task(task));
 					});
 				});
 			}
 
-			//新しいToDoを作成する前の、入力中のToDoの名前を保持するスロット
-			ctrl.description = m.prop('');
+			//新しいTaskを作成する前の、入力中のTaskの名前を保持するスロット
+			ctrl.title = m.prop('');
 
-			//ToDoをリストに登録し、ユーザが使いやすいようにdescriptionフィールドをクリアする
+			//Taskをリストに登録し、ユーザが使いやすいようにtitleフィールドをクリアする
 			ctrl.add = function () {
-				if (ctrl.description()) {
-					ctrl.list.push(new Todo({description: ctrl.description()}));
-					ctrl.description('');
+				if (ctrl.title()) {
+					ctrl.list.push(new Task({title: ctrl.title()}));
+					ctrl.title('');
 				}
 			};
 
@@ -69,35 +69,35 @@ this.todoComponent = function () {
 
 			//完了タスクの数
 			ctrl.countDone = function () {
-				return ctrl.list.filter(function (todo) {
-					return todo.done();
+				return ctrl.list.filter(function (task) {
+					return task.done();
 				}).length;
 			};
 
 			//未了タスクの数
 			ctrl.countUndone = function () {
-				return ctrl.list.filter(function (todo) {
-					return !todo.done();
+				return ctrl.list.filter(function (task) {
+					return !task.done();
 				}).length;
 			};
 
 			//完了タスクを全て削除(未了タスクを残す)
 			ctrl.removeAllDone = function () {
-				ctrl.list = ctrl.list.filter(function (todo) {
-					return !todo.done();
+				ctrl.list = ctrl.list.filter(function (task) {
+					return !task.done();
 				});
 			};
 
 			//全て完了/未了
 			ctrl.checkAll = function () {
 				var state = ctrl.countUndone() !== 0;
-				ctrl.list.forEach(function (todo) { todo.done(state); });
+				ctrl.list.forEach(function (task) { task.done(state); });
 			};
 
 			//削除
-			ctrl.removeTodo = function (todoToRemove) {
-				ctrl.list = ctrl.list.filter(function (todo) {
-					return todo !== todoToRemove;
+			ctrl.removeTask = function (todoToRemove) {
+				ctrl.list = ctrl.list.filter(function (task) {
+					return task !== todoToRemove;
 				});
 			};
 
@@ -105,17 +105,17 @@ this.todoComponent = function () {
 			ctrl.mode = 0; //0:ALL, 1:DONE, 2:UNDONE
 
 			//編集モード
-			ctrl.todoEdit = null;
-			ctrl.toggleEdit = function (todo) {
-				if (ctrl.todoEdit) {
-					if (!ctrl.todoEdit.description())
-						ctrl.todoEdit.description(ctrl.saveDescriptionToEdit);
-					ctrl.todoEdit = null;
+			ctrl.taskEdit = undefined;
+			ctrl.toggleEdit = function (task) {
+				if (ctrl.taskEdit) {
+					if (!ctrl.taskEdit.title())
+						ctrl.taskEdit.title(ctrl.saveTitleToEdit);
+					ctrl.taskEdit = undefined;
 				}
 				else {
-					ctrl.todoEdit = todo;
-					if (todo)
-						ctrl.saveDescriptionToEdit = todo.description();
+					ctrl.taskEdit = task;
+					if (task)
+						ctrl.saveTitleToEdit = task.title();
 				}
 			};
 			ctrl.configEdit = function (elem, isInit) {
@@ -133,9 +133,9 @@ this.todoComponent = function () {
 		//ビュー
 		view: function (ctrl) {
 			return [
-				m('h1', 'ToDoアプリ'),
+				m('h1', 'Task管理アプリ'),
 				m('div', ['タスク: ',
-					m('input', m_connect('onchange', 'value', ctrl.description,
+					m('input', m_on('change', 'value', ctrl.title,
 						{autofocus: true,
 						 placeholder: '新しいタスクを入力',
 						 config: ctrl.configInput})),
@@ -155,30 +155,30 @@ this.todoComponent = function () {
 					m('button[type=button]', {onclick: ctrl.removeAllDone}, '完了タスクを全て削除')
 				]),
 				m('hr'),
-				m('table', [ctrl.list.map(function(todo) {
-					var attrs = {key: todo.key};
-					if (ctrl.mode === 1 && !todo.done() ||
-						ctrl.mode === 2 &&  todo.done())
+				m('table', [ctrl.list.map(function(task) {
+					var attrs = {key: task.key};
+					if (ctrl.mode === 1 && !task.done() ||
+						ctrl.mode === 2 &&  task.done())
 							attrs.style = {display: 'none'};
 					return m('tr', attrs,
-						todo === ctrl.todoEdit ? [
+						task === ctrl.taskEdit ? [
 							//編集
 							m('td', {colspan:2}),
 							m('td', [
-								m('input', m_connect('onchange', 'value', todo.description,
-									{onblur: ctrl.toggleEdit, config: ctrl.configEdit}))
+								m('input', m_on('change', 'value', task.title,
+									{onblur: ctrl.toggleEdit.bind(ctrl, null), config: ctrl.configEdit}))
 							])] : [
 							//表示
 							m('td', [
-								m('button[type=reset]', {onclick: ctrl.removeTodo.bind(null, todo)}, '削除')
+								m('button[type=reset]', {onclick: ctrl.removeTask.bind(null, task)}, '削除')
 							]),
 							m('td', [
-								m('input[type=checkbox]', m_connect('onclick', 'checked', todo.done))
+								m('input[type=checkbox]', m_on('click', 'checked', task.done))
 							]),
 							m('td',
-								{style: {textDecoration: todo.done() ? 'line-through' : 'none'},
-								 ondblclick: ctrl.toggleEdit.bind(null, todo)},
-								todo.description())]
+								{style: {textDecoration: task.done() ? 'line-through' : 'none'},
+								 ondblclick: ctrl.toggleEdit.bind(ctrl, task)},
+								task.title())]
 					);
 				})]),
 				m('div', '※ダブルクリックで編集')
@@ -187,9 +187,9 @@ this.todoComponent = function () {
 	};
 
 	//HTML要素のイベントと値にプロパティを接続するユーティリティ
-	function m_connect(onEventName, propName, propFunc, attrs) {
+	function m_on(eventName, propName, propFunc, attrs) {
 		attrs = attrs || {};
-		attrs[onEventName] = m.withAttr(propName, propFunc);
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
 		attrs[propName] = propFunc();
 		return attrs;
 	}
@@ -202,6 +202,6 @@ this.todoComponent = function () {
 		}, 0);
 	}
 
-	return todoComponent;
+	return taskListComponent;
 
 }();

@@ -17,16 +17,16 @@
 
 //アプリケーションの初期化
 //HTML要素にコンポーネントをマウント
-m.mount($todoElement, m.component(todoComponent, {url:'todo-list.json'}));
+m.mount($todoElement, m.component(taskListComponent, {url:'todo-list.json'}));
 
-//m.mount($todoElement, m.component(todoComponent, {list:[
-//	{done:false, description:'最初のタスク'},
-//	{done:false, description:'2番目のタスク'},
-//	{done:false, description:'3番目のタスク'},
-//	{done:true, description:'完了しているタスク'}
+//m.mount($todoElement, m.component(taskListComponent, {list:[
+//	{done:false, title:'最初のタスク'},
+//	{done:false, title:'2番目のタスク'},
+//	{done:false, title:'3番目のタスク'},
+//	{done:true, title:'完了しているタスク'}
 //]}));
 
-//m.mount($todoElement, todoComponent);
+//m.mount($todoElement, taskListComponent);
 
 // 参考: AngularJS チュートリアル - ToDoアプリをつくろう
 // http://8th713.github.io/LearnAngularJS/#/
