@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Task List App - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<script src="/js/es5-shim.min.js"></script>
+
+<body>
+<div id="$taskListElement1"></div>
+<div id="$taskListElement2"></div>
+<div id="$taskListElement3"></div>
+<hr>
+<a href="/">home</a>
+</body>
+
+<script src="task-list-component.js"></script>
+
+<script>
+
+//アプリケーションの初期化
+//HTML要素にコンポーネントをマウント
+m.mount($taskListElement1, m.component(taskListComponent, {url:'task-list.json'}));
+
+m.mount($taskListElement2, m.component(taskListComponent, {list:[
+	{done:false, title:'最初のタスク'},
+	{done:false, title:'2番目のタスク'},
+	{done:false, title:'3番目のタスク'},
+	{done:true, title:'完了しているタスク'}
+]}));
+
+m.mount($taskListElement3, taskListComponent);
+
+// 参考: AngularJS チュートリアル - ToDoアプリをつくろう
+// http://8th713.github.io/LearnAngularJS/#/
+
+</script>

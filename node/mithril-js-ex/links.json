@@ -13,6 +13,7 @@
   {"title": "ex07 text list",         "url": "/ex07-components/text-list-component.html"},
   {"title": "ex08 todo app",          "url": "/ex08-todo/todo-app.html"},
   {"title": "ex09 basics",            "url": "/ex09-basics/basics.html"},
+  {"title": "ex10 task list",         "url": "/ex10-task-list/task-list-app.html"},
   {"title": "qiita counter-min.html",        "url": "/js/counter-min.html"},
   {"title": "qiita counter-variation.html",  "url": "/js/counter-variation.html"},
   {"title": "qiita counter-prop.html",       "url": "/js/counter-prop.html"},
