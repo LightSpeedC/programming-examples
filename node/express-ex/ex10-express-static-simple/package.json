@@ -1,0 +1,26 @@
+{
+  "name": "ex10-express-static-simple",
+  "version": "0.0.0",
+  "description": "ex10-express-static-simple",
+  "main": "app.js",
+  "private": true,
+  "dependencies": {
+    "express": "^4.13.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/LightSpeedC/programming-examples#readme",
+  "bugs": {
+    "url": "https://github.com/LightSpeedC/programming-examples/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "keywords": [
+    "lightspeedc"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
