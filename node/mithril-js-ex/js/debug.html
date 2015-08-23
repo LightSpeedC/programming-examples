@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>debug - Mithril.js</title>
+
+<script src="mithril.min.js"></script>
+<!--[if IE]><script src="es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$debugElement"></div>
+</body>
+
+<script>
+
+(function () {
+	'use strict';
+
+	function logger() {
+		var style = this !== window && this || {};
+		logger.list.push([{key: ++logger.seq, style: style}, [].slice.call(arguments).join(' ')]);
+		while (logger.list.length > logger.limit())
+			logger.list.shift();
+	}
+	logger.seq = 0;
+	logger.log   = function () { return logger.apply({color: 'blue'},   ['log:  '].concat([].slice.call(arguments))); };
+	logger.info  = function () { return logger.apply({color: 'green'},  ['info: '].concat([].slice.call(arguments))); };
+	logger.warn  = function () { return logger.apply({color: 'orange'}, ['warn: '].concat([].slice.call(arguments))); };
+	logger.error = function () { return logger.apply({color: 'red'},    ['error:'].concat([].slice.call(arguments))); };
+	logger.debug = function () { return logger.apply({color: 'purple'}, ['debug:'].concat([].slice.call(arguments))); };
+	logger.list  = [];
+	logger.flag  = m.prop(false); // DEBUGフラグ
+	logger.limit = m.prop(20);    // 表示数の制限
+
+	var count = 0;
+	setInterval(function () {
+		logger('       count:', ++count);
+		if (Math.random() > 0.5) logger.log('count:', ++count);
+		if (Math.random() > 0.5) logger.info('count:', ++count);
+		if (Math.random() > 0.5) logger.warn('count:', ++count);
+		if (Math.random() > 0.5) logger.debug('count:', ++count);
+		if (Math.random() > 0.5) logger.error('count:', ++count);
+		m.redraw(true);
+	}, 1000);
+
+	// コンポーネント定義
+	var debugComponent = {
+		// コントローラ
+		controller: function () {
+			var ctrl = this;
+
+			// ビュー
+			ctrl.view = function view(ctrl) {
+				return [
+					m('input[type=checkbox]', m_on('click', 'checked', logger.flag)), 'dbg',
+					// DEBUG表示
+					!logger.flag() ? [] : [
+						' limit: ' + logger.limit() + ' ',
+						m('button[type=button]', {onclick: function () {
+							var x = logger.limit() - 10;
+							if (x < 10) x = 10;
+							logger.limit(x); }}, '-'),
+						m('button[type=button]', {onclick: function () {
+							logger.limit(logger.limit() + 10); }}, '+'),
+						// m('input', m_on('change', 'value', logger.limit)),
+						m('pre', {style:{backgroundColor:'lightgray'}},
+							logger.list.map(function (e) { return m('div', e[0], e[1]); })
+						)
+					]
+				];
+			};
+		},
+		// ビュー
+		view: function (ctrl) { return ctrl.view(ctrl); }
+	};
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	//HTML要素にコンポーネントをマウント
+	m.mount($debugElement, debugComponent);
+
+})();
+
+</script>
