@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>form example - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$formElement"></div>
+</body>
+
+<script>
+
+(function () {
+	'use strict';
+
+	var inputComponent = function () {
+		return {
+			//コントローラ
+			controller: function (attrs) {
+				var ctrl = this;
+
+				var label = attrs.label || 'label';
+				var text  = attrs.text  || m.prop('');
+				var focus = false;
+
+				//ビュー
+				ctrl.view = function view(ctrl) {
+					return m('div', [
+						m('span', {style: {backgroundColor: '#eeffee'}}, label + ': '),
+						m('input', m_on('change', 'value', text, {
+							style: focus ? {backgroundColor: 'lightyellow'} : {},
+							onfocus: function () { focus = true; },
+							onblur: function () { focus = false; }
+						}))
+					]);
+				};
+			},
+			//ビュー
+			view: function (ctrl) { return ctrl.view(ctrl); }
+		};
+	}();
+
+	//コンポーネント定義
+	var formComponent = function () {
+		'use strict';
+
+		var formComponent = {
+			//コントローラ
+			controller: function () {
+				var ctrl = this;
+
+				var ctrls = [
+					m_ctrl(inputComponent, {label: 'ラベル1', text: m.prop('11')}),
+					m_ctrl(inputComponent, {label: 'ラベル2', text: m.prop('22')}),
+					m_ctrl(inputComponent, {label: 'ラベル3', text: m.prop('33')}),
+					m_ctrl(inputComponent, {label: 'ラベル4', text: m.prop('44')})
+				];
+
+				//ビュー
+				ctrl.view = function view(ctrl) {
+					return ctrls.map(function (ct) {
+						return ct.view(ct);
+					});
+				};
+			},
+			//ビュー
+			view: function (ctrl) { return ctrl.view(ctrl); }
+		};
+
+		return formComponent;
+	}();
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	function m_ctrl() {
+		return new (m.component.apply(m, arguments).controller)();
+	}
+
+	m.mount($formElement, formComponent);
+
+})();
+
+</script>
