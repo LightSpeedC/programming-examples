@@ -14,14 +14,18 @@
 (function () {
 	'use strict';
 
+	var seq = 0;
+
 	var inputComponent = function () {
 		return {
 			//コントローラ
 			controller: function (attrs) {
 				var ctrl = this;
 
-				var label = attrs.label || 'label';
-				var text  = attrs.text  || m.prop('');
+				++seq;
+				var label = ctrl.label = seq + ': ' + (attrs.label || 'label');
+				var text  = ctrl.text  = attrs.text  || m.prop('');
+				text(seq + ': ' + text());
 				var focus = false;
 
 				//ビュー
@@ -29,7 +33,7 @@
 					return m('div', [
 						m('span', {style: {backgroundColor: '#eeffee'}}, label + ': '),
 						m('input', m_on('change', 'value', text, {
-							style: focus ? {backgroundColor: 'lightyellow'} : {},
+							style: focus ? {backgroundColor: 'yellow'} : {},
 							onfocus: function () { focus = true; },
 							onblur: function () { focus = false; }
 						}))
@@ -50,18 +54,65 @@
 			controller: function () {
 				var ctrl = this;
 
-				var ctrls = [
-					m_ctrl(inputComponent, {label: 'ラベル1', text: m.prop('11')}),
-					m_ctrl(inputComponent, {label: 'ラベル2', text: m.prop('22')}),
-					m_ctrl(inputComponent, {label: 'ラベル3', text: m.prop('33')}),
-					m_ctrl(inputComponent, {label: 'ラベル4', text: m.prop('44')})
+/*
+				// 特殊なコントローラを持つパターン
+				var ctrls = [ // special: component' control object must have view method
+					new m.component(inputComponent, {label: 'ラベル 1', text: m.prop('11')}).controller(),
+					new m.component(inputComponent, {label: 'ラベル 2', text: m.prop('22')}).controller(),
+					new m.component(inputComponent, {label: 'ラベル 3', text: m.prop('33')}).controller()
 				];
+				// →OKだけど特殊すぎるね
+*/
+
+				// 特殊なコントローラ(クロージャ付きview関数をプロパティに持つ)パターン
+				var ctrls = [ // special: component' control object must have view method
+					new inputComponent.controller({label: 'ラベル 1', text: m.prop('11')}),
+					new inputComponent.controller({label: 'ラベル 2', text: m.prop('22')}),
+					new inputComponent.controller({label: 'ラベル 3', text: m.prop('33')})
+				];
+				// →OKだけど特殊すぎるね
+
+				// 単純なコンポーネントの配列
+				var comps = [
+					m.component(inputComponent, {label: 'ラベル a', text: m.prop('aa')}),
+					m.component(inputComponent, {label: 'ラベル b', text: m.prop('bb')}),
+					m.component(inputComponent, {label: 'ラベル c', text: m.prop('cc')})
+				];
+				// →ダメだね
+
+				// 引数をクロージャにしたview関数の配列
+				var views = [
+					m.component(inputComponent, {label: 'ラベル A', text: m.prop('AA')}),
+					m.component(inputComponent, {label: 'ラベル B', text: m.prop('BB')}),
+					m.component(inputComponent, {label: 'ラベル C', text: m.prop('CC')})
+				].map(m_view);
+				// →OKだけど使いにくいね
+
+				// クロージャにしたコンポーネントの配列
+				var children = [
+					m.component(inputComponent, {label: 'ラベル あ', text: m.prop('あ')}),
+					m.component(inputComponent, {label: 'ラベル い', text: m.prop('い')}),
+					m.component(inputComponent, {label: 'ラベル う', text: m.prop('う')})
+				].map(m_comp);
+				// →とりあえずOK
 
 				//ビュー
 				ctrl.view = function view(ctrl) {
-					return ctrls.map(function (ct) {
-						return ct.view(ct);
-					});
+					return [
+						ctrls.map(function (ct, i, a) {
+							return [
+								m('button[type=button]',
+									{onclick: function () { delete a[i]; }}, '削除↓'),
+								ct.view(ct)
+							];
+						}),
+						m.component(inputComponent, {label: 'ラベル X', text: m.prop('XX')}),
+						m.component(inputComponent, {label: 'ラベル Y', text: m.prop('YY')}),
+						m.component(inputComponent, {label: 'ラベル Z', text: m.prop('ZZ')}),
+						comps,
+						views.map(function (view) { return view(); }),
+						children
+					];
 				};
 			},
 			//ビュー
@@ -79,10 +130,24 @@
 		return attrs;
 	}
 
-	function m_ctrl() {
-		return new (m.component.apply(m, arguments).controller)();
+	// 特殊なコントローラ用
+	//function m_ctrl() {
+	//	return new (m.component.apply(m, arguments).controller)();
+	//}
+
+	// view用
+	function m_view(comp) {
+		var ctrl = new comp.controller();
+		return function view() { return comp.view(ctrl); };
 	}
 
+	// component用
+	function m_comp(comp) {
+		var ctrl = new comp.controller();
+		return {view: function view() { return comp.view(ctrl); }};
+	}
+
+	// マウント
 	m.mount($formElement, formComponent);
 
 })();
