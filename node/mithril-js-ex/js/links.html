@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>links - Mithril.js</title>
+
+<script src="mithril.min.js"></script>
+<!--[if IE]><script src="es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$linksElement"></div>
+</body>
+
+<script>
+
+// コンポーネント定義
+var linksComponent = {
+	// コントローラ
+	controller: function () {
+		// データをサーバーから取得する
+		this.list = m.request({method: 'GET', url: 'links.json', initialValue: []});
+	},
+	// ビュー
+	view: function (ctrl) {
+		return m('ul',
+			ctrl.list().map(function (item) {
+				return m('li', [m('a', {href: item.url}, item.title)]);
+			})
+		);
+	}
+};
+
+m.mount($linksElement, linksComponent);
+
+</script>
