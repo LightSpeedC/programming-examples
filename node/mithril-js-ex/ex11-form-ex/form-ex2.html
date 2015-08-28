@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>form example - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$formElement"></div>
+</body>
+
+<script>
+
+(function () {
+	'use strict';
+
+	// Empty コンポーネント
+	var emptyComponent = extend({
+		view: function view(ctrl) { throw new Error('implement please!'); }
+	},
+	{ // statics
+		makeComponent: function () { return {controller: this,
+			view: function (ctrl) { return ctrl.view(ctrl); }};
+		}
+	}).makeComponent();
+
+	// Label コンポーネント
+	var labelComponent = emptyComponent.controller.extend({
+		constructor: function LabelController(attrs) {
+			emptyComponent.controller.apply(this, arguments);
+			var label = attrs.label || 'label';
+
+			// ビュー
+			this.viewLabel = function viewLabel(ctrl) {
+				return m('span', {style: {backgroundColor: '#eeffee'}}, label + ': ');
+			};
+			this.view = function view(ctrl) { return ctrl.viewLabel(ctrl); };
+		}
+	}).makeComponent();
+
+	// Text コンポーネント
+	var textComponent = emptyComponent.controller.extend({
+		constructor: function TextController(attrs) {
+			emptyComponent.controller.apply(this, arguments);
+			var text = attrs.text || m.prop('');
+			var focus = false;
+
+			// ビュー
+			this.viewText = function viewText(ctrl) {
+				return m('input', m_on('change', 'value', text, {
+					style: focus ? {backgroundColor: 'yellow'} : {},
+					onfocus: function () { focus = true; },
+					onblur: function () { focus = false; }
+				}));
+			};
+			this.view = function view(ctrl) { return ctrl.viewText(ctrl); };
+		}
+	}).makeComponent();
+
+	// Input コンポーネント
+	var inputComponent = emptyComponent.controller.extend({
+		constructor: function InputController(attrs) {
+			labelComponent.controller.apply(this, arguments);
+			textComponent.controller.apply(this, arguments);
+
+			// ビュー
+			this.viewInput = function viewInput(ctrl) {
+				return [
+					ctrl.viewLabel(ctrl),
+					ctrl.viewText(ctrl)
+				];
+			};
+			this.view = function view(ctrl) { return ctrl.viewInput(ctrl); };
+		}
+	}).makeComponent();
+
+	// Form コンポーネント定義
+	var formComponent = emptyComponent.controller.extend({
+		constructor: function FormController() {
+			// クロージャにしたコンポーネントの配列
+			var children = [
+				m.component(inputComponent, {label: 'ラベル あ', text: m.prop('あ')}),
+				m.component(inputComponent, {label: 'ラベル い', text: m.prop('い')}),
+				m.component(inputComponent, {label: 'ラベル う', text: m.prop('う')})
+			].map(m_closure);
+
+			// ビュー
+			this.view = function view(ctrl) {
+				return [
+					children.map(function (comp, i, a) {
+						return m('div', {},
+							m('button[type=button]',
+								{onclick: function () { delete a[i]; }}, '削除'),
+							comp.view()
+						);
+					})
+				];
+			};
+		}
+	}).makeComponent();
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	// component用 closure化ユーティリティ
+	function m_closure(comp) {
+		var ctrl = new comp.controller();
+		return {view: function view() { return comp.view(ctrl); }};
+	}
+
+	// merge
+	function merge(dst, src) {
+		for (var i = 1, n = arguments.length; src = arguments[i], i < n; ++i)
+			for (var p in src)
+				if (src.hasOwnProperty(p) && !dst.hasOwnProperty(p) &&
+						dst[p] !== src[p]) dst[p] = src[p];
+		return dst;
+	}
+
+	// extend
+	function extend(proto, statics) {
+		proto = proto || {};
+		var super_ = typeof this === 'function' ? this : undefined;
+		var ctor = proto.hasOwnProperty('constructor') ? proto.constructor :
+			super_ ? function () { super_.apply(this, arguments); } : function () {};
+		function $super() { this.constructor = ctor; }
+		if (super_) $super.prototype = super_.prototype;
+		ctor.prototype = merge(new $super(), proto);
+		return merge(ctor, statics,
+			super_ ? {super_: super_} : undefined, super_, {extend: extend});
+	}
+
+	// マウント
+	m.mount($formElement, formComponent);
+
+})();
+
+</script>
