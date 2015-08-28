@@ -1,0 +1,23 @@
+{
+  "name": "chat-socket-io-jquery",
+  "version": "0.0.0",
+  "description": "chat with socket.io and jquery",
+  "private": true,
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "^1.3.6"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "keywords": [
+    "jquery",
+    "socket.io"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
