@@ -56,51 +56,23 @@ var todoComponent = function () {
 
 			// ToDoをリストに登録し、ユーザが使いやすいようにtitleフィールドをクリアする
 			ctrl.add = function () {
-				if (ctrl.title()) {
-					ctrl.list.push(new Todo({title: ctrl.title()}));
+				var val = ctrl.title() ||
+					document.getElementById('$title').value; // for ie8
+				if (val) {
+					ctrl.list.push(new Todo({title: val}));
 					ctrl.title('');
 				}
-			};
-
-			// Enterキーに対応
-			ctrl.configInput = function (elem, isInit) {
-				elem.focus();
-				if (isInit) return;
-				elem.onkeypress = function (e) {
-					if ((e || event).keyCode !== 13) return true;
-					setTimeout(function () {
-						ctrl.add();
-						m.redraw(true);
-						elem.focus();
-					}, 0);
-					elem.onchange();
-					return false;
-				};
-			};
-
-			/*
-			// キーインのチェック(Enter)
-			ctrl.onkeypressInput = function (e) {
-				m.redraw.strategy('none');
-				if ((e || event).keyCode !== 13) return true;
-				var elem = this;
-				setTimeout(function () {
-					ctrl.add();
-					m.redraw(true);
-					elem.focus();
-				}, 0);
-				elem.onchange();
 				return false;
 			};
-			*/
 
 		},
 
 		// ビュー
 		view: function (ctrl) {
 			return [
-				m('input', m_on('change', 'value', ctrl.title, {config: ctrl.configInput})),
-				m('button[type=submit]', {onclick: ctrl.add}, 'Add'),
+				m('form', {onsubmit: ctrl.add},
+					m('input', m_on('change', 'value', ctrl.title, {id: '$title'})),
+					m('button[type=submit]', {onclick: ctrl.add}, 'Add')),
 				m('table', [ctrl.list.map(function(todo) {
 					return m('tr', [
 						m('td', [
