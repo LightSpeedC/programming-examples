@@ -1,0 +1,18 @@
+<script>
+
+	function f() {
+		var x;
+		var s = [];
+		s.push('XMLHttpRequest = ' + typeof XMLHttpRequest);
+		s.push('ActiveXObject = ' + typeof ActiveXObject);
+		var m = ['MSXML2.XMLHTTP.6.0', 'MSXML2.XMLHTTP.3.0', 'MSXML2.XMLHTTP', 'Microsoft.XMLHTTP'];
+		try { x = new XMLHttpRequest(); s.push('XMLHttpRequest'); } catch (e) {}
+		for (var i = 0; i < m.length; ++i)
+			try { x = new ActiveXObject(m[i]); s.push(m[i]); } catch (e) {}
+		x = null;
+		alert(s.join(', '));
+	}
+
+	f();
+
+</script>
