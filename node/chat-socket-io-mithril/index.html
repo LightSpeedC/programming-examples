@@ -1,0 +1,106 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>chat</title>
+<script src="/socket.io/socket.io.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.11/es5-shim.min.js"></script>
+<body>
+<div id="$appElement"></div>
+</body>
+<script>
+
+(function () {
+	'use strict';
+
+	var socket = io();
+
+	// numConnections: 接続数
+	var numConnections = 0;
+
+	// itemList: 項目リスト
+	var itemList = [];
+
+	function showMessage(message) {
+		addItem({key: new Date - 0, msg: message});
+	}
+	function addItem(item) {
+		itemList.push(item);
+		if (itemList.length > 5) itemList.shift();
+		m.redraw(true);
+	}
+
+	socket.on('connect', function () {
+		showMessage('connect');
+		socket.emit('req-all-msg-to-server');
+		m.redraw(true);
+	});
+
+	socket.on('disconnect', function () {
+		showMessage('disconnect');
+		numConnections = 0;
+		m.redraw(true);
+	});
+
+	socket.on('msg-to-client', addItem);
+	socket.on('all-msg-to-client', function (data) {
+		itemList = data;
+		m.redraw(true);
+	});
+	socket.on('num-to-client', function (data) {
+		numConnections = data;
+		m.redraw(true);
+	});
+
+	// message: メッセージ
+	var message = m.prop('');
+	function sendMessage() {
+		//showMessage('sendMessage: "' + message() + '"');
+		socket.emit('msg-to-server', message());
+		message('');
+		return false;
+	}
+
+	var appComponent = {
+		controller: function () {
+			// Enterキーに対応
+			function config(elem, isInit) {
+				elem.focus();
+				if (isInit) return;
+				elem.onkeypress = function (e) {
+					if ((e || event).keyCode !== 13) return true;
+					setTimeout(function () {
+						sendMessage();
+						m.redraw(true);
+						elem.focus();
+					}, 0);
+					elem.onchange();
+					return false;
+				};
+			};
+
+			this.view = function () {
+				return [
+					m('form', {onsubmit: sendMessage},
+						m('input', m_on('change', 'value', message, {config: config})),
+						m('button[type=submit]', {onclick: sendMessage}, 'send'),
+						m('span', ' (online: ' + numConnections + ')')),
+					m('div', itemList.map(function (item) {
+						return m('div', {key: item.key}, item.msg); }))
+				];
+			};
+		},
+		view: function view(ctrl) { return ctrl.view(ctrl); }
+	};
+	m.mount($appElement, appComponent);
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+})();
+
+</script>
