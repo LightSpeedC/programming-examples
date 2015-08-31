@@ -47,25 +47,23 @@ this.taskListComponent = function () {
 					.then(importList);
 
 			// 新しいTaskを作成する前の、入力中のTaskの名前を保持するスロット
-			var titleInput = m.prop('');
+			var titleInput = m.prop(''), titleInputElem;
 
 			// Taskをリストに登録し、ユーザが使いやすいようにtitleフィールドをクリアする
 			function addTitleInput() {
-				if (titleInput()) {
-					addTask({title: titleInput()});
+				var val = titleInput() || titleInputElem.value;
+				if (val) {
+					addTask({title: val});
 					titleInput('');
 				}
+				return false;
 			}
 
 			// Enterキーに対応
 			function configTitleInput(elem, isInit) {
 				if (isInit) return;
 				elem.focus();
-				elem.onkeypress = function (e) {
-					if ((e || event).keyCode === 13)
-						m_delay(function () { addTitleInput(); elem.focus(); });
-					return true;
-				};
+				titleInputElem = elem;
 			}
 
 			// タスクが完了している?
@@ -110,39 +108,42 @@ this.taskListComponent = function () {
 			var dispMode = 0; //0:ALL, 1:DONE, 2:UNDONE
 
 			// 編集モード
-			var taskToEdit; // 編集中のTask
-			var saveTitleToEdit; // 編集開始時のタイトル
+			var taskToEdit = null;  // 編集中のTask
+			var taskToEditElem;     // 編集中のTaskのDOM要素 (ie8対応)
+			var saveTitleToEdit;    // 編集開始時のタイトル
 			// タスク編集モードをトグル
 			function toggleEditTask(task) {
 				if (taskToEdit) {
-					if (!taskToEdit.title())
-						taskToEdit.title(saveTitleToEdit);
-					taskToEdit = undefined;
+					var val = taskToEditElem.value;
+					if (val) taskToEdit.title(val);
+					else taskToEdit.title(saveTitleToEdit);
+					taskToEdit = null;
 				}
 				else {
 					taskToEdit = task;
 					if (task) saveTitleToEdit = task.title();
 				}
+				return false;
 			}
 			// 編集するinputを構成
 			function configEditTask(elem, isInit) {
 				if (isInit) return;
 				elem.focus();
-				elem.onkeypress = function (e) {
-					if ((e || event).keyCode === 13)
-						m_delay(toggleEditTask);
-					return true;
-				};
+				taskToEditElem = elem;
 			}
+
+			// DEBUGフラグ
+			var debugFlag = m.prop(false);
 
 			this.view = function view(ctrl) {
 				return [
 					m('h1', 'Task管理アプリ'),
 					m('div', ['タスク: ',
-						m('input', m_on('change', 'value', titleInput,
-							{placeholder: '新しいタスクを入力',
-							 config: configTitleInput, autofocus: true})),
-						m('button[type=submit]', {onclick: addTitleInput}, '追加')
+						m('form', {onsubmit: addTitleInput},
+							m('input', m_on('change', 'value', titleInput,
+								{placeholder: '新しいタスクを入力',
+								 config: configTitleInput, autofocus: true})),
+							m('button[type=submit]', {onclick: addTitleInput}, '追加'))
 					]),
 					m('hr'),
 					m('div', ['表示: ',
@@ -167,10 +168,12 @@ this.taskListComponent = function () {
 							task === taskToEdit ? [
 								//編集
 								m('td', {colspan:2}),
-								m('td', [
-									m('input', m_on('change', 'value', task.title,
-										{onblur: toggleEditTask.bind(null, null), config: configEditTask}))
-								])] : [
+								m('td', {},
+									m('form', {onsubmit: toggleEditTask.bind(null, null)},
+										m('input', m_on('change', 'value', task.title,
+											{onblur: toggleEditTask.bind(null, null),
+											 config: configEditTask})))
+								)] : [
 								//表示
 								m('td', [
 									m('button[type=reset]', {onclick: removeTask.bind(null, task)}, '削除')
@@ -186,6 +189,8 @@ this.taskListComponent = function () {
 					})]),
 					m('div', '※ダブルクリックで編集'),
 					//DEBUG表示
+					m('input[type=checkbox]', m_on('click', 'checked', debugFlag)), 'dbg',
+					!debugFlag() ? [] :
 					m('pre', {style:{color:'green', backgroundColor:'lightgray'}},
 						JSON.stringify(taskList, null, '  ').split('\n').map(function (x) {
 							return m('div', x);
@@ -207,14 +212,6 @@ this.taskListComponent = function () {
 		attrs['on' + eventName] = m.withAttr(propName, propFunc);
 		attrs[propName] = propFunc();
 		return attrs;
-	}
-
-	// 遅延実行および再描画
-	function m_delay(fn) {
-		setTimeout(function () {
-			fn();
-			m.redraw(true);
-		}, 0);
 	}
 
 	return taskListComponent;

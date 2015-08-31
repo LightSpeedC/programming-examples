@@ -3,12 +3,16 @@
 <title>ToDo App - Mithril.js</title>
 
 <script src="/js/mithril.min.js"></script>
-<script src="/js/es5-shim.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
 
 <body>
-<div id="$todoElement1"></div>
-<div id="$todoElement2"></div>
-<div id="$todoElement3"></div>
+<table>
+<tr valign="top">
+<td><div id="$todoElement1"></div></td>
+<td><div id="$todoElement2"></div></td>
+<td><div id="$todoElement3"></div></td>
+</tr>
+</table>
 <hr>
 <a href="/">home</a>
 </body>
