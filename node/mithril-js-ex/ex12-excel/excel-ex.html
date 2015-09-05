@@ -51,7 +51,7 @@
 	function collectData() {
 		currData = '';
 		for (var i in dispData)
-			currData += i + '=' + JSON.stringify(dispData[i]) + ';';
+			currData += 'var ' + i + '=' + JSON.stringify(dispData[i]) + ';';
 
 		if (currData !== prevData && !timer)
 			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);

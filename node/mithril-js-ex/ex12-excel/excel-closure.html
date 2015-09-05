@@ -15,6 +15,7 @@
 	'use strict';
 
 	var ROWS = 10, COLS = 6; // 縦と横の最大
+	var HEADER_STYLE = {style: {backgroundColor: 'lightblue'}};
 
 	// Excel Sheet コンポーネント定義
 	var excelComponent = {
@@ -58,7 +59,7 @@
 	function collectData() {
 		currData = '';
 		for (var i in dispData)
-			currData += i + '=' + JSON.stringify(dispData[i]) + ';';
+			currData += 'var ' + i + '=' + JSON.stringify(dispData[i]) + ';';
 
 		if (currData !== prevData && !timer)
 			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);
@@ -108,11 +109,11 @@
 			this.view = function (ctrl) {
 				// 一番上の行 A, B, C, ...
 				if (attrs.row === 0)
-					return m('th', {style: {backgroundColor: 'lightblue'}}, cellNm);
+					return m('th', HEADER_STYLE}, cellNm);
 
 				// 一番左の列 1, 2, 3, ...
 				if (attrs.col === 0)
-					return m('th', {style: {backgroundColor: 'lightblue'}}, attrs.row);
+					return m('th', HEADER_STYLE, attrs.row);
 
 				// 入力中は再計算および表示を抑制
 				if (focus === 2) return {subtree: 'retain'};
