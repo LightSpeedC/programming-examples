@@ -16,6 +16,7 @@
   {"title": "ex10 task list",         "url": "/ex10-task-list/task-list-app.html"},
   {"title": "ex11 form ex",           "url": "/ex11-form-ex/form-ex.html"},
   {"title": "ex12 excel ex",          "url": "/ex12-excel/excel-ex.html"},
+  {"title": "ex12 excel closure",     "url": "/ex12-excel/excel-closure.html"},
   {"title": "qiita counter-min.html",        "url": "/js/counter-min.html"},
   {"title": "qiita counter-variation.html",  "url": "/js/counter-variation.html"},
   {"title": "qiita counter-prop.html",       "url": "/js/counter-prop.html"},
