@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Excel example - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$excelElement"></div>
+</body>
+
+<script>
+(function () {
+	'use strict';
+
+	var ROWS = 10, COLS = 6; // 縦と横の最大
+	var HEADER_STYLE = {style: {backgroundColor: 'lightblue'}};
+
+	// Excel Sheet コンポーネント定義
+	var excelComponent = {
+		// コントローラ
+		controller: function () {
+			// 子コンポーネント「行」の配列
+			this.children = range(ROWS + 1).map(function (i) {
+				return m.component(rowComponent, {row: i}); });
+		},
+		// ビュー
+		view: function (ctrl) {
+			return m('table', {border: 0, cellpadding: 0, cellspacing: 0}, ctrl.children);
+		}
+	};
+
+	// Excel Row コンポーネント定義
+	var rowComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			// 子コンポーネント「セル」の配列
+			this.children = range(COLS + 1).map(function (i) {
+				return m.component(cellComponent, {col: i, row: attrs.row}); });
+		},
+		// ビュー
+		view: function (ctrl) { return m('tr', ctrl.children); }
+	};
+
+	var dispData = {}; // 計算結果
+	var prevData = ''; // 前回の計算結果(script)
+	var currData = ''; // 今回の計算結果(script)
+	var timer = null;  // timer稼働中かどうか
+
+	// 計算結果を集約する。計算結果が前回と違うなら再描画(再計算)する。
+	function collectData() {
+		currData = '';
+		for (var i in dispData)
+			currData += i + '=' + JSON.stringify(dispData[i]) + ';';
+
+		if (currData !== prevData && !timer)
+			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);
+
+		prevData = currData;
+	}
+
+	// Excel Cell コンポーネント定義
+	var cellComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			this.attrs = attrs;
+			this.cellNm = attrs.col ? String.fromCharCode(0x40 + attrs.col) : '＼';
+			if (attrs.col && attrs.row) {
+				this.index = attrs.col && attrs.row ? this.cellNm + attrs.row : '';
+				this.expr = ''; // 入力中の数式
+				this.disp = ''; // 表示用: 入れた文字列もしくは計算結果
+				this.cell = m.prop(''); // セルの値
+				dispData[this.index] = this.disp;
+				this.focus = 0; // focusを取得しているかどうか
+				this.onchange = m.withAttr('value', this.cell);
+			}
+		},
+		// セルを計算する
+		calcCell: function (ctrl) {
+			collectData();
+
+			// 入力したものが数式の場合、計算してみる
+			if (ctrl.expr.charAt(0) === '=') {
+				try { ctrl.disp = Function(currData +
+							'return ' + ctrl.expr.substr(1).toUpperCase())();
+				} catch (e) { ctrl.disp = ctrl.expr + ' ' + e; }
+			}
+			// それ以外は、文字列か数値とする
+			else {
+				ctrl.disp = ctrl.expr;
+				try { if (String(Number(ctrl.expr)) === ctrl.expr)
+							ctrl.disp = Number(ctrl.expr);
+				} catch (e) {}
+			}
+			dispData[ctrl.index] = ctrl.disp;
+
+			collectData();
+		},
+		// ビュー
+		view: function view(ctrl) {
+			// 一番上の行 A, B, C, ...
+			if (ctrl.attrs.row === 0)
+				return m('th', HEADER_STYLE, ctrl.cellNm);
+
+			// 一番左の列 1, 2, 3, ...
+			if (ctrl.attrs.col === 0)
+				return m('th', HEADER_STYLE, ctrl.attrs.row);
+
+			// 入力中は再計算および表示を抑制
+			if (ctrl.focus === 2) return {subtree: 'retain'};
+			if (ctrl.focus === 1) ctrl.focus = 2; // focus取得直後の1回だけ表示する
+
+			// セルを計算
+			cellComponent.calcCell(ctrl);
+
+			return m('td', {},
+				m('input', {
+					style: ctrl.focus ? {backgroundColor: 'lightgreen'} : {},
+					onchange: function (e) {
+						ctrl.onchange.call(this, e);
+						ctrl.expr = ctrl.cell();
+						cellComponent.calcCell(ctrl);
+					},
+					value: ctrl.focus ? ctrl.expr : ctrl.disp,
+					onfocus: function () { ctrl.focus = 1; ctrl.cell(ctrl.expr); },
+					onblur:  function () { ctrl.focus = 0; ctrl.cell(ctrl.disp); }
+				})
+			);
+		}
+	};
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	// componentのclosure化 (componentが静的で増減しない場合は不要)
+	function m_comp(comp) {
+		var ctrl = new comp.controller();
+		return {view: function view() { return comp.view(ctrl); }};
+	}
+
+	// 0～n-1までの配列を返す
+	function range(n) {
+		var array = Array(n);
+		for (var i = 0; i < n; ++i)
+			array[i] = i;
+		return array;
+	}
+
+	// マウント
+	m.mount($excelElement, excelComponent);
+})();
+</script>

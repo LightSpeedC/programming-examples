@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Excel example - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$excelElement"></div>
+</body>
+
+<script>
+
+(function () {
+	'use strict';
+
+	var ROWS = 10, COLS = 6; // 縦と横の最大
+
+	// Excel Sheet コンポーネント定義
+	var excelComponent = {
+		// コントローラ
+		controller: function () {
+			// 子コンポーネント「行」の配列
+			var children = range(ROWS + 1).map(function (i) {
+				return m.component(rowComponent, {row: i});
+			}); // .map(m_comp);
+
+			// ビュー
+			this.view = function view() {
+				return m('table', {border: 0, cellpadding: 0, cellspacing: 0}, children);
+			};
+		},
+		// ビュー
+		view: function (ctrl) { return ctrl.view(ctrl); }
+	};
+
+	// Excel Row コンポーネント定義
+	var rowComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			// 子コンポーネント「セル」の配列
+			var children = range(COLS + 1).map(function (i) {
+				return m.component(cellComponent, {col: i, row: attrs.row});
+			}); // .map(m_comp);
+			// ビュー
+			this.view = function () { return m('tr', children); };
+		},
+		// ビュー
+		view: function (ctrl) { return ctrl.view(ctrl); }
+	};
+
+	var dispData = {}; // 計算結果
+	var prevData = ''; // 前回の計算結果(script)
+	var currData = ''; // 今回の計算結果(script)
+	var timer = null;  // timer稼働中かどうか
+
+	// 計算結果を集約する。計算結果が前回と違うなら再描画(再計算)する。
+	function collectData() {
+		currData = '';
+		for (var i in dispData)
+			currData += i + '=' + JSON.stringify(dispData[i]) + ';';
+
+		if (currData !== prevData && !timer)
+			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);
+
+		prevData = currData;
+	}
+
+	// Excel Cell コンポーネント定義
+	var cellComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			var cellNm = attrs.col ? String.fromCharCode(0x40 + attrs.col) : '＼';
+			if (attrs.col && attrs.row) {
+				var index = attrs.col && attrs.row ? cellNm + attrs.row : '';
+				var expr = ''; // 入力中の数式
+				var disp = ''; // 表示用: 入れた文字列もしくは計算結果
+				var cell = m.prop(''); // セルの値
+				dispData[index] = disp;
+				var focus = 0; // focusを取得しているかどうか
+				var onchange = m.withAttr('value', cell);
+			}
+
+			// セルを計算する
+			this.calcCell = function () {
+				collectData();
+
+				// 入力したものが数式の場合、計算してみる
+				if (expr.charAt(0) === '=') {
+					try {
+						disp = Function(currData +
+							'return ' + expr.substr(1).toUpperCase())();
+					} catch (e) { disp = expr + ' ' + e; }
+				}
+				// それ以外は、文字列か数値とする
+				else {
+					disp = expr;
+					try {
+						if (String(Number(expr)) === expr) disp = Number(expr);
+					} catch (e) {}
+				}
+				dispData[index] = disp;
+
+				collectData();
+			};
+
+			// ビュー
+			this.view = function (ctrl) {
+				// 一番上の行 A, B, C, ...
+				if (attrs.row === 0)
+					return m('th', {style: {backgroundColor: 'lightblue'}}, cellNm);
+
+				// 一番左の列 1, 2, 3, ...
+				if (attrs.col === 0)
+					return m('th', {style: {backgroundColor: 'lightblue'}}, attrs.row);
+
+				// 入力中は再計算および表示を抑制
+				if (focus === 2) return {subtree: 'retain'};
+				if (focus === 1) focus = 2; // focus取得直後の1回だけ表示する
+
+				// セルを計算
+				ctrl.calcCell();
+
+				return m('td', {},
+					m('input', {
+						style: focus ? {backgroundColor: 'lightgreen'} : {},
+						onchange: function (e) {
+							onchange.call(this, e);
+							expr = cell();
+							ctrl.calcCell();
+						},
+						value: focus ? expr : disp,
+						onfocus: function () { focus = 1; cell(expr); },
+						onblur:  function () { focus = 0; cell(disp); }
+					})
+				);
+			};
+		},
+		// ビュー
+		view: function (ctrl) { return ctrl.view(ctrl); }
+	};
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	// componentのclosure化 (componentが静的で増減しない場合は不要)
+	function m_comp(comp) {
+		var ctrl = new comp.controller();
+		return {view: function view() { return comp.view(ctrl); }};
+	}
+
+	// 0～n-1までの配列を返す
+	function range(n) {
+		var array = Array(n);
+		for (var i = 0; i < n; ++i)
+			array[i] = i;
+		return array;
+	}
+
+	// マウント
+	m.mount($excelElement, excelComponent);
+
+})();
+
+</script>
