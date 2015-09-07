@@ -10,7 +10,6 @@
 </body>
 
 <script>
-
 (function () {
 	'use strict';
 
@@ -58,8 +57,8 @@
 	// 計算結果を集約する。計算結果が前回と違うなら再描画(再計算)する。
 	function collectData() {
 		currData = '';
-		for (var i in dispData)
-			currData += 'var ' + i + '=' + JSON.stringify(dispData[i]) + ';';
+		for (var v in dispData)
+			currData += 'var ' + v + '=' + JSON.stringify(dispData[v]) + ';';
 
 		if (currData !== prevData && !timer)
 			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);
@@ -71,13 +70,13 @@
 	var cellComponent = {
 		// コントローラ
 		controller: function (attrs) {
-			var cellNm = attrs.col ? String.fromCharCode(0x40 + attrs.col) : '＼';
+			var colNm = attrs.col ? String.fromCharCode(0x40 + attrs.col) : '＼';
 			if (attrs.col && attrs.row) {
-				var index = attrs.col && attrs.row ? cellNm + attrs.row : '';
+				var cellNm = colNm + attrs.row;
 				var expr = ''; // 入力中の数式
 				var disp = ''; // 表示用: 入れた文字列もしくは計算結果
 				var cell = m.prop(''); // セルの値
-				dispData[index] = disp;
+				dispData[cellNm] = disp;
 				var focus = 0; // focusを取得しているかどうか
 				var onchange = m.withAttr('value', cell);
 			}
@@ -100,7 +99,7 @@
 						if (String(Number(expr)) === expr) disp = Number(expr);
 					} catch (e) {}
 				}
-				dispData[index] = disp;
+				dispData[cellNm] = disp;
 
 				collectData();
 			};
@@ -109,7 +108,7 @@
 			this.view = function (ctrl) {
 				// 一番上の行 A, B, C, ...
 				if (attrs.row === 0)
-					return m('th', HEADER_STYLE, cellNm);
+					return m('th', HEADER_STYLE, colNm);
 
 				// 一番左の列 1, 2, 3, ...
 				if (attrs.col === 0)
@@ -165,7 +164,5 @@
 
 	// マウント
 	m.mount($excelElement, excelComponent);
-
 })();
-
 </script>
