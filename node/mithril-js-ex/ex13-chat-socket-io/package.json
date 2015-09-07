@@ -1,0 +1,23 @@
+{
+  "name": "chat-socket-io",
+  "version": "0.0.0",
+  "description": "socket io example",
+  "main": "app.js",
+  "private": true,
+  "dependencies": {
+    "socket.io": "^1.3.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "socket",
+    "io"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
