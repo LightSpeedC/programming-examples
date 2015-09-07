@@ -1,0 +1,109 @@
+﻿<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Chat Firebase example - Mithril.js チャット</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<body>
+<div id="$chatElement"></div>
+</body>
+
+<script>
+(function () {
+	'use strict';
+
+	var TEXT_STYLE = {style: {backgroundColor: 'lightblue'}};
+
+	// Chat コンポーネント定義
+	var chatComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			// attrs 属性
+			this.attrs = attrs;
+
+			// content 入力した内容
+			this.content = m.prop('');
+			this.textInput = m.component(textInputComponent,
+				{textInput: content,
+				 onsubmit: function (val) {
+				 }});
+
+			// 子コンポーネント「テキスト」の配列
+			this.children = [];
+		},
+		// ビュー
+		view: function (ctrl) {
+			return [this.textInput,
+				m('div', {}, ctrl.children)
+			];
+		}
+	};
+
+	// TextInput コンポーネント定義
+	var textInputComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			var ctrl = this;
+			ctrl.attrs = attrs = attrs || {};
+			ctrl.textInput = attrs.textInput = attrs.textInput || m.prop('');
+			ctrl.onsubmit = function () {
+				var val = ctrl.textInput() || ctrl.textInputElement.value;
+				ctrl.textInput(val);
+				if (attrs.onsubmit)
+					attrs.onsubmit(val, ctrl.textInput, ctrl.textInputElement);
+				return false;
+			};
+			ctrl.textInputElement = null;
+			ctrl.config = function (elem, isInit) {
+				if (isInit) return;
+				ctrl.textInputElement = elem;
+			};
+		},
+		// ビュー
+		view: function (ctrl) {
+			return m('form', {onsubmit: ctrl.onsubmit},
+				m('input',
+					m_on('change', 'value', ctrl.textInput,
+						{config: ctrl.config})
+				)
+			);
+		}
+	};
+
+	// Text コンポーネント定義
+	var textComponent = {
+		// コントローラ
+		controller: function (attrs) {
+			this.attrs = attrs;
+		},
+		// ビュー
+		view: function (ctrl) { return m('div', {}, ctrl.attrs.text); }
+	};
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	// componentのclosure化 (componentが静的で増減しない場合は不要)
+	function m_comp(comp) {
+		var ctrl = new comp.controller();
+		return {view: function view() { return comp.view(ctrl); }};
+	}
+
+	// 0～n-1までの配列を返す
+	function range(n) {
+		var array = Array(n);
+		for (var i = 0; i < n; ++i)
+			array[i] = i;
+		return array;
+	}
+
+	// マウント
+	m.mount($chatElement, chatComponent);
+})();
+</script>
