@@ -4,49 +4,66 @@
 		<title>Socket.IO chat</title>
 	</head>
 	<body>
-		<form action="">
+		<form id="form" action="">
 			<input id="user" autocomplete="off" />
-			<input id="msg" autocomplete="off" />
+			<input id="msg" autocomplete="off" autofocus />
 			<button>Send</button>
 		</form>
 		<ul id="msgs"></ul>
 	</body>
 </html>
 <!--[if IE]><script src="es5-shim.min.js"></script><![endif]-->
-<script>
-//if (typeof window.console === 'undefined')
-//	window.console = {
-//		log: function () {},
-//		info: function () {},
-//		warn: function () {},
-//		error: function () {}};
-</script>
 <!--<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>-->
+<!--<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>-->
 <script src="/socket.io/socket.io.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="jquery-1.11.3.min.js"></script>
 <script>
+(function () {
+	var cookies = getCookies();
 	var $user = $('#user');
 	var $msg  = $('#msg');
 	var $msgs = $('#msgs');
-	var $form = $('form');
+	var $form = $('#form');
+	addMsg({user: 'client', msg: 'connecting...'});
 	var socket = io();
-	$user.val(+new Date+Math.random());
-	$form.submit(function(){
-		socket.emit('chat message', {user: $user.val(), message: $msg.val()});
+	cookies.user = cookies.user || (+ new Date + Math.random()).toFixed(3);
+	cookies.name = cookies.name || cookies.user;
+	$user.val(cookies.name);
+	$user.change(function () {
+		cookies.name = $user.val();
+		document.cookie = 'user=' + cookies.user + '; max-age=1800';
+		document.cookie = 'name=' + cookies.name + '; max-age=1800';
+		socket.emit('user', {user: cookies.user, name: cookies.name});
+		return false;
+	});
+	$form.submit(function () {
+		socket.emit('chat message', {user: cookies.user, msg: $msg.val()});
 		$msg.val('');
 		return false;
 	});
 	function addMsg(msg) {
-		msg=JSON.stringify(msg);
+		//msg = JSON.stringify(msg);
+		msg = msg.user + ': ' + msg.msg;
 		$msgs.append($('<li>').text(msg));
 		if ($msgs.children().length > 10)
 			$msgs.children().first().remove();
 	}
-	addMsg({client: 'connecting...'});
+	socket.on('connect', function () {
+		socket.emit('user', {user: cookies.user, name: cookies.name});
+	});
 	socket.on('chat message', addMsg);
-	socket.on('all messages', function(list) {
+	socket.on('all messages', function (list) {
 		// console.log('list: ' + list);
 		$msgs.empty();
 		list.forEach(addMsg);
 	});
+	function getCookies() {
+		var cookies = {};
+		document.cookie.split(/; */).forEach(function (c) {
+			var kv = c.split('=');
+			cookies[kv[0]] = kv[1];
+		});
+		return cookies;
+	}
+})();
 </script>
