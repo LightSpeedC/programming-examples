@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+<title>Excel example - Mithril.js</title>
+
+<script src="/js/mithril.min.js"></script>
+<!--[if IE]><script src="/js/es5-shim.min.js"></script><![endif]-->
+
+<script src="/js/extend-light.js"></script>
+
+
+<body>
+<div id="$excelElement"></div>
+</body>
+
+<script>
+(function () {
+	'use strict';
+
+	var extend = window['extend-light'];
+	var Controller = extend({
+		constructor: function Controller(attrs) {
+			for (var p in attrs) this[p] = attrs[p];
+		},
+		view: function view() { return []; }
+	},
+	{
+		component: function component() {
+			return {controller: this, view: this.prototype.view};
+		}
+	});
+
+	var ROWS = 10, COLS = 6; // 縦と横の最大
+	var HEADER_STYLE = {style: {backgroundColor: 'lightblue'}};
+
+	// Excel Sheet コンポーネント定義
+	var ExcelController = Controller.extend({
+		// コントローラ
+		constructor: function ExcelController(attrs) {
+			Controller.apply(this, arguments);
+
+			// 子コンポーネント「行」の配列
+			this.children = range(ROWS + 1).map(function (i) {
+				return m_comp(rowComponent, {row: i}); });
+		},
+		// ビュー
+		view: function (ctrl) {
+			return m('table', {border: 0, cellpadding: 0, cellspacing: 0}, ctrl.children);
+		}
+	});
+	var excelComponent = ExcelController.component();
+
+	// Excel Row コンポーネント定義
+	var RowController = Controller.extend({
+		// コントローラ
+		constructor: function RowController(attrs) {
+			Controller.apply(this, arguments);
+
+			// 子コンポーネント「セル」の配列
+			this.children = range(COLS + 1).map(function (i) {
+				return m_comp(cellComponent, {col: i, row: attrs.row}); });
+		},
+		// ビュー
+		view: function (ctrl) { return m('tr', ctrl.children); }
+	});
+	var rowComponent = RowController.component();
+
+	var dispData = {}; // 計算結果
+	var prevData = ''; // 前回の計算結果(script)
+	var currData = ''; // 今回の計算結果(script)
+	var timer = null;  // timer稼働中かどうか
+
+	// 計算結果を集約する。計算結果が前回と違うなら再描画(再計算)する。
+	function collectData() {
+		currData = '';
+		for (var v in dispData)
+			currData += 'var ' + v + '=' + JSON.stringify(dispData[v]) + ';';
+
+		if (currData !== prevData && !timer)
+			timer = setTimeout(function () { timer = null; m.redraw(true); }, 300);
+
+		prevData = currData;
+	}
+
+	// Excel Cell コンポーネント定義
+	var CellController = Controller.extend({
+		// コントローラ
+		constructor: function CellController(attrs) {
+			Controller.apply(this, arguments);
+
+			this.colNm = attrs.col ? String.fromCharCode(0x40 + attrs.col) : '＼';
+			if (this.col && this.row) {
+				this.cellNm = this.colNm + this.row;
+				this.expr = ''; // 入力中の数式
+				this.disp = ''; // 表示用: 入れた文字列もしくは計算結果
+				this.cell = m.prop(''); // セルの値
+				dispData[this.cellNm] = this.disp;
+				this.focus = 0; // focusを取得しているかどうか
+				this.onchangeInput = m.withAttr('value', this.cell);
+			}
+		},
+		// セルを計算する
+		calcCell: function calcCell() {
+			collectData();
+
+			// 入力したものが数式の場合、計算してみる
+			if (this.expr.charAt(0) === '=') {
+				try { this.disp = Function(currData +
+							'return ' + this.expr.substr(1).toUpperCase())();
+				} catch (e) { this.disp = this.expr + ' ' + e; }
+			}
+			// それ以外は、文字列か数値とする
+			else {
+				this.disp = this.expr;
+				try { if (String(Number(this.expr)) === this.expr)
+							this.disp = Number(this.expr);
+				} catch (e) {}
+			}
+			dispData[this.cellNm] = this.disp;
+
+			collectData();
+		},
+		onfocus: function onfocus() { this.focus = 1; this.cell(this.expr); },
+		onblur:  function onblur()  { this.focus = 0; this.cell(this.expr); },
+		// ビュー
+		view: function view() {
+			// 一番上の行 A, B, C, ...
+			if (this.row === 0)
+				return m('th', HEADER_STYLE, this.colNm);
+
+			// 一番左の列 1, 2, 3, ...
+			if (this.col === 0)
+				return m('th', HEADER_STYLE, this.row);
+
+			// 入力中は再計算および表示を抑制
+			if (this.focus === 2) return {subtree: 'retain'};
+			if (this.focus === 1) this.focus = 2; // focus取得直後の1回だけ表示する
+
+			// セルを計算
+			this.calcCell(); // TODO
+
+			var ctrl = this;
+			return m('td', {},
+				m('input', {
+					style: this.focus ? {backgroundColor: 'lightgreen'} : {},
+					onchange: function (e) {
+						ctrl.onchangeInput(e);
+						ctrl.expr = ctrl.cell();
+						ctrl.calcCell();
+					},
+					value: this.focus ? this.expr : this.disp,
+					onfocus: this.onfocus.bind(this),
+					onblur:  this.onblur.bind(this)
+				})
+			);
+		}
+	});
+	var cellComponent = CellController.component();
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+	// componentのclosure化 (componentが静的で増減しない場合は不要)
+	function m_comp(comp, attrs) {
+		var ctrl = new comp.controller(attrs);
+		return {view: function view() { return comp.view.call(ctrl, ctrl); }};
+	}
+
+	// 0～n-1までの配列を返す
+	function range(n) {
+		var array = Array(n);
+		for (var i = 0; i < n; ++i)
+			array[i] = i;
+		return array;
+	}
+
+	// マウント
+	m.mount($excelElement, excelComponent);
+})();
+</script>
