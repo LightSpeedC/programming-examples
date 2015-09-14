@@ -1,4 +1,4 @@
 pushd %~dp0
-iojs fwd
+node fwd
 pause
 popd

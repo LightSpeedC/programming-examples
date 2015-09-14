@@ -1,4 +1,4 @@
 pushd %~dp0
-iojs tmp
+node tmp
 pause
 popd

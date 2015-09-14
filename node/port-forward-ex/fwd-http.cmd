@@ -1,4 +1,4 @@
 pushd %~dp0
-iojs fwd-http
+node fwd-http
 pause
 popd
