@@ -17,6 +17,8 @@
   var ctxDummy = {socketId:'----', servicePort:'----'};
   var socketIdSeq = parseInt('1000', 36);
 
+  log.info('node ' + process.version);
+
   //======================================================================
   ControlC(
     function () {
