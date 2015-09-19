@@ -1,0 +1,24 @@
+{
+  "name": "http-get-ex",
+  "version": "0.0.0",
+  "description": "http get example",
+  "main": "get-wsdl.js",
+  "dependencies": {
+    "aa": ">=0.1.7",
+    "mkdir-parents": "0.0.2",
+    "promise-light": ">=0.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "http"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
