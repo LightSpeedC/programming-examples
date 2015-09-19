@@ -1,6 +1,6 @@
   inFileName=process.argv[2]
   outFileName=process.argv[3]
-  if (!inFileName) return console.log('node a2 {in} {out}')
+  if (!inFileName) return console.log('node add2sp {in} {out}')
   if (!outFileName) outFileName = inFileName + '.log';
   fs=require('fs')
   lines=fs.readFileSync(inFileName).toString().split('\r\n');
