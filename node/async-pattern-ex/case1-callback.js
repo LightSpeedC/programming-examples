@@ -13,6 +13,8 @@
 
 	var procs = require('./procs');
 
+	main();
+
 	function main() {
 		var n = 0, result = [];
 
@@ -34,7 +36,5 @@
 			procs.info('end* ', val);
 		}
 	}
-
-	main();
 
 })();

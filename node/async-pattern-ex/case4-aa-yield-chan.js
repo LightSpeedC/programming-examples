@@ -14,6 +14,21 @@
 	var procs = require('./procs');
 	var aa = require('aa');
 
+	aa(function *() {
+		procs.info('start**', '');
+		try {
+			var val = yield main();
+			procs.info('final', val);
+		} catch (err) {
+			procs.error('final', err);
+		}
+		procs.info('final**', '');
+	});
+
+//	aa(main()).then(
+//		function (val) { procs.info('final', val); },
+//		function (err) { procs.error('final', err); });
+
 	function *main() {
 		var chanA = aa.chan();
 		var chanB = aa.chan();
@@ -47,9 +62,5 @@
 
 		return 'ok';
 	}
-
-	aa(main()).then(
-		function (val) { procs.info('final', val); },
-		function (err) { procs.error('final', err); });
 
 })();

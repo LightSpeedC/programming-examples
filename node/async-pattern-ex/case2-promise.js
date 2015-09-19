@@ -13,7 +13,9 @@
 
 	var procs = require('./procs');
 //	var Promise = require('promise-light');
-	var Promise = require('promise-thunk');
+//	var Promise = require('promise-thunk');
+
+	main();
 
 	function main() {
 		var promises = [
@@ -38,7 +40,5 @@
 		});
 
 	}
-
-	main();
 
 })();
