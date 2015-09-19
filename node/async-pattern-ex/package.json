@@ -1,0 +1,23 @@
+{
+  "name": "async-pattern-ex",
+  "version": "0.0.0",
+  "description": "async pattern examples",
+  "main": "case1-callback.js",
+  "dependencies": {
+    "aa": ">=0.1.9",
+    "promise-light": ">=0.1.5",
+    "promise-thunk": ">=0.0.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "async"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
