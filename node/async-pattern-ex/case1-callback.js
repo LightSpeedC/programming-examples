@@ -4,7 +4,7 @@
 	'use strict';
 
 	// FLOW:
-	// start -->*--> procA --->*--> procC --> end
+	// start -->*--> procA --->*--> procC --> procA --> procB --> procX --> end
 	//          +--> procB --->+
 	//          +--> procX0 -->+
 	//          +--> procX1 -->+
@@ -13,8 +13,10 @@
 
 	var procs = require('./procs');
 
+	// メインを呼び出す
 	main();
 
+	// メイン
 	function main() {
 		var n = 0, result = [];
 
@@ -25,7 +27,16 @@
 		}
 
 		function callbackABX(err, val) {
-			if (err) procs.error('err1*', err), n = 0;
+			if (err) {
+				procs.error('err1*', err);
+				// 一度だけ最後の処理を呼ぶ
+				if (n) {
+					n = 0;
+					callbackC(err, result);
+				}
+				return;
+			}
+
 			result.push(val);
 			if (--n === 0)
 				procs.procC('C:' + result.join(','), callbackC);
