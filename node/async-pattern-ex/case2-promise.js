@@ -12,8 +12,13 @@
 	//          +--> procXm -->+
 
 	var procs = require('./procs');
-//	var Promise = require('promise-light');
-//	var Promise = require('promise-thunk');
+	var aa = require('aa');
+	var Promise = require('aa').Promise;
+
+	for (var p in procs)
+		if (p.substr(0, 4) === 'proc' &&
+				typeof procs[p] === 'function')
+			procs[p] = aa(procs[p]);
 
 	main();
 

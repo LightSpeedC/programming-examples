@@ -14,6 +14,11 @@
 	var procs = require('./procs');
 	var aa = require('aa');
 
+	for (var p in procs)
+		if (p.substr(0, 4) === 'proc' &&
+				typeof procs[p] === 'function')
+			procs[p] = aa(procs[p]);
+
 	aa(function *() {
 		procs.info('start**', '');
 		try {

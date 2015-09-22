@@ -1,9 +1,6 @@
 (function () {
 	'use strict';
 
-//	var Promise = require('promise-light');
-//	var Promise = require('promise-thunk');
-
 	// 処理A
 	function procA(arg, cb) {
 		return timer(200, arg, cb);
@@ -42,29 +39,21 @@
 
 	// タイマー
 	function timer(ms, arg, cb) {
-		if (typeof cb === 'function')
-			return setup();
-		else
-			return new Promise(setup);
+		console.log('start', arg);
+		setTimeout(function () {
+			var err = null;
+			if (Math.random() < 0.1)
+				err = new Error('random error ' + arg);
 
-		function setup(resolve, reject) {
-			console.log('start', arg);
-			setTimeout(function () {
-				var err = null;
-				if (Math.random() < 0.1)
-					err = new Error('random error ' + arg);
-
-				if (err)
-					error('end  ', err);
-				else
-					console.info('end  ', arg);
-
-				if (typeof cb === 'function')
-					!err ? cb(null, arg) : cb(err);
-				else
-					!err ? resolve(arg) : reject(err);
-			}, ms);
-		}
+			if (err) {
+				error('end  ', err);
+				cb(err);
+			}
+			else {
+				console.info('end  ', arg);
+				cb(null, arg);
+			}
+		}, ms);
 	}
 
 	// インターバル
@@ -75,13 +64,14 @@
 			if (Math.random() < 0.1)
 				err = new Error('random error ' + arg);
 
-			if (err)
+			if (err) {
 				error('fire ', err);
-			else
+				cb(err);
+			}
+			else {
 				console.info('fire ', arg);
-
-			if (typeof cb === 'function')
-				!err ? cb(null, arg) : cb(err);
+				cb(null, arg);
+			}
 		}, ms);
 	}
 

@@ -30,15 +30,15 @@
 //		function (err) { procs.error('final', err); });
 
 	function *main() {
-		var chanA = aa.chan();
-		var chanB = aa.chan();
-		var chanC = aa.chan();
+		var chanA = aa();
+		var chanB = aa();
+		var chanC = aa();
 
 		procs.procA('A', chanA);
 		procs.procB('B', chanB);
 		var channels = [chanA, chanB];
 		for (var x = 0, m = Math.random() * 3 + 2; x < m; ++x) {
-			var chanX = aa.chan();
+			var chanX = aa();
 			procs.procX('X' + x, chanX);
 			channels.push(chanX);
 		}
