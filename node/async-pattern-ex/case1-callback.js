@@ -20,10 +20,13 @@
 	function main() {
 		var n = 0, result = [];
 
-		n++; procs.procA('A', callbackABX);
-		n++; procs.procB('B', callbackABX);
+		n++;
+		procs.procA('A', callbackABX);
+		n++;
+		procs.procB('B', callbackABX);
 		for (var x = 0, m = Math.random() * 3 + 2; x < m; ++x) {
-			n++; procs.procX('X' + x, callbackABX);
+			n++;
+			procs.procX('X' + x, callbackABX);
 		}
 
 		function callbackABX(err, val) {
