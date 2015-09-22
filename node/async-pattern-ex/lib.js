@@ -1,0 +1,81 @@
+// lib.js
+
+this.lib = function (lib) {
+	'use strict';
+
+	var w = typeof window !== 'undefined';
+
+	// 処理
+	function procA(arg, cb) { return timer(200, arg, cb); }
+	function procB(arg, cb) { return timer(100, arg, cb); }
+	function procC(arg, cb) { return timer(150, arg, cb); }
+	function procX(arg, cb) { return timer(120 + Math.random() * 60, arg, cb); }
+
+	// 異常時エラー表示
+	function error(msg, err) {
+		if (w) console.error(msg, err);
+		else   console.error('\x1b[1;31m' + msg, err, '\x1b[m');
+	}
+
+	// 正常時情報表示
+	function info(msg, val) {
+		if (w) console.info(msg, val);
+		else   console.info('\x1b[1;32m' + msg, val, '\x1b[m');
+	}
+
+	// ログ表示
+	function log(msg, val) {
+		if (w) console.log(msg, val);
+		else   console.log('\x1b[1;36m' + msg, val, '\x1b[m');
+	}
+
+	// タイマー
+	function timer(ms, arg, cb) {
+		console.log('start', arg);
+		setTimeout(function () {
+			var err = null;
+			if (Math.random() < 0.1)
+				err = new Error('random error ' + arg);
+
+			if (!err) {
+				console.log('end  ', arg);
+				cb(null, arg);
+			}
+			else {
+				error('end  ', err);
+				cb(err);
+			}
+		}, ms);
+	}
+
+	// インターバル
+	function interval(ms, arg, cb) {
+		console.log('start', arg);
+		return setInterval(function () {
+			var err = null;
+			if (Math.random() < 0.1)
+				err = new Error('random error ' + arg);
+
+			if (!err) {
+				console.log('fire ', arg);
+				cb(null, arg);
+			}
+			else {
+				error('fire ', err);
+				cb(err);
+			}
+		}, ms);
+	}
+
+	lib.timer = timer;
+	lib.procA = procA;
+	lib.procB = procB;
+	lib.procC = procC;
+	lib.procX = procX;
+	lib.error = error;
+	lib.info  = info;
+	lib.log   = log;
+	lib.interval = interval;
+
+	return lib;
+}(this);

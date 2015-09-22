@@ -11,27 +11,35 @@
 	//          |    . . .     |
 	//          +--> procXm -->+
 
-	var procs = require('./procs');
+	var lib = require('./lib').lib;
 
 	// メインを呼び出す
 	main();
 
 	// メイン
 	function main() {
+		lib.log('start**', '');
+
 		var n = 0, result = [];
 
 		n++;
-		procs.procA('A', callbackABX);
+		lib.procA('A', callbackABX);
 		n++;
-		procs.procB('B', callbackABX);
+		lib.procB('B', callbackABX);
 		for (var x = 0, m = Math.random() * 3 + 2; x < m; ++x) {
 			n++;
-			procs.procX('X' + x, callbackABX);
+			lib.procX('X' + x, callbackABX);
 		}
 
 		function callbackABX(err, val) {
-			if (err) {
-				procs.error('err1*', err);
+			if (!err) {
+				result.push(val);
+				if (--n === 0)
+					lib.procC('C:' + result.join(','), callbackC);
+			}
+			else {
+				lib.error('err1*', err);
+
 				// 一度だけ最後の処理を呼ぶ
 				if (n) {
 					n = 0;
@@ -39,15 +47,13 @@
 				}
 				return;
 			}
-
-			result.push(val);
-			if (--n === 0)
-				procs.procC('C:' + result.join(','), callbackC);
 		}
 
 		function callbackC(err, val) {
-			if (err) procs.error('err2*', err);
-			procs.info('end* ', val);
+			if (err) lib.error('err2*', err);
+			else lib.info('end* ', val);
+
+			lib.log('final**', '');
 		}
 	}
 

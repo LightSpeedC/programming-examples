@@ -11,50 +11,48 @@
 	//          |    . . .     |
 	//          +--> procXm -->+
 
-	var procs = require('./procs');
+	var lib = require('./lib').lib;
 	var aa = require('aa');
 
-	for (var p in procs)
+	for (var p in lib)
 		if (p.substr(0, 4) === 'proc' &&
-				typeof procs[p] === 'function')
-			procs[p] = aa(procs[p]);
+				typeof lib[p] === 'function')
+			lib[p] = aa(lib[p]);
 
 	aa(function *() {
-		procs.info('start**', '');
+		lib.log('start**', '');
+
 		try {
 			var val = yield main();
-			procs.info('final', val);
+			lib.info('final', val);
 		} catch (err) {
-			procs.error('final', err);
+			lib.error('final', err);
 		}
-		procs.info('final**', '');
-	});
 
-//	aa(main()).then(
-//		function (val) { procs.info('final', val); },
-//		function (err) { procs.error('final', err); });
+		lib.log('final**', '');
+	});
 
 	function *main() {
 		var promises = [
-			procs.procA('A'),
-			procs.procB('B')
+			lib.procA('A'),
+			lib.procB('B')
 		];
 		for (var x = 0, m = Math.random() * 3 + 2; x < m; ++x) {
-			promises.push(procs.procX('X' + x));
+			promises.push(lib.procX('X' + x));
 		}
 
 		try {
 			var result = yield promises;
 		} catch (err) {
-			procs.error('err1*', err);
+			lib.error('err1*', err);
 			throw err;
 		}
 
 		try {
-			var val = yield procs.procC('C:' + result.join(','));
-			procs.info('end* ', val);
+			var val = yield lib.procC('C:' + result.join(','));
+			lib.info('end* ', val);
 		} catch (err) {
-			procs.error('err2*', err);
+			lib.error('err2*', err);
 			throw err;
 		}
 
