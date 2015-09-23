@@ -1,64 +1,101 @@
 // aa: yield chan
 
-(function () {
+(function (lib, aa) {
 	'use strict';
 
 	// FLOW:
-	// start -->*--> procA --->*--> procC --> end
-	//          +--> procB --->+
-	//          +--> procX0 -->+
-	//          +--> procX1 -->+
+	// start --> procA  --> procB  --> procC -->
+	//       --> procX0 --> procX1 --> . . . --> procXm -->
+	//       -->*--> procD --->*--> procG -->*--> procH --> procI --> procJ -->*--> end
+	//          +--> procE --->+             +--> procK --> procL --> procM -->+ 
+	//          +--> procF --->+
+	//          +--> procY0 -->+
+	//          +--> procY1 -->+
 	//          |    . . .     |
-	//          +--> procXm -->+
+	//          +--> procYm -->+
 
-	var lib = require('./lib').lib;
-	var aa = require('aa');
-
-	aa(function *() {
-		lib.log('start**', '');
-
-		try {
-			var val = yield main();
-			lib.info('final', val);
-		} catch (err) {
-			lib.error('final', err);
-		}
-
-		lib.log('final**', '');
-	});
+	aa(main());
 
 	function *main() {
-		var chanA = aa();
-		var chanB = aa();
-		var chanC = aa();
+		lib.log('start**', '');
 
-		lib.procA('A', chanA);
-		lib.procB('B', chanB);
-		var channels = [chanA, chanB];
-		for (var x = 0, m = Math.random() * 3 + 2; x < m; ++x) {
-			var chanX = aa();
-			lib.procX('X' + x, chanX);
-			channels.push(chanX);
-		}
+		var result = {};
 
 		try {
-			var result = yield channels;
+
+			var chan = aa();
+
+			// 処理A, B, C, Xmをシーケンシャルに実行する。
+			lib.procA('A', chan);
+			result.A = yield chan;
+
+			lib.procB('B', chan);
+			result.B = yield chan;
+
+			lib.procC('C', chan);
+			result.C = yield chan;
+
+			for (var x = 0, numX = Math.random() * 3 + 2; x < numX; ++x) {
+				lib.procX('X' + x, chan);
+				result['X' + x] = yield chan;
+			}
+
+			// 処理D, E, F, Ymをパラレルに実行する。
+			var channels = {};
+			lib.procD('D', channels.D = aa());
+			lib.procE('E', channels.E = aa());
+			lib.procF('F', channels.F = aa());
+			for (var y = 0, numY = Math.random() * 3 + 2; y < numY; ++y)
+				lib.procY('Y' + y, channels['Y' + y] = aa());
+
+			var para = yield channels;
+			for (var p in para) result[p] = para[p];
+
+			// 処理Gを、シーケンシャルに実行する。
+			lib.procG('G', chan);
+			result.G = yield chan;
+
+			// 処理H, I, Jをシーケンシャルに、そして同時に
+			// 処理K, L, Mをシーケンシャルに実行する。
+			yield [
+				function *() {
+					var chan = aa();
+					result.J = result.I = result.H = null;
+
+					lib.procH('H', chan);
+					result.H = yield chan;
+
+					lib.procI('I', chan);
+					result.I = yield chan;
+
+					lib.procJ('J', chan);
+					result.J = yield chan;
+				},
+				function *() {
+					var chan = aa();
+					result.M = result.L = result.K = null;
+
+					lib.procK('K', chan);
+					result.K = yield chan;
+
+					lib.procL('L', chan);
+					result.L = yield chan;
+
+					lib.procM('M', chan);
+					result.M = yield chan;
+				}
+			];
+
+			lib.info('end* ', '');
+
 		} catch (err) {
-			lib.error('err1*', err);
-			throw err;
+			lib.error('errZ*', err);
 		}
 
-		lib.procC('C:' + result.join(','), chanC);
-
-		try {
-			var val = yield chanC;
-			lib.info('end* ', val);
-		} catch (err) {
-			lib.error('err2*', err);
-			throw err;
-		}
-
-		return 'ok';
+		lib.log('final**', JSON.stringify(result).replace(/\"/g, ''));
 	}
 
-})();
+})(
+	this.lib || require('./lib').lib,
+	this.aa || require('aa')
+);
