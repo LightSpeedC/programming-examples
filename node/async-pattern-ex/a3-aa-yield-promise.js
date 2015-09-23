@@ -69,10 +69,10 @@
 			lib.error('errZ*', err);
 		}
 
-		lib.log('final**', JSON.stringify(result).replace(/\"/g, ''));
+		lib.log('final**', JSON.stringify(result).replace(RegExp('"', 'g'), ''));
 	}
 
 })(
-	this.lib || require('./lib').lib,
-	this.aa || require('aa')
+	(this || window).lib || require('./lib').lib,
+	(this || window).aa  || require('aa')
 );

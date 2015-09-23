@@ -1,6 +1,6 @@
 // promise
 
-(function (lib, aa) {
+(function (lib, Promise) {
 	'use strict';
 
 	// FLOW:
@@ -14,12 +14,22 @@
 	//          |    . . .     |
 	//          +--> procYm -->+
 
-	var Promise = aa.Promise;
+	function wrap(fn) {
+		return function () {
+			var ctx = this, args = arguments;
+			return new Promise(function (resolve, reject) {
+				args[args.length++] = function (err, val) {
+					err ? reject(err) : resolve(val);
+				};
+				fn.apply(ctx, args);
+			});
+		}
+	}
 
-	// procで始まる関数をaaを使用してPromise化する。
+	// procで始まる関数をwrapを使用してPromise化する。
 	for (var p in lib)
 		if (p.substr(0, 4) === 'proc')
-			lib[p] = aa(lib[p]);
+			lib[p] = wrap(lib[p]);
 
 	main();
 
@@ -123,11 +133,11 @@
 				function () { lib.info('end* ', ''); },
 				function (err) { lib.error('errZ*', err); })
 			.then(
-				function () { lib.log('final**', JSON.stringify(result).replace(/\"/g, '')); });
+				function () { lib.log('final**', JSON.stringify(result).replace(RegExp('"', 'g'), '')); });
 
 	}
 
 })(
 	this.lib || require('./lib').lib,
-	this.aa || require('aa')
+	this.PromiseThunk || require('promise-thunk')
 );

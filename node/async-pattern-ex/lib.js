@@ -91,4 +91,4 @@ this.lib = function () {
 	lib.interval = interval;
 
 	return lib;
-}(this);
+}();

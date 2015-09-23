@@ -146,7 +146,7 @@
 			if (err) lib.error('errZ*', err);
 			else     lib.info('end* ', '');
 
-			lib.log('final**', JSON.stringify(result).replace(/\"/g, ''));
+			lib.log('final**', JSON.stringify(result).replace(RegExp('"', 'g'), ''));
 		}
 	}
 

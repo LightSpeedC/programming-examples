@@ -4,9 +4,10 @@
   "description": "async pattern examples",
   "main": "case1-callback.js",
   "dependencies": {
-    "aa": ">=0.1.9",
-    "promise-light": ">=0.1.5",
-    "promise-thunk": ">=0.0.3"
+    "aa": ">=0.1.12",
+    "babel-core": ">=5.8.25",
+    "promise-light": ">=0.1.7",
+    "promise-thunk": ">=0.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
