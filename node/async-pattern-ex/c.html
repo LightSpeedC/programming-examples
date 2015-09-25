@@ -1,11 +1,52 @@
 <!doctype html>
-<body></body>
+<body>
+<pre id='$pr'></pre>
+</body>
+
 <script>
-(function () {
-	function load(file) {
-		var $script = document.createElement('script');
-		$script.setAttribute('src', file);
-		document.body.appendChild($script);
+(function (global) {
+	'use strict';
+
+	// loadScriptFile
+	function loadScriptFile(file) {
+		var script = document.createElement('script');
+		script.setAttribute('src', file);
+		document.body.appendChild(script);
 	}
-})();
+
+	function f() {}
+	if (typeof console !== 'object') global.console = {log:f, info:f, error:f, warn:f, debug:f};
+
+	var colors = {log:'green', info:'blue', error:'red', warn:'orange', debug:'blue'};
+	var marks = {log:' ', info:'blue', error:'red', warn:'orange', debug:'blue'};
+
+	function pr() {
+		var ctx = this || 'log';
+		var div = document.createElement('div');
+		div.setAttribute('style', 'color: ' + colors[ctx]);
+		div.innerText = ctx + ': ' + [].slice.call(arguments).join(' ');
+		$pr.appendChild(div);
+	}
+
+	['log', 'info', 'error', 'warn', 'debug'].forEach(function (prop) {
+		console[prop] = function (f) {
+			return function () {
+				f.apply(console, arguments);
+				pr.apply(prop, arguments);
+			};
+		} (console[prop]);
+	});
+
+	console.log('log1');
+	console.info('info1');
+	console.error('error1');
+	console.warn('warn1');
+	console.debug('debug1');
+	loadScriptFile('c.js');
+	console.log('log2');
+	console.info('info2');
+	console.error('error2');
+	console.warn('warn2');
+	console.debug('debug2');
+})(this);
 </script>

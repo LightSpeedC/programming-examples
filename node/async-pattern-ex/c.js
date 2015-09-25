@@ -1,1 +1,1 @@
-alert('c.js loaded');
+console.log('c.js loaded');
