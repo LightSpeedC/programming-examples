@@ -1,5 +1,5 @@
 (function (global) {
-	var aa = require('aa');
+	var aa = global.aa || require('aa');
 	function *g() {
 		yield 1;
 		yield 2;
@@ -17,4 +17,6 @@
 	console.log(gg.next());
 	console.log(gg.next());
 	console.log(gg.next());
-})(typeof global ? global : typeof window ? window : typeof self ? self : this);
+})(typeof global === 'object' ? global :
+   typeof window === 'object' ? window :
+   typeof self   === 'object' ? self : this);
