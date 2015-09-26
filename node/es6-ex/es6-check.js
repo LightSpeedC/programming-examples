@@ -14,7 +14,7 @@ try {
 catch (e) { console.log('%c%s', 'color:red', 'デフォルト引数 は使えません') }
 
 try {
-	eval('(function(...numbers) { return numbeers })()');
+	eval('(function(...numbers) { return numbers })()');
 	console.log('%c%s', 'color:green', '可変引数 を使えます');
 } 
 catch (e) { console.log('%c%s', 'color:red', '可変引数 は使えません') }
