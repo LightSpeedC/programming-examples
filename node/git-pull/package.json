@@ -1,0 +1,22 @@
+{
+  "name": "git-pull",
+  "version": "0.0.0",
+  "description": "git pull",
+  "main": "git-pull.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "git",
+    "pull"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "aa": "^0.1.14"
+  }
+}
