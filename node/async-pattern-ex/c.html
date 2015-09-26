@@ -1,41 +1,18 @@
 <!doctype html>
-<body>
-<pre id='$pr'></pre>
-</body>
-
+<meta charset="UTF-8">
+<script src="console-to-window.js"></script>
 <script>
 (function (global) {
 	'use strict';
 
 	// loadScriptFile
 	function loadScriptFile(file) {
-		var script = document.createElement('script');
-		script.src = file;
-		document.body.appendChild(script);
+		setTimeout(function () {
+			var script = document.createElement('script');
+			script.src = file;
+			document.body.appendChild(script);
+		}, 0);
 	}
-
-	function f() {}
-	if (typeof console !== 'object') global.console = {log:f, info:f, error:f, warn:f, debug:f};
-
-	var colors = {log:'green', info:'blue', error:'red', warn:'orange', debug:'blue'};
-	var marks = {log:' ', info:'blue', error:'red', warn:'orange', debug:'blue'};
-
-	function pr() {
-		var ctx = this || 'log';
-		var div = document.createElement('div');
-		div.setAttribute('style', 'color: ' + colors[ctx]);
-		div.innerText = ctx + ': ' + [].slice.call(arguments).join(' ');
-		$pr.appendChild(div);
-	}
-
-	['log', 'info', 'error', 'warn', 'debug'].forEach(function (prop) {
-		console[prop] = function (f) {
-			return function () {
-				f.apply(console, arguments);
-				pr.apply(prop, arguments);
-			};
-		} (console[prop]);
-	});
 
 	console.log('log1');
 	console.info('info1');
