@@ -1,27 +1,55 @@
 (function (global) {
 	'use strict';
 
-	function f() {}
-	if (typeof console !== 'object') global.console = {log:f, info:f, error:f, warn:f, debug:f};
+	var methods = ['log', 'info', 'debug', 'warn', 'error'];
 
-	var colors = {log:'black', info:'green', error:'red', warn:'orange', debug:'blue'};
+	var styles = {
+		log:   {color: 'black'},
+		info:  {color: 'green'},
+		debug: {color: 'blue'},
+		warn:  {color: 'orange'},
+		error: {color: 'red'},
+		time:  {color: 'blue'},
+		dir:   {color: 'black'},
+		trace: {color: 'black'}};
+
+	if (typeof console === 'undefined') global.console = {};
 
 	var $consoleToWindow = document.createElement('pre');
 
-	var ready = false;
+	var parent, ignore = 0;
 
-	window.onload = function (onload) {
-		return function () {
-			document.body.appendChild($consoleToWindow);
-			if (onload) onload();
-			ready = true;
-		};
-	} (window.onload);
+	console.mount = function (element) {
+		if (!element) element = document.body;
+		if (!element) {
+			// element and document.body are undefined
+			window.onload = function (onload) {
+				return function () {
+					console.mount(parent);
+					if (onload) onload();
+				};
+			} (window.onload);
+			return;
+		}
+		if (element === parent) return parent;
+		if (parent) parent.removeChild($consoleToWindow);
+		parent = element;
+		parent.appendChild($consoleToWindow);
+		return parent;
+	};
+
+	console.setStyle = function (method, style) {
+		styles[method] = style;
+	};
+
+	console.mount();
 
 	function pr() {
+		//if (ignore) return;
 		var ctx = this || 'log';
 		var div = document.createElement('div');
-		div.setAttribute('style', 'color: ' + colors[ctx]);
+		for (var i in styles[ctx])
+			div.style[i] = styles[ctx][i];
 		var msg = ctx + ': ' + [].slice.call(arguments).join(' ');
 
 		if (typeof div.textContent === 'string')
@@ -32,15 +60,61 @@
 		$consoleToWindow.appendChild(div);
 	}
 
-	['log', 'info', 'error', 'warn', 'debug'].forEach(function (prop) {
-		console[prop] = function (f) {
+	for (var i in methods)
+		console[methods[i]] = function (method, fn) {
 			return function () {
-				f.apply(console, arguments);
-				pr.apply(prop, arguments);
+				applyFunc(fn, this, arguments);
+				pr.apply(method, arguments);
 			};
-		} (console[prop]);
-	});
+		} (methods[i], console[methods[i]]);
 
-})(typeof global === 'object' ? global :
-	typeof window === 'object' ? window :
-	typeof self   === 'object' ? self : this);
+	var timerNames = {};
+
+	// console.time(timerName)
+	console.time = function (fn) {
+		return function (timerName) {
+			applyFunc(fn, this, arguments);
+			timerNames[timerName] = new Date - 0;
+		};
+	} (console.time);
+
+	// console.timeEnd(timerName)
+	console.timeEnd = function (fn) {
+		return function (timerName) {
+			applyFunc(fn, this, arguments);
+			pr.call('time', timerName + ':', (new Date - timerNames[timerName]) + 'ms');
+		};
+	} (console.timeEnd);
+
+	// console.dir(obj)
+	console.dir = function (fn) {
+		return function (obj) {
+			applyFunc(fn, this, arguments);
+			pr.call('dir', JSON.stringify(obj));
+		};
+	} (console.dir);
+
+	// console.trace()
+	console.trace = function (fn) {
+		return function (obj) {
+			applyFunc(fn, this, arguments);
+			var err = new Error();
+			var msg = err.message || err.description || '';
+			if (err.stack) msg += ': ' + err.stack;
+			if (err.fileName) msg += ': ' + err.fileName + '@' + err.lineNumber + ',' + err.columnNumber;
+			arguments[arguments.length++] = msg;
+			pr.apply('trace', arguments);
+		};
+	} (console.trace);
+
+	function applyFunc(fn, ctx, args) {
+		++ignore;
+		if (typeof fn === 'function')
+			fn.apply(ctx, args);
+		--ignore;
+	}
+
+})(this ||
+	typeof window !== 'undefined' ? window :
+	typeof global !== 'undefined' ? global :
+	typeof self   !== 'undefined' ? self : this);
