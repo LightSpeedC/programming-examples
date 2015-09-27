@@ -1,27 +1,49 @@
 (function (global) {
 	'use strict';
 
-	function f() {}
-	if (typeof console !== 'object') global.console = {log:f, info:f, error:f, warn:f, debug:f};
+	var styles = {
+		log:   {color: 'black'},
+		info:  {color: 'green'},
+		debug: {color: 'blue'},
+		warn:  {color: 'orange'},
+		error: {color: 'red'}};
 
-	var colors = {log:'black', info:'green', error:'red', warn:'orange', debug:'blue'};
+	if (typeof console === 'undefined') global.console = {};
 
 	var $consoleToWindow = document.createElement('pre');
 
-	var ready = false;
+	var parent;
 
-	window.onload = function (onload) {
-		return function () {
-			document.body.appendChild($consoleToWindow);
-			if (onload) onload();
-			ready = true;
-		};
-	} (window.onload);
+	console.mount = function (element) {
+		if (!element) element = document.body;
+		if (!element) {
+			// elem and document.body are undefined
+			window.onload = function (onload) {
+				return function () {
+					console.mount(parent);
+					if (onload) onload();
+				};
+			} (window.onload);
+			return;
+		}
+		if (element === parent) return parent;
+		if (parent) parent.removeChild($consoleToWindow);
+		parent = element;
+		parent.appendChild($consoleToWindow);
+		return parent;
+	};
+
+	console.setStyle = function (method, style) {
+		styles[method] = style;
+	};
+
+	console.mount();
 
 	function pr() {
 		var ctx = this || 'log';
 		var div = document.createElement('div');
-		div.setAttribute('style', 'color: ' + colors[ctx]);
+		for (var i in styles[ctx])
+			div.style[i] = styles[ctx][i];
 		var msg = ctx + ': ' + [].slice.call(arguments).join(' ');
 
 		if (typeof div.textContent === 'string')
@@ -32,15 +54,16 @@
 		$consoleToWindow.appendChild(div);
 	}
 
-	['log', 'info', 'error', 'warn', 'debug'].forEach(function (prop) {
-		console[prop] = function (f) {
+	for (var method in styles)
+		console[method] = function (method, fn) {
 			return function () {
-				f.apply(console, arguments);
-				pr.apply(prop, arguments);
+				if (typeof fn === 'function')
+					fn.apply(console, arguments);
+				pr.apply(method, arguments);
 			};
-		} (console[prop]);
-	});
+		} (method, console[method]);
 
-})(typeof global === 'object' ? global :
-	typeof window === 'object' ? window :
-	typeof self   === 'object' ? self : this);
+})(this ||
+	typeof window !== 'undefined' ? window :
+	typeof global !== 'undefined' ? global :
+	typeof self   !== 'undefined' ? self : this);
