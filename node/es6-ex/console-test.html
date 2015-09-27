@@ -1,0 +1,20 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script src="console-to-window.js"></script>
+<script src="es6-check.js"></script>
+
+<body>
+<input id="$checkbox" type="checkbox" onclick="dbg()" checked="true">dbg
+<div id="$console" style="background-color: #fcfcfc;"></div>
+</body>
+<script>
+function dbg() {
+	if (!$checkbox.checked)
+		$console.style.display = 'none';
+	else
+		$console.style.display = '';
+}
+console.mount($console);
+</script>
+
+<script src="console-test.js"></script>
