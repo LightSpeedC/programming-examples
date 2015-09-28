@@ -1,0 +1,21 @@
+{
+  "name": "mobile-cordova-ex",
+  "version": "0.0.0",
+  "description": "cordova example",
+  "main": "index.js",
+  "dependencies": {
+    "cordova": "^5.3.3"
+  },
+  "keywords": [
+    "cordova"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
