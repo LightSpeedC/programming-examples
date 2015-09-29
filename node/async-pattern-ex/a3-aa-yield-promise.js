@@ -65,6 +65,8 @@
 				}
 			];
 
+			lib.info('end* ', '');
+
 		} catch (err) {
 			lib.error('errZ*', err);
 		}

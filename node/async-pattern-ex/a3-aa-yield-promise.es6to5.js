@@ -193,24 +193,27 @@
 					})];
 
 				case 29:
-					context$2$0.next = 34;
+
+					lib.info('end* ', '');
+
+					context$2$0.next = 35;
 					break;
 
-				case 31:
-					context$2$0.prev = 31;
+				case 32:
+					context$2$0.prev = 32;
 					context$2$0.t0 = context$2$0['catch'](2);
 
 					lib.error('errZ*', context$2$0.t0);
 
-				case 34:
+				case 35:
 
 					lib.log('final**', JSON.stringify(result).replace(RegExp('"', 'g'), ''));
 
-				case 35:
+				case 36:
 				case 'end':
 					return context$2$0.stop();
 			}
-		}, marked1$0[0], this, [[2, 31]]);
+		}, marked1$0[0], this, [[2, 32]]);
 	}
 })((undefined || window).lib || require('./lib').lib, (undefined || window).aa || require('aa'));
 
