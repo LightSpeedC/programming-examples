@@ -1,9 +1,18 @@
 <!doctype html>
 <meta charset="UTF-8">
 <script src="console-to-window.js"></script>
-<script src="https://lightspeedworks.github.io/promise-thunk/promise-thunk.js"></script>
-<!--<script src="node_modules/promise-thunk/promise-thunk.js"></script>-->
-<script src="https://lightspeedworks.github.io/aa/aa.js"></script>
-<!--<script src="node_modules/aa/aa.js"></script>-->
+<script src="load-script-file.js"></script>
+<script src="node_modules/promise-thunk/promise-thunk.js"></script>
+<script src="node_modules/aa/aa.js"></script>
 <script src="lib.js"></script>
-<script src="a3-aa-yield-promise.js"></script>
+<script>
+(function () {
+	try {
+		eval('(function *() { yield 1; }().next())');
+		loadScriptFile('a3-aa-yield-promise.js');
+	} catch (e) {
+		loadScriptFile('node_modules/babel-core/browser-polyfill.min.js');
+		loadScriptFile('a3-aa-yield-promise.es6to5.js');
+	}
+})();
+</script>
