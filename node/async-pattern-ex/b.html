@@ -1,7 +1,17 @@
 <!doctype html>
 <meta charset="UTF-8">
 <script src="console-to-window.js"></script>
+<script src="load-script-file.js"></script>
 <script src="node_modules/promise-thunk/promise-thunk.js"></script>
 <script src="node_modules/aa/aa.js"></script>
-<script src="node_modules/babel-core/browser-polyfill.js"></script>
-<script src="b.es5.js"></script>
+<script>
+(function () {
+	try {
+		eval('(function *() { yield 1; }().next())');
+		loadScriptFile('b.js');
+	} catch (e) {
+		loadScriptFile('node_modules/babel-core/browser-polyfill.min.js');
+		loadScriptFile('b.es6to5.js');
+	}
+})();
+</script>
