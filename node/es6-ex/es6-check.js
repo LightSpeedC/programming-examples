@@ -25,7 +25,7 @@ try {
 } catch (e) { console.error('x default arguments disabled:', e) }
 
 try {
-	if (eval('(function() { "use strict"; var foo = 105; {let foo = 106; } return foo; })()') === 105)
+	if (eval('(function() { "use strict"; var foo = 105; { let foo = 106; } return foo; })()') === 105)
 		console.info('o let enabled');
 	else throw Error('unexpected let value');
 } catch (e) { console.error('x let disabled:', e) }
