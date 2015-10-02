@@ -4,10 +4,10 @@ this.taskListComponent = function () {
 
 	var mx = 'h1 div form input hr table tr td pre span'.split(' ').reduce(
 		function (mx, tag) { mx[tag] = m.bind(m, tag); return mx; }, {});
-	mx.button   = m.bind(m, 'button[type=button]');
-	mx.submit   = m.bind(m, 'button[type=submit]');
-	mx.reset    = m.bind(m, 'button[type=reset]');
-	mx.checkbox = m.bind(m, 'input[type=checkbox]');
+	mx = 'button:button button:submit button:reset input:checkbox'.split(' ').reduce(
+		function (mx, tag) { var p = tag.split(':');
+			mx[p[1]] = m.bind(m, p[0] + '[type=' + p[1] + ']');
+			return mx; }, mx);
 
 	// モデル: Taskクラスは2つのプロパティ(title : string, done : boolean)を持つ
 	function Task(task) {
