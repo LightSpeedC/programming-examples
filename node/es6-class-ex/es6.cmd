@@ -1,1 +1,1 @@
-iojs --es_staging %*
+node --es_staging %*

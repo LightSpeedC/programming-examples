@@ -1,4 +1,4 @@
 if not exist node_modules call npm install
-start iojs app 3004
+start node app 3004
 timeout /t 3
 start http://localhost:3004

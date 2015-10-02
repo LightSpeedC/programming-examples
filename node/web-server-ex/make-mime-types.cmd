@@ -1,1 +1,1 @@
-reg query hkcr /s | iojs make-mime-typesr-filter > mime-types-new.json
+reg query hkcr /s | node make-mime-typesr-filter > mime-types-new.json
