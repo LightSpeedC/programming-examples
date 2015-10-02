@@ -12,6 +12,7 @@
   {"title": "ex07 components",        "url": "/ex07-components/components.html"},
   {"title": "ex07 text list",         "url": "/ex07-components/text-list-component.html"},
   {"title": "ex08 todo app",          "url": "/ex08-todo/todo-app.html"},
+  {"title": "ex08 todo app (bind)",   "url": "/ex08-todo/todo-app-bind.html"},
   {"title": "ex09 basics",            "url": "/ex09-basics/basics.html"},
   {"title": "ex10 task list",         "url": "/ex10-task-list/task-list-app.html"},
   {"title": "ex11 form ex",           "url": "/ex11-form-ex/form-ex.html"},
