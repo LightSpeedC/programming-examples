@@ -1,0 +1,23 @@
+{
+  "name": "minimongo-ex",
+  "version": "0.0.0",
+  "description": "minimongo example",
+  "private": true,
+  "main": "index.js",
+  "dependencies": {
+    "minimongo": "^3.5.1"
+  }
+  "keywords": [
+    "minimongo",
+    "mongodb"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
