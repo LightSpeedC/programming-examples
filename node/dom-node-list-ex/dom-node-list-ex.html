@@ -1,0 +1,44 @@
+
+<body>
+<p>111</p>
+<p>222</p>
+<p>333</p>
+<p>444</p>
+<p>555</p>
+</body>
+
+<!--[if IE]><script src="js/es5-shim.min.js"></script><![endif]-->
+
+<script>
+if (typeof window.console === 'undefined')
+  window.console = {log: function () {}};
+function func(x, i) { console.log(i + ' ' + (x.textContent || x.innerText)); }
+var paragraphs = document.getElementsByTagName('p');
+console.log('--- : [].forEach.call(paragraphs, func);');
+[].forEach.call(paragraphs, func);
+console.log('--- : [].map.call(paragraphs, Object).forEach(func);');
+[].map.call(paragraphs, Object).forEach(func);
+console.log('--- : [].map.call(paragraphs, func);');
+[].map.call(paragraphs, func);
+/*
+console.log('--- : [].slice.call(paragraphs).forEach(func);');
+[].slice.call(paragraphs).forEach(func);
+console.log('--- : [].slice.call(paragraphs).map(func);');
+[].slice.call(paragraphs).map(func);
+*/
+console.log('--- : for (var i = 0, n = paragraphs.length; i < n; ++i)  func(paragraphs[i], i);');
+for (var i = 0, n = paragraphs.length; i < n; ++i)
+  func(paragraphs[i], i);
+console.log('--- : paragraphs.length);');
+console.log(paragraphs.length);
+console.log('--- : paragraphs');
+console.log(paragraphs);
+//console.log('--- : console.log([].slice.call(paragraphs));');
+//console.log([].slice.call(paragraphs));
+console.log('---');
+//.map(console.log);
+//for(var i=0,paragraph;paragraph=paragraphs[i];i++){
+//	console.log(paragraph.innerHTML);
+//}
+</script>
+
