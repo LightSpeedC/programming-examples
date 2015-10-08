@@ -17,6 +17,8 @@
 #Word Color=0, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
 abstract
 arguments
+async
+await
 boolean
 break
 byte
@@ -54,6 +56,7 @@ inner
 instanceof
 int
 interface
+label
 let
 long
 native
@@ -91,11 +94,21 @@ apply
 call
 
 #Word Color=3, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
+.filter
+.forEach
+.length
+.log
+.map
+.name
+.next
+.prototype
+.reduce
 Anchor
 Applet
 Area
 Array
 Body
+Boolean
 Button
 Checkbox
 Date
@@ -105,10 +118,13 @@ Frame
 Hidden
 History
 Image
+JSON
 Layer
 Link
 Math
 MimeType
+Number
+Object
 Option
 Password
 Plugin
@@ -126,6 +142,7 @@ Textarea
 anchors
 applets
 console
+constructor
 document
 forms
 frames
