@@ -96,13 +96,14 @@ call
 #Word Color=3, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
 .filter
 .forEach
+.indexOf
 .length
-.log
 .map
 .name
 .next
 .prototype
 .reduce
+.toString
 Anchor
 Applet
 Area
@@ -112,6 +113,7 @@ Boolean
 Button
 Checkbox
 Date
+Error
 FileUpload
 Form
 Frame
@@ -125,6 +127,7 @@ Math
 MimeType
 Number
 Object
+Object.keys
 Option
 Password
 Plugin
@@ -142,6 +145,10 @@ Textarea
 anchors
 applets
 console
+console.error
+console.info
+console.log
+console.warn
 constructor
 document
 forms
@@ -157,6 +164,14 @@ navigator
 options
 plugins
 process
+process.arch
+process.argv
+process.env
+process.exit
+process.on
+process.platform
+process.title
+process.version
 radio
 regular expression
 require
@@ -164,5 +179,10 @@ screen
 self
 window
 
+#Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
+.contains
+console.debug
+console.trace
+
 #Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=True
-/([\\].|[!-.@-~])*/
+/(\\.|[ -.@-ﾝ])+?/
