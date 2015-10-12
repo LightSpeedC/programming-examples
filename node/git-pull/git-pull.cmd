@@ -1,0 +1,2 @@
+node git-pull ..\..\..\..
+@pause
