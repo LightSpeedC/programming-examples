@@ -16,9 +16,10 @@
 	var COLOR_NORMAL = '\x1b[m';
 
 	var N = 5;
+	var slice = [].slice;
 
 	function Executor(n) {
-		n = n || N;
+		n = n || 1;
 
 		var executorChannel = chan();
 
@@ -32,7 +33,6 @@
 			for (var i = 0; i < n; ++i)
 				shadowExecutors.push(shadowExecutor);
 			yield shadowExecutors;
-			// console.log('end of all executors!!!');
 		}
 
 		// closeExecutors
@@ -52,13 +52,12 @@
 					elem.result(e);
 				}
 			}
-			// console.log('end of executor');
 		}
 
 		// executor
 		function* executor(fn) {
 			var result = chan();
-			executorChannel({fn:fn, ctx:this, args:[].slice.call(arguments, 1), result:result});
+			executorChannel({fn:fn, ctx:this, args:slice.call(arguments, 1), result:result});
 			return yield result;
 		}
 
