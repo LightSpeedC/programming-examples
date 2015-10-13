@@ -4,7 +4,8 @@
   "description": "git pull",
   "main": "git-pull.js",
   "dependencies": {
-    "aa": ">=0.1.18"
+    "aa": ">=0.1.18",
+    "executors": ">=0.0.1"
   },
   "keywords": [
     "git",
