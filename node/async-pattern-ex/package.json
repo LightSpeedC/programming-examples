@@ -7,7 +7,7 @@
     "aa": ">=0.1.18",
     "babel-core": ">=5.8.25",
     "promise-light": ">=0.1.7",
-    "promise-thunk": ">=0.1.1"
+    "promise-thunk": ">=0.1.5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
