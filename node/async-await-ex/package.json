@@ -1,0 +1,22 @@
+{
+  "name": "async-await-ex",
+  "version": "0.0.0",
+  "description": "ES7 async await",
+  "main": "async-func.es6to5.js",
+  "dependencies": {
+    "babel": "^5.8.23"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "async",
+    "await"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
