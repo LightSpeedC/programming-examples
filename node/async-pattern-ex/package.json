@@ -4,7 +4,7 @@
   "description": "async pattern examples",
   "main": "case1-callback.js",
   "dependencies": {
-    "aa": ">=0.1.14",
+    "aa": ">=0.1.18",
     "babel-core": ">=5.8.25",
     "promise-light": ">=0.1.7",
     "promise-thunk": ">=0.1.1"

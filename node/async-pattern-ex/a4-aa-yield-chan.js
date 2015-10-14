@@ -15,6 +15,7 @@
 	//          +--> procYm -->+
 
 	aa(main());
+	var Channel = aa.Channel;
 
 	function *main() {
 		lib.log('start**', '');
@@ -23,7 +24,7 @@
 
 		try {
 
-			var chan = aa();
+			var chan = Channel();
 
 			// 処理A, B, C, Xmをシーケンシャルに実行する。
 			lib.procA('A', chan);
@@ -59,7 +60,7 @@
 			// 処理K, L, Mをシーケンシャルに実行する。
 			yield [
 				function *() {
-					var chan = aa();
+					var chan = Channel();
 					result.J = result.I = result.H = null;
 
 					lib.procH('H', chan);
@@ -72,7 +73,7 @@
 					result.J = yield chan;
 				},
 				function *() {
-					var chan = aa();
+					var chan = Channel();
 					result.M = result.L = result.K = null;
 
 					lib.procK('K', chan);

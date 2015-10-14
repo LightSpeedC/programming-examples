@@ -17,7 +17,7 @@
 	//          +--> procYm -->+
 
 	var marked1$0 = [main].map(regeneratorRuntime.mark);
-	for (var p in lib) if (p.substr(0, 4) === 'proc') lib[p] = aa(lib[p]);
+	for (var p in lib) if (p.substr(0, 4) === 'proc') lib[p] = aa.promisify(lib[p]);
 
 	aa(main());
 

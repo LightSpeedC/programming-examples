@@ -16,7 +16,7 @@
 
 	for (var p in lib)
 		if (p.substr(0, 4) === 'proc')
-			lib[p] = aa(lib[p]);
+			lib[p] = aa.promisify(lib[p]);
 
 	aa(main());
 

@@ -14,22 +14,22 @@
 	//          |    . . .     |
 	//          +--> procYm -->+
 
-	function wrap(fn) {
+	function promisify(fn) {
 		return function () {
-			var ctx = this, args = arguments;
+			var args = arguments;
 			return new Promise(function (resolve, reject) {
 				args[args.length++] = function (err, val) {
 					err ? reject(err) : resolve(val);
 				};
-				fn.apply(ctx, args);
+				fn.apply(null, args);
 			});
 		}
 	}
 
-	// procで始まる関数をwrapを使用してPromise化する。
+	// procで始まる関数をpromisifyを使用してPromise化する。
 	for (var p in lib)
 		if (p.substr(0, 4) === 'proc')
-			lib[p] = wrap(lib[p]);
+			lib[p] = promisify(lib[p]);
 
 	main();
 

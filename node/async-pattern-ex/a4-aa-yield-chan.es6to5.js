@@ -18,6 +18,7 @@
 
 	var marked1$0 = [main].map(regeneratorRuntime.mark);
 	aa(main());
+	var Channel = aa.Channel;
 
 	function main() {
 		var result, chan, x, numX, channels, y, numY, para, p;
@@ -28,7 +29,7 @@
 
 					result = {};
 					context$2$0.prev = 2;
-					chan = aa();
+					chan = Channel();
 
 					// 処理A, B, C, Xmをシーケンシャルに実行する。
 					lib.procA('A', chan);
@@ -100,7 +101,7 @@
 						return regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
 							while (1) switch (context$3$0.prev = context$3$0.next) {
 								case 0:
-									chan = aa();
+									chan = Channel();
 
 									result.J = result.I = result.H = null;
 
@@ -135,7 +136,7 @@
 						return regeneratorRuntime.wrap(function callee$2$0$(context$3$0) {
 							while (1) switch (context$3$0.prev = context$3$0.next) {
 								case 0:
-									chan = aa();
+									chan = Channel();
 
 									result.M = result.L = result.K = null;
 
