@@ -1,6 +1,6 @@
-// dir-tree.js
+// dir-tree-sync.js
 
-this.dirTree = function () {
+this.dirTreeSync = function () {
 	'use strict';
 
 	var fs = require('fs');
@@ -8,7 +8,7 @@ this.dirTree = function () {
 	var $totalsize = '*totalsize*';
 	//var $dirsize = '*dirsize*';
 
-	function dirTree(dir) {
+	function dirTreeSync(dir) {
 		if (!dir) dir = '.';
 		dir = path.resolve(dir);
 
@@ -31,7 +31,7 @@ this.dirTree = function () {
 				continue;
 			}
 			var size = stat.size;
-			var child = stat.isDirectory() ? dirTree(file) : null;
+			var child = stat.isDirectory() ? dirTreeSync(file) : null;
 			children[name] = child ? child : size;
 			totalsize += size + (child ? child[$totalsize] : 0);
 		}
@@ -44,7 +44,7 @@ this.dirTree = function () {
 		//  var file = path.resolve(dir, name);
 		//  var stat = fs.statSync(file);
 		//  var size = stat.size;
-		//  var child = stat.isFile() ? null : dirTree(file);
+		//  var child = stat.isFile() ? null : dirTreeSync(file);
 		//  children.push(child ?
 		//    {name: name, child: child} :
 		//    {name: name, size: size});
@@ -53,19 +53,19 @@ this.dirTree = function () {
 		//return {totalsize: totalsize, children: children};
 	}
 
-	dirTree.dirTree = dirTree;
+	dirTreeSync.dirTreeSync = dirTreeSync;
 
 	// node.js module.exports
 	if (typeof module === 'object' && module && module.exports) {
-		module.exports = dirTree;
+		module.exports = dirTreeSync;
 
 		// main
 		if (require.main === module) {
-			var tree = dirTree(process.argv[2]);
+			var tree = dirTreeSync(process.argv[2]);
 			console.log(require('util').inspect(tree,
 				{colors: true, depth: null}).replace(/\'/g, ''));
 		}
 	}
 
-	return dirTree;
+	return dirTreeSync;
 }();
