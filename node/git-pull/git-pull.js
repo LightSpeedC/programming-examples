@@ -1,7 +1,7 @@
 (function () {
 	'use strict';
 
-	var aa = require('aa'), chan = aa.chan, thunkify = aa.thunkify;
+	var aa = require('aa'), thunkify = aa.thunkify;
 	var fs = require('fs');
 	var path = require('path');
 	var util = require('util');
@@ -23,6 +23,7 @@
 	// main
 	aa(function* main() {
 		var executor = Executors(N);
+		var testMode = process.argv[3] === 'test';
 		yield tree(path.resolve(process.argv[2] || '.'));
 		yield executor.end();
 		console.log('all finished!');
@@ -37,6 +38,8 @@
 				if (yield fs_exists(path.resolve(dir, '.git/ORIG_HEAD.lock')))
 					return console.error('*** ' + dir + '\n' + COLOR_WARN + 'SKIPPED (ORIG_HEAD.lock)!!!' + COLOR_NORMAL);
 				try {
+					if (testMode)
+						return console.log('*** ' + dir + ' --- test');
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
 					if (res[0].indexOf('use "') === -1)
 						console.log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
@@ -45,7 +48,8 @@
 					res[1] && console.error(COLOR_WARN + res[1] + COLOR_NORMAL);
 				} catch (e) {
 					console.error('*** ' + dir + '\n' + COLOR_ERROR +
-						util.inspect(e, {colors:true, depth:null}) + COLOR_NORMAL); }
+						util.inspect(e, {colors:true, depth:null}) + COLOR_NORMAL);
+				}
 				return;
 			} // names contains '.git'
 
@@ -53,7 +57,7 @@
 				if (name === 'node_modules') return;
 				var file = path.resolve(dir, name);
 				if ((yield fs_stat(file)).isDirectory())
-					yield tree(path.resolve(dir, name));
+					yield tree(file);
 			}); // names.map
 
 		} // tree
