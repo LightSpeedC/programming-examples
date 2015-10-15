@@ -1,4 +1,4 @@
-pushd %~dp0
+@pushd %~dp0
 node fwd
-pause
-popd
+@popd
+@pause

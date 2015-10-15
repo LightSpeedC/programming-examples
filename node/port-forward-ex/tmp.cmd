@@ -1,4 +1,4 @@
-pushd %~dp0
+@pushd %~dp0
 node tmp
-pause
-popd
+@popd
+@pause
