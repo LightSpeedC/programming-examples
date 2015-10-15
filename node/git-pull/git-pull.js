@@ -15,6 +15,7 @@
 	var COLOR_ERROR  = '\x1b[41m';
 	var COLOR_WARN   = '\x1b[33m';
 	var COLOR_NORMAL = '\x1b[m';
+	var COLOR_AHEAD  = '\x1b[35m';
 
 	var N = 5;
 	var cd = 'cd ' + (process.platform === 'win32' ? '/d ' : '');
@@ -37,7 +38,10 @@
 					return console.error('*** ' + dir + '\n' + COLOR_WARN + 'SKIPPED (ORIG_HEAD.lock)!!!' + COLOR_NORMAL);
 				try {
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
-					console.log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
+					if (res[0].indexOf('use "') === -1)
+						console.log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
+					else
+						console.log('*** ' + dir + '\n' + COLOR_AHEAD + res[0] + COLOR_NORMAL);
 					res[1] && console.error(COLOR_WARN + res[1] + COLOR_NORMAL);
 				} catch (e) {
 					console.error('*** ' + dir + '\n' + COLOR_ERROR +
