@@ -1,21 +1,26 @@
 // aa-dir-tree.js
 
-this.dirTree = function () {
+this.dirTreeAsync = function () {
 	'use strict';
 
-	var aa = require('aa');
-	var fs = require('co-fs');
+	var fs = require('fs');
 	var path = require('path');
-	var $totalsize = '*totalsize*';
-	//var $dirsize = '*dirsize*';
 
-	function *dirTree(dir) {
-		if (!dir) dir = '.';
-		dir = path.resolve(dir);
+	var aa = require('aa'), thunkify = aa.thunkify;
+	var fs_readdir = thunkify(fs.readdir);
+	var fs_stat = thunkify(fs.stat);
+
+	var $totalsize = '*totalsize*';
+	var $dirsize = '*dirsize*';
+
+	// *dirTreeAsync(dir)
+	function *dirTreeAsync(dir) {
+		dir = path.resolve(dir || '.');
 
 		try {
-			var names = yield fs.readdir(dir);
+			var names = yield fs_readdir(dir);
 		} catch (err) {
+			console.log(err.stack);
 			return null;
 		}
 
@@ -23,61 +28,44 @@ this.dirTree = function () {
 		var dirsize = 0;
 		var children = {};
 
-		for (var i = 0, n = names.length; i < n; ++i) {
-			var name = names[i];
+		names.forEach(name => children[name] = null);
+
+		yield names.map(name => function *() {
 			var file = path.resolve(dir, name);
 			try {
-				var stat = yield fs.stat(file);
+				var stat = yield fs_stat(file);
 			} catch (err) {
 				console.log(err.stack);
-				children[name] = null;
-				continue;
+				return;
 			}
-			var size = stat.size;
-			var child = stat.isDirectory() ? yield dirTree(file) : null;
-			children[name] = child ? child : size;
-			totalsize += size + (child ? child[$totalsize] : 0);
-			dirsize += size;
-		}
+			var child = stat.isDirectory() ? yield dirTreeAsync(file) : null;
+			children[name] = child ? child : stat.size;
+			totalsize += stat.size + (child ? child[$totalsize] : 0);
+			dirsize += stat.size;
+		});
 
-		//children[$dirsize] = dirsize;
+		children[$dirsize] = dirsize;
 		children[$totalsize] = totalsize;
 		return children;
 
-		//var children = [];
-		//for (var i = 0, n = names.length; i < n; ++i) {
-		//  var name = names[i];
-		//  var file = path.resolve(dir, name);
-		//  var stat = yield fs.stat(file);
-		//  var size = stat.size;
-		//  var child = stat.isDirectory() ? yield dirTree(file) : null;
-		//  children.push(child ?
-		//    {name: name, child: child} :
-		//    {name: name, size: size});
-		//  totalsize += size + (child ? child.totalsize : 0);
-		//  dirsize += size;
-		//}
-		//return {totalsize: totalsize, dirsize: dirsize, children: children};
 	}
-
-	dirTree.dirTree = dirTree;
 
 	// node.js module.exports
 	if (typeof module === 'object' && module && module.exports) {
-		module.exports = dirTree;
+		module.exports = dirTreeAsync;
 
 		// main
 		if (require.main === module) {
-			var tree = 
-			aa(dirTree(process.argv[2] || '.')).then(function (tree) {
-				console.log(require('util').inspect(tree,
-					{colors: true, depth: null}).replace(/\'/g, ''));
-			}, function (err) {
-				console.log(err.stack);
+			aa(function *() {
+				console.time('async');
+				var tree = yield dirTreeAsync(process.argv[2]);
+				console.timeEnd('async');
+				//console.log(require('util').inspect(tree,
+				//	{colors: true, depth: null}).replace(/\'/g, ''));
 			});
 		}
 
 	}
 
-	return dirTree;
+	return dirTreeAsync;
 }();
