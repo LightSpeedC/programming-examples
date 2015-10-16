@@ -121,6 +121,7 @@ Hidden
 History
 Image
 JSON
+JSON.stringify
 Layer
 Link
 Math
