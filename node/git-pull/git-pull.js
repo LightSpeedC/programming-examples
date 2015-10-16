@@ -6,6 +6,7 @@
 	var path = require('path');
 	var util = require('util');
 	var Executors = require('executors');
+	var DateTime = require('date-time-string');
 	var fs_readdir = thunkify(fs.readdir);
 	var fs_stat =    thunkify(fs.stat);
 	var fs_exists =  thunkify(fs.exists);
@@ -20,13 +21,23 @@
 	var N = 5;
 	var cd = 'cd ' + (process.platform === 'win32' ? '/d ' : '');
 
+	var dttm = DateTime.toDateTimeString().replace(/[\-:]/g, '').replace(/ /g, '-').substr(0, 13);
+
 	// main
 	aa(function* main() {
 		var executor = Executors(N);
 		var testMode = process.argv[3] === 'test';
-		yield tree(path.resolve(process.argv[2] || '.'));
+		var dir = path.resolve(process.argv[2] || '.');
+		var w = require('fs').createWriteStream(
+			path.resolve(dir, 'git-pull-' + dttm + '.log'), {encoding: 'utf8'});
+
+		var rex = RegExp('\x1b\\[.*?m', 'g')
+		function log(x)   { console.log(x);   w.write(x.replace(rex, '') + '\r\n'); }
+		function error(x) { console.error(x); w.write(x.replace(rex, '') + '\r\n'); }
+
+		yield tree(dir);
 		yield executor.end();
-		console.log('all finished!');
+		log('all finished!');
 		return;
 
 		// tree
@@ -34,20 +45,20 @@
 			var names = yield fs_readdir(dir);
 
 			if (names.indexOf('.git') >= 0) {
-				console.log('Git ===> ', dir);
+				log('Git ===> ' + dir);
 				if (yield fs_exists(path.resolve(dir, '.git/ORIG_HEAD.lock')))
-					return console.error('*** ' + dir + '\n' + COLOR_WARN + 'SKIPPED (ORIG_HEAD.lock)!!!' + COLOR_NORMAL);
+					return error('*** ' + dir + '\n' + COLOR_WARN + 'SKIPPED (ORIG_HEAD.lock)!!!' + COLOR_NORMAL);
 				try {
 					if (testMode)
-						return console.log('*** ' + dir + ' --- test');
+						return log('*** ' + dir + ' --- test');
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
 					if (res[0].indexOf('use "') === -1)
-						console.log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
+						log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
 					else
-						console.log('*** ' + dir + '\n' + COLOR_AHEAD + res[0] + COLOR_NORMAL);
-					res[1] && console.error(COLOR_WARN + res[1] + COLOR_NORMAL);
+						log('*** ' + dir + '\n' + COLOR_AHEAD + res[0] + COLOR_NORMAL);
+					res[1] && error(COLOR_WARN + res[1] + COLOR_NORMAL);
 				} catch (e) {
-					console.error('*** ' + dir + '\n' + COLOR_ERROR +
+					error('*** ' + dir + '\n' + COLOR_ERROR +
 						util.inspect(e, {colors:true, depth:null}) + COLOR_NORMAL);
 				}
 				return;

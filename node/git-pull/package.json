@@ -5,6 +5,7 @@
   "main": "git-pull.js",
   "dependencies": {
     "aa": ">=0.1.18",
+    "date-time-string": ">=0.0.9",
     "executors": ">=0.0.1"
   },
   "keywords": [
