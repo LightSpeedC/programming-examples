@@ -1,0 +1,25 @@
+{
+  "name": "package-versions",
+  "version": "0.0.0",
+  "description": "git pull",
+  "private": true,
+  "main": "package-versions.js",
+  "dependencies": {
+    "aa": ">=0.1.18",
+    "date-time-string": ">=0.0.9",
+    "executors": ">=0.0.1"
+  },
+  "keywords": [
+    "git",
+    "pull"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
