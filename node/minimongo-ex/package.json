@@ -6,7 +6,7 @@
   "main": "index.js",
   "dependencies": {
     "minimongo": "^3.5.1"
-  }
+  },
   "keywords": [
     "minimongo",
     "mongodb"
