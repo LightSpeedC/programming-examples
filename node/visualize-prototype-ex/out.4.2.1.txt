@@ -1,0 +1,298 @@
+v4.2.1 ia32 win32
+
+*************** Object.prototype
+{ constructor: 
+   { value: [Function: Object],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  toString: 
+   { value: [Function: toString],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  toLocaleString: 
+   { value: [Function: toLocaleString],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  valueOf: 
+   { value: [Function: valueOf],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  hasOwnProperty: 
+   { value: [Function: hasOwnProperty],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  isPrototypeOf: 
+   { value: [Function: isPrototypeOf],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  propertyIsEnumerable: 
+   { value: [Function: propertyIsEnumerable],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  __defineGetter__: 
+   { value: [Function: __defineGetter__],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  __lookupGetter__: 
+   { value: [Function: __lookupGetter__],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  __defineSetter__: 
+   { value: [Function: __defineSetter__],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  __lookupSetter__: 
+   { value: [Function: __lookupSetter__],
+     writable: true,
+     enumerable: false,
+     configurable: true } }
+
+*************** Function.prototype
+{ length: 
+   { value: 0,
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  name: 
+   { value: '',
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  arguments: 
+   { get: [Function],
+     set: [Function],
+     enumerable: false,
+     configurable: true },
+  caller: 
+   { get: [Function],
+     set: [Function],
+     enumerable: false,
+     configurable: true },
+  constructor: 
+   { value: [Function: Function],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  bind: 
+   { value: [Function: bind],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  toString: 
+   { value: [Function: toString],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  call: 
+   { value: [Function: call],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  apply: 
+   { value: [Function: apply],
+     writable: true,
+     enumerable: false,
+     configurable: true } }
+
+*************** Object
+{ length: 
+   { value: 1,
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  name: 
+   { value: 'Object',
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  arguments: 
+   { value: null,
+     writable: false,
+     enumerable: false,
+     configurable: false },
+  caller: 
+   { value: null,
+     writable: false,
+     enumerable: false,
+     configurable: false },
+  prototype: 
+   { value: {},
+     writable: false,
+     enumerable: false,
+     configurable: false },
+  keys: 
+   { value: [Function: keys],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  create: 
+   { value: [Function: create],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  defineProperty: 
+   { value: [Function: defineProperty],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  defineProperties: 
+   { value: [Function: defineProperties],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  freeze: 
+   { value: [Function: freeze],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  getPrototypeOf: 
+   { value: [Function: getPrototypeOf],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  setPrototypeOf: 
+   { value: [Function: setPrototypeOf],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  getOwnPropertyDescriptor: 
+   { value: [Function: getOwnPropertyDescriptor],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  getOwnPropertyNames: 
+   { value: [Function: getOwnPropertyNames],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  is: 
+   { value: [Function: is],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  isExtensible: 
+   { value: [Function: isExtensible],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  isFrozen: 
+   { value: [Function: isFrozen],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  isSealed: 
+   { value: [Function: isSealed],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  preventExtensions: 
+   { value: [Function: preventExtensions],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  seal: 
+   { value: [Function: seal],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  getOwnPropertySymbols: 
+   { value: [Function: getOwnPropertySymbols],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  deliverChangeRecords: 
+   { value: [Function: deliverChangeRecords],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  getNotifier: 
+   { value: [Function: getNotifier],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  observe: 
+   { value: [Function: observe],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  unobserve: 
+   { value: [Function: unobserve],
+     writable: true,
+     enumerable: false,
+     configurable: true },
+  assign: 
+   { value: [Function: assign],
+     writable: true,
+     enumerable: false,
+     configurable: true } }
+
+*************** Function
+{ length: 
+   { value: 1,
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  name: 
+   { value: 'Function',
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  arguments: 
+   { value: null,
+     writable: false,
+     enumerable: false,
+     configurable: false },
+  caller: 
+   { value: null,
+     writable: false,
+     enumerable: false,
+     configurable: false },
+  prototype: 
+   { value: [Function],
+     writable: false,
+     enumerable: false,
+     configurable: false } }
+
+*************** Function 1
+{ length: 
+   { value: 2,
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  name: 
+   { value: '',
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  prototype: 
+   { value: {},
+     writable: true,
+     enumerable: false,
+     configurable: false } }
+
+*************** Function 2
+{ length: 
+   { value: 0,
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  name: 
+   { value: '',
+     writable: false,
+     enumerable: false,
+     configurable: true },
+  prototype: 
+   { value: {},
+     writable: true,
+     enumerable: false,
+     configurable: false } }
