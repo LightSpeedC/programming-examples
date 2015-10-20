@@ -1,6 +1,8 @@
 (function () {
 	'use strict';
 
+	console.log(process.version, process.arch, process.platform);
+
 	function visualize(src) {
 		var dst = {};
 		Object.getOwnPropertyNames(src).
@@ -17,7 +19,7 @@
 
 	function showvis(tag, src) {
 		var dst = visualize(src);
-		console.log('***************', tag);
+		console.log('\n***************', tag);
 		console.log(dst);
 		for (var p in dst) {
 		}
