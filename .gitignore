@@ -76,3 +76,9 @@ $RECYCLE.BIN/
 
 # local Node.js exe
 node.exe
+
+# Executables
+*.exe
+
+# Compiled Object files
+*.obj
