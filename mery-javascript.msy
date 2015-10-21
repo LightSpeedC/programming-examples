@@ -152,6 +152,7 @@ console.log
 console.warn
 constructor
 document
+exports
 forms
 frames
 global
@@ -161,6 +162,8 @@ layers
 links
 location
 mimeTypes
+module
+module.exports
 navigator
 options
 plugins
