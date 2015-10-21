@@ -1,6 +1,7 @@
 // http://hack.aipo.com/archives/11249/
 
 var fs = require('fs');
+var path = require('path');
 
 if (require.main === module) main();
 
@@ -16,25 +17,14 @@ function eachFiles(filepath, rootPath, callback) {
 		rootPath = filepath;
 	}
 	var stat = fs.statSync(filepath);
-	if (!stat) {
-
-	} else if (stat.isDirectory()) {
+	if (stat.isDirectory()) {
 		try {
 			var files = fs.readdirSync(filepath);
-			if (!files) {
-
-			} else {
-				for (var _i in files)(function (i) {
-					var file = files[i];
-					if (filepath.match(/.*\/$/)) {
-						eachFiles(filepath + file, rootPath, callback);
-					} else {
-						eachFiles(filepath + "/" + file, rootPath, callback);
-					}
-				}(_i));
-			}
+			files.forEach(file => {
+				eachFiles(path.resolve(filepath, file), rootPath, callback);
+			});
 		} catch (e1) {
-			console.error("Directory " + filepath + " is unreadable.");
+			console.error("Directory " + filepath + " is unreadable." + e1);
 		}
 	} else if (stat.isFile()) {
 		if (callback) {
