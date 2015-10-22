@@ -97,12 +97,14 @@ call
 .filter
 .forEach
 .indexOf
+.join
 .length
 .map
 .name
 .next
 .prototype
 .reduce
+.split
 .toString
 Anchor
 Applet
