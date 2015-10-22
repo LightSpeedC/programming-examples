@@ -1,0 +1,33 @@
+ ECMAScript    | ES3      | ES5      | ES6 
+ ------------- | -------- | -------- | --------
+ 定義          | function | function | class
+ getter/setter | できない | できる   | できる
+ 継承          | できる   | できる   | extends
+
+ ECMAScript           | ES3      | ES5      | ES6 
+ -------------------- | -------- | -------- | --------
+ 定義方法             | function | function | class
+ プロパティ継承       | できる   | できる   | extends
+ クラスプロパティ継承 | できない | できる   | extends
+ getter/setter        | できない | できる   | できる
+ private変数          | できる   | できる   | できるかな
+
+
+function Class() {
+  this._someValue = null; // Any
+  ...
+}
+
+Class.prototype = Object.create(Class, {
+  constructor: { value: Class },
+  method: { value: Class_method },
+  someValue: {
+    set: function(v) { this._someValue = v; },
+    get: function()  { return this._someValue; } },
+});
+
+function Class_method() {
+  ...
+}
+
+

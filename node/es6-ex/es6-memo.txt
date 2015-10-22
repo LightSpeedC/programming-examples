@@ -1,0 +1,40 @@
+ES6
+
+アロー関数
+クラス
+オブジェクトリテラル
+テンプレート文字列
+デストラクチャリング
+デフォルト・レスト・スプレッド
+let, const
+iterator + for..of
+generators
+
+reflect api
+tail call
+
+Proxy
+Symbol
+
+
+かなり良くなる系
+function*(){yield}
+
+結構良くなる系
+()=>1
+Promise
+for of
+
+
+
+すっきり書ける系
+(...args)
+(arg=default)
+class extends
+Map, Set
+const, let
+`${}`
+Spread Destructuring
+[a,b]=[1,2]
+{a,b}={a:1,b:2}
+{[x]: val}
