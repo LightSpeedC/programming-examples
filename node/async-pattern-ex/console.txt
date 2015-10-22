@@ -1,0 +1,14 @@
+node:
+Console {
+  dir: [Function: bound ],
+  trace: [Function: bound ],
+  assert: [Function: bound ],
+
+firefox: MDN
+Console.assert()
+Console.count()
+Console.dir()
+Console.group()
+Console.groupCollapsed()
+Console.groupEnd()
+Console.trace()
