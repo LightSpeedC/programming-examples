@@ -1,0 +1,41 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script>
+if (!Object.keys) Object.keys = function (obj) {
+	if (obj === window) return ['window', 'self', 'document', 'navigator'];
+	var a = [];
+	try {
+		for (var i in obj) {
+			//console.log('keys', typeof obj, i);
+			if (obj.hasOwnProperty(i))
+				a.push(i);
+		}
+	} catch (e) {
+		console.error('keys', typeof obj, e);
+		a.push(e + '');
+	}
+	return a;
+};
+</script>
+<!--[if IE]><script src="js/es5-shim.min.js"></script><![endif]-->
+<script src="console-to-window.js"></script>
+<script src="load-script-file.js"></script>
+<script>
+(function () {
+	try {
+		var msg = 'generators(yield)';
+		if (eval('(function *() { yield 2; }().next().value)') !== 2)
+			throw new Error(msg);
+		var msg = 'arrow function';
+		if (eval('(x => x * x)(3)') !== 9)
+			throw new Error(msg);
+		loadScriptFile('a.js');
+		loadScriptFile('b.js');
+	} catch (e) {
+		console.warn(msg, e);
+		loadScriptFile('node_modules/babel-core/browser-polyfill.min.js');
+		loadScriptFile('a.es6to5.js');
+		loadScriptFile('b.es6to5.js');
+	}
+})();
+</script>
