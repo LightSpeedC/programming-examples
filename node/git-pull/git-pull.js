@@ -52,8 +52,13 @@
 					if (testMode)
 						return log('*** ' + dir + ' --- test');
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
-					if (res[0].indexOf('use "') === -1)
-						log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
+					if (res[0].indexOf('use "') === -1) {
+						if (res[0].replace(/\r\n/g, '\n') ===
+							"On branch master\nYour branch is up-to-date with 'origin/master'.\n\nnothing to commit, working directory clean\nAlready up-to-date.\n")
+							log('*** ' + dir + ' ===> ' + COLOR_OK + 'OK' + COLOR_NORMAL);
+						else
+							log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
+					}
 					else
 						log('*** ' + dir + '\n' + COLOR_AHEAD + res[0] + COLOR_NORMAL);
 					res[1] && error(COLOR_WARN + res[1] + COLOR_NORMAL);
