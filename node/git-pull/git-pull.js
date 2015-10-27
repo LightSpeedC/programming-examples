@@ -18,7 +18,7 @@
 	var COLOR_NORMAL = '\x1b[m';
 	var COLOR_AHEAD  = '\x1b[35m';
 
-	var N = 5;
+	var N = 7;
 	var cd = 'cd ' + (process.platform === 'win32' ? '/d ' : '');
 
 	var dttm = DateTime.toDateTimeString().replace(/[\-:]/g, '').replace(/ /g, '-').substr(0, 13);
