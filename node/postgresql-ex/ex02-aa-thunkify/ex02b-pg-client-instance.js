@@ -16,24 +16,24 @@ var pw   = process.env.PGPASSWORD || 'password';
 var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
 
 aa(function *() {
-  var client = new pg.Client(conString);
-  try {
-    yield client.connect();
-  } catch (err) {
-    return console.error('could not connect to postgres', err);
-  }
+	var client = new pg.Client(conString);
+	try {
+		yield client.connect();
+	} catch (err) {
+		return console.error('could not connect to postgres', err);
+	}
 
-  try {
-    var result = yield client.query('SELECT NOW() AS "theTime"');
-  } catch (err) {
-    return console.error('error running query', err);
-  }
+	try {
+		var result = yield client.query('SELECT NOW() AS "theTime"');
+	} catch (err) {
+		return console.error('error running query', err);
+	}
 
-  console.log(result.rows[0].theTime);
-  //output: Tue Jan 15 2013 19:12:47 GMT-600 (CST)
+	console.log(result.rows[0].theTime);
+	//output: Tue Jan 15 2013 19:12:47 GMT-600 (CST)
 
-  client.end();
+	client.end();
 }).catch(function (err) {
-  console.error('\x1b[31m' + err.stack + '\x1b[m');
-  throw err;
+	console.error('\x1b[31m' + err.stack + '\x1b[m');
+	throw err;
 });

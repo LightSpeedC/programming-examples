@@ -20,27 +20,27 @@ var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
 //and set a limit of 20 (also configurable)
 aa(function *() {
 
-  try {
-    var client = yield pg.connect(conString);
-  } catch (err) {
-    return console.error('error fetching client from pool', err);
-  }
+	try {
+		var client = yield pg.connect(conString);
+	} catch (err) {
+		return console.error('error fetching client from pool', err);
+	}
 
-  try {
-    var result = yield client.query('SELECT $1::int AS num', ['1']);
+	try {
+		var result = yield client.query('SELECT $1::int AS num', ['1']);
 
-    //call `done()` to release the client back to the pool
-    client.done();
-  } catch (err) {
-    return console.error('error running query', err);
-  }
+		//call `done()` to release the client back to the pool
+		client.done();
+	} catch (err) {
+		return console.error('error running query', err);
+	}
 
-  console.log(result.rows[0].num);
-  //output: 1
+	console.log(result.rows[0].num);
+	//output: 1
 
-  // end/disconnect
-  pg.end();
+	// end/disconnect
+	pg.end();
 }).catch(function (err) {
-  console.error('\x1b[31m' + err.stack + '\x1b[m');
-  throw err;
+	console.error('\x1b[31m' + err.stack + '\x1b[m');
+	throw err;
 });
