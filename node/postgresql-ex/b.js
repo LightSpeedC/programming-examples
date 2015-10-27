@@ -4,17 +4,22 @@
 	var pg = require('pg');
 	var aa = require('aa'), thunkify = aa.thunkify, Channel = aa.Channel;
 
-	// Client pooling
+	// Client instance
 
-	//var conString = 'postgres://postgres:1234@localhost/postgres';
-	var conString = 'postgres://myami_common:myami_common@localhost/myami';
+	var host = process.env.PGHOST     || 'localhost';
+	var port = process.env.PGPORT     || '5432';
+	var db   = process.env.PGDATABASE || 'postgres';
+	var user = process.env.PGUSER     || 'postgres';
+	var pw   = process.env.PGPASSWORD || 'password';
+
+	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
 	//pg.connectA = thunkify.call(pg, pg.connect);
 
 	aa(function *() {
 
-	var client = new pg.Client(conString);
-	client.connectA = thunkify.call(client, client.connect);
-	client.queryA = thunkify.call(client, client.query);
+		var client = new pg.Client(conString);
+		client.connectA = thunkify.call(client, client.connect);
+		client.queryA = thunkify.call(client, client.query);
 
 		try {
 			var msg = 'could not connect to postgres';
@@ -44,11 +49,11 @@
 		client.connectA = thunkify.call(client, client.connect);
 		client.queryA = thunkify.call(client, client.query);
 
-			console.log('2nd connectA++');
-			yield client.connectA();
-			console.log('2nd connectA--');
-			var result = yield client.queryA('select * from s_tenant_r', []);
-			console.log(result);
+		console.log('2nd connectA++');
+		yield client.connectA();
+		console.log('2nd connectA--');
+		var result = yield client.queryA('select * from s_tenant_r', []);
+		console.log(result);
 		client.end();
 		yield aa.wait(100);
 		//console.log('process.exit()');

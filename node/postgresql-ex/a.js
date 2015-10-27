@@ -6,8 +6,13 @@
 
 	// Client pooling
 
-	//var conString = 'postgres://postgres:1234@localhost/postgres';
-	var conString = 'postgres://myami_common:myami_common@localhost/myami';
+	var host = process.env.PGHOST     || 'localhost';
+	var port = process.env.PGPORT     || '5432';
+	var db   = process.env.PGDATABASE || 'postgres';
+	var user = process.env.PGUSER     || 'postgres';
+	var pw   = process.env.PGPASSWORD || 'password';
+
+	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
 	pg.connectA = thunkify.call(pg, pg.connect);
 
 	aa(function *() {
