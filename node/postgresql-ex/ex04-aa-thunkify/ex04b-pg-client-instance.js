@@ -4,19 +4,9 @@
 	var pg = require('pg');
 	var aa = require('aa'), thunkify = aa.thunkify, Channel = aa.Channel;
 
-	function defineMethodA(obj, method) {
-		var methodAcached = method + 'Acached';
-		Object.defineProperty(obj, method + 'A', {
-			get: function () {
-				return this[methodAcached] ? this[methodAcached] :
-					this[methodAcached] = thunkify(this, this[method]);
-			}
-		});
-	}
-
-	defineMethodA(pg, 'connect');
-	defineMethodA(pg.Client.prototype, 'connect');
-	defineMethodA(pg.Client.prototype, 'query');
+	thunkify(pg, 'connect');
+	thunkify(pg.Client.prototype, 'connect');
+	thunkify(pg.Client.prototype, 'query');
 
 	// Client instance
 

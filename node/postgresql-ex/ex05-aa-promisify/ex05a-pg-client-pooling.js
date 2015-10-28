@@ -4,19 +4,9 @@
 	var pg = require('pg');
 	var aa = require('aa'), promisify = aa.promisify, Channel = aa.Channel;
 
-	function defineMethodA(obj, method) {
-		var methodAcached = method + 'Acached';
-		Object.defineProperty(obj, method + 'A', {
-			get: function () {
-				return this[methodAcached] ? this[methodAcached] :
-					this[methodAcached] = promisify(this, this[method]);
-			}
-		});
-	}
-
-	defineMethodA(pg, 'connect');
-	defineMethodA(pg.Client.prototype, 'connect');
-	defineMethodA(pg.Client.prototype, 'query');
+	promisify(pg, 'connect');
+	promisify(pg.Client.prototype, 'connect');
+	promisify(pg.Client.prototype, 'query');
 
 	// Client pooling
 
