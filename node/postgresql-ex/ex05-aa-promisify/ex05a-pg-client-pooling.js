@@ -4,6 +4,20 @@
 	var pg = require('pg');
 	var aa = require('aa'), promisify = aa.promisify, Channel = aa.Channel;
 
+	function defineMethodA(obj, method) {
+		var methodAcached = method + 'Acached';
+		Object.defineProperty(obj, method + 'A', {
+			get: function () {
+				return this[methodAcached] ? this[methodAcached] :
+					this[methodAcached] = promisify(this, this[method]);
+			}
+		});
+	}
+
+	defineMethodA(pg, 'connect');
+	defineMethodA(pg.Client.prototype, 'connect');
+	defineMethodA(pg.Client.prototype, 'query');
+
 	// Client pooling
 
 	var host = process.env.PGHOST     || 'localhost';
@@ -13,7 +27,6 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	pg.connectA = promisify(pg, pg.connect);
 
 	aa(function *() {
 		try {
@@ -25,7 +38,6 @@
 			console.log('connected!!!');
 
 			msg = 'error running query';
-			client.queryA = promisify(client, client.query)
 
 			//client_query('SELECT $1::int AS numbor', ['1'])
 			var result = yield client.queryA('select * from s_tenant_r', []);
@@ -43,6 +55,6 @@
 			return console.error(msg, err);
 		}
 
-		process.exit();
+		pg.end();
 	});
 })();

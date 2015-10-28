@@ -4,6 +4,20 @@
 	var pg = require('pg');
 	var aa = require('aa'), promisify = aa.promisify, Channel = aa.Channel;
 
+	function defineMethodA(obj, method) {
+		var methodAcached = method + 'Acached';
+		Object.defineProperty(obj, method + 'A', {
+			get: function () {
+				return this[methodAcached] ? this[methodAcached] :
+					this[methodAcached] = promisify(this, this[method]);
+			}
+		});
+	}
+
+	defineMethodA(pg, 'connect');
+	defineMethodA(pg.Client.prototype, 'connect');
+	defineMethodA(pg.Client.prototype, 'query');
+
 	// Client instance
 
 	var host = process.env.PGHOST     || 'localhost';
@@ -13,13 +27,10 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	//pg.connectA = promisify(pg, pg.connect);
 
 	aa(function *() {
 
 		var client = new pg.Client(conString);
-		client.connectA = promisify(client, client.connect);
-		client.queryA = promisify(client, client.query);
 
 		try {
 			var msg = 'could not connect to postgres';
@@ -36,7 +47,6 @@
 
 			console.log('client.end()++');
 			client.end();
-			//yield promisify(client, client.end);
 			console.log('client.end()--');
 		}
 		catch (err) {
@@ -46,8 +56,6 @@
 		yield aa.wait(100);
 
 		var client = new pg.Client(conString);
-		client.connectA = promisify(client, client.connect);
-		client.queryA = promisify(client, client.query);
 
 		console.log('2nd connectA++');
 		yield client.connectA();
@@ -56,7 +64,5 @@
 		console.log(result);
 		client.end();
 		yield aa.wait(100);
-		//console.log('process.exit()');
-		//process.exit();
 	});
 })();
