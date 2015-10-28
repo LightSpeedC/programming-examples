@@ -13,7 +13,7 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	pg.connectA = promisify.call(pg, pg.connect);
+	pg.connectA = promisify(pg, pg.connect);
 
 	aa(function *() {
 		try {
@@ -25,7 +25,7 @@
 			console.log('connected!!!');
 
 			msg = 'error running query';
-			client.queryA = promisify.call(client, client.query)
+			client.queryA = promisify(client, client.query)
 
 			//client_query('SELECT $1::int AS numbor', ['1'])
 			var result = yield client.queryA('select * from s_tenant_r', []);

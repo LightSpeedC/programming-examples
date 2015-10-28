@@ -13,7 +13,7 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	pg.connectA = thunkify.call(pg, pg.connect);
+	pg.connectA = thunkify(pg, pg.connect);
 
 	aa(function *() {
 		try {

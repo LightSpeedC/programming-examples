@@ -13,13 +13,13 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	//pg.connectA = promisify.call(pg, pg.connect);
+	//pg.connectA = promisify(pg, pg.connect);
 
 	aa(function *() {
 
 		var client = new pg.Client(conString);
-		client.connectA = promisify.call(client, client.connect);
-		client.queryA = promisify.call(client, client.query);
+		client.connectA = promisify(client, client.connect);
+		client.queryA = promisify(client, client.query);
 
 		try {
 			var msg = 'could not connect to postgres';
@@ -36,7 +36,7 @@
 
 			console.log('client.end()++');
 			client.end();
-			//yield promisify.call(client, client.end);
+			//yield promisify(client, client.end);
 			console.log('client.end()--');
 		}
 		catch (err) {
@@ -46,8 +46,8 @@
 		yield aa.wait(100);
 
 		var client = new pg.Client(conString);
-		client.connectA = promisify.call(client, client.connect);
-		client.queryA = promisify.call(client, client.query);
+		client.connectA = promisify(client, client.connect);
+		client.queryA = promisify(client, client.query);
 
 		console.log('2nd connectA++');
 		yield client.connectA();

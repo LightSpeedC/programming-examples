@@ -13,13 +13,13 @@
 	var pw   = process.env.PGPASSWORD || 'password';
 
 	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
-	//pg.connectA = thunkify.call(pg, pg.connect);
+	//pg.connectA = thunkify(pg, pg.connect);
 
 	aa(function *() {
 
 		var client = new pg.Client(conString);
-		client.connectA = thunkify.call(client, client.connect);
-		client.queryA = thunkify.call(client, client.query);
+		client.connectA = thunkify(client, client.connect);
+		client.queryA = thunkify(client, client.query);
 
 		try {
 			var msg = 'could not connect to postgres';
@@ -36,7 +36,7 @@
 
 			console.log('client.end()++');
 			client.end();
-			//yield thunkify.call(client, client.end);
+			//yield thunkify(client, client.end);
 			console.log('client.end()--');
 		}
 		catch (err) {
@@ -46,8 +46,8 @@
 		yield aa.wait(100);
 
 		var client = new pg.Client(conString);
-		client.connectA = thunkify.call(client, client.connect);
-		client.queryA = thunkify.call(client, client.query);
+		client.connectA = thunkify(client, client.connect);
+		client.queryA = thunkify(client, client.query);
 
 		console.log('2nd connectA++');
 		yield client.connectA();
