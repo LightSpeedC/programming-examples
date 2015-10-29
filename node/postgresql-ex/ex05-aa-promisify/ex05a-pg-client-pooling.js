@@ -2,10 +2,10 @@
 	'use strict';
 
 	var pg = require('pg');
-	var aa = require('aa'), promisifyAll = aa.promisifyAll;
+	var aa = require('aa');
 
-	promisifyAll(pg.constructor.prototype, {postfix: 'A'});
-	promisifyAll(pg.Client.prototype, {postfix: 'A'});
+	aa.promisifyAll(pg.constructor.prototype, {postfix: 'A'});
+	aa.promisifyAll(pg.Client.prototype, {postfix: 'A'});
 
 	// Client pooling
 

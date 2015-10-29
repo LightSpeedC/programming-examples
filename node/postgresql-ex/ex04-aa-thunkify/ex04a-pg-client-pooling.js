@@ -2,10 +2,10 @@
 	'use strict';
 
 	var pg = require('pg');
-	var aa = require('aa'), thunkifyAll = aa.thunkifyAll;
+	var aa = require('aa');
 
-	thunkifyAll(pg.constructor.prototype, {postfix: 'A'});
-	thunkifyAll(pg.Client.prototype, {postfix: 'A'});
+	aa.thunkifyAll(pg.constructor.prototype, {postfix: 'A'});
+	aa.thunkifyAll(pg.Client.prototype, {postfix: 'A'});
 
 	// Client pooling
 
