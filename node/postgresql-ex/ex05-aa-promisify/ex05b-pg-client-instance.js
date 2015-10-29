@@ -2,11 +2,10 @@
 	'use strict';
 
 	var pg = require('pg');
-	var aa = require('aa'), promisify = aa.promisify, Channel = aa.Channel;
+	var aa = require('aa'), promisifyAll = aa.promisifyAll;
 
-	promisify(pg, 'connect');
-	promisify(pg.Client.prototype, 'connect');
-	promisify(pg.Client.prototype, 'query');
+	promisifyAll(pg.constructor.prototype, {postfix: 'A'});
+	promisifyAll(pg.Client.prototype, {postfix: 'A'});
 
 	// Client instance
 

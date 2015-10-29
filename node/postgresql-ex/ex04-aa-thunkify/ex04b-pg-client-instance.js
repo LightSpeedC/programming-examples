@@ -2,11 +2,10 @@
 	'use strict';
 
 	var pg = require('pg');
-	var aa = require('aa'), thunkify = aa.thunkify, Channel = aa.Channel;
+	var aa = require('aa'), thunkifyAll = aa.thunkifyAll;
 
-	thunkify(pg, 'connect');
-	thunkify(pg.Client.prototype, 'connect');
-	thunkify(pg.Client.prototype, 'query');
+	thunkifyAll(pg.constructor.prototype, {postfix: 'A'});
+	thunkifyAll(pg.Client.prototype, {postfix: 'A'});
 
 	// Client instance
 
