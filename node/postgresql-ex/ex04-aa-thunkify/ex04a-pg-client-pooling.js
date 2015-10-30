@@ -4,8 +4,8 @@
 	var pg = require('pg');
 	var aa = require('aa');
 
-	aa.thunkifyAll(pg.constructor.prototype, {postfix: 'A'});
-	aa.thunkifyAll(pg.Client.prototype, {postfix: 'A'});
+	aa.thunkify(pg, 'connect', {postfix: 'A'});
+	aa.thunkify(pg.Client.prototype, 'query', {postfix: 'A'});
 
 	// Client pooling
 
