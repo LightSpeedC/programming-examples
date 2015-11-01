@@ -4,8 +4,8 @@
 	var pg = require('pg');
 	var aa = require('aa');
 
-	aa.promisify(pg, 'connect', {postfix: 'A'});
-	aa.promisify(pg.Client.prototype, 'query', {postfix: 'A'});
+	aa.promisify(pg, 'connect', {suffix: 'A'});
+	aa.promisify(pg.Client.prototype, 'query', {suffix: 'A'});
 
 	// Client pooling
 

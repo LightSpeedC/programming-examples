@@ -4,8 +4,8 @@
 	var pg = require('pg');
 	var aa = require('aa');
 
-	aa.thunkifyAll(pg.constructor.prototype, {postfix: 'A'});
-	aa.thunkifyAll(pg.Client.prototype, {postfix: 'A'});
+	aa.thunkifyAll(pg.constructor.prototype, {suffix: 'A'});
+	aa.thunkifyAll(pg.Client.prototype, {suffix: 'A'});
 
 	// Client instance
 
