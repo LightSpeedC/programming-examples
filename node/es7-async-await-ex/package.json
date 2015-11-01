@@ -1,0 +1,24 @@
+{
+  "name": "es7-async-await-ex",
+  "version": "0.0.0",
+  "description": "ES7 Async Await example",
+  "main": "es7-async-await-ex.js",
+  "dependencies": {
+    "aa": "^0.1.31",
+    "promise-thunk": "^0.1.11",
+    "regenerator": "^0.8.41"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "async",
+    "await"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
