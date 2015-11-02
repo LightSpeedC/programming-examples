@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "description": "nvm",
   "main": "nvm.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "aa": "^0.1.31"
   },
   "repository": {
     "type": "git",
@@ -15,9 +15,7 @@
   ],
   "author": "LightSpeedC",
   "license": "MIT",
-  "dependencies": {
-    "co": ">=4.5.1",
-    "co-fs": ">=1.2.0",
-    "thunkify": ">=2.1.2"
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   }
 }

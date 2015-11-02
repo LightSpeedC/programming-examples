@@ -6,10 +6,10 @@
 	var fs = require('fs');
 	var path = require('path');
 	var exec = require('child_process').exec;
-	var co = require('co');
-	var cofs = require('co-fs');
+	var aa = require('aa');
+	aa.thunkifyAll(fs, {suffix: 'A'});
 
-	function co_exec(cmd, options) {
+	function execA(cmd, options) {
 		return function (cb) {
 			exec(cmd, options, function (err, stdout, stderr) {
 				cb(err, {stdout: stdout, stderr: stderr});
@@ -22,22 +22,22 @@
 
 	var node_root = path.resolve(__dirname, '..');
 
-	co(function *() {
+	aa(function *() {
 
 		// fs.readdir
-		var res = yield cofs.readdir(node_root);
+		var res = yield fs.readdirA(node_root);
 
 		// fs.stat
 		res = yield res.map(function (name) {
 			var dir = path.resolve(node_root, name);
-			return {name: name, dir: dir, stat: cofs.stat(dir)};
+			return {name: name, dir: dir, stat: fs.statA(dir)};
 		});
 
 		// filter isDirectory then fs.readdir
 		res = yield res.filter(function (elem) {
 			return elem.stat.isDirectory();
 		}).map(function (elem) {
-			return {name: elem.name, dir: elem.dir, dirs: cofs.readdir(elem.dir)};
+			return {name: elem.name, dir: elem.dir, dirs: fs.readdirA(elem.dir)};
 		});
 
 		// filter node.exe then exec it
@@ -45,7 +45,7 @@
 			return elem.dirs.indexOf('node.exe') >= 0;
 		}).map(function (elem) {
 			return {name: elem.name, dir: elem.dir,
-				exec: co_exec('"' + path.resolve(elem.dir, 'node') +
+				exec: execA('"' + path.resolve(elem.dir, 'node') +
 					'" -p "process.version"') };
 					//' -p "process.version+\' \'+process.arch+\' \'+process.platform"') };
 		});
@@ -69,7 +69,7 @@
 					pad(elem.name, -20) + '  ' + elem.cmd);
 		});
 
-		yield cofs.writeFile(path.resolve(__dirname, 'nvm_out.cmd'),
+		yield fs.writeFileA(path.resolve(__dirname, 'nvm_out.cmd'),
 			out.length ? '@' + out[0].cmd + '\r\n@node -v': '');
 
 		//console.log(JSON.stringify(res, null, '  '));
