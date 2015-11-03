@@ -94,132 +94,63 @@ process.umask = function() { return 0; };
 },{}],2:[function(require,module,exports){
 // ES6 Async Await and Babel with npm regenerator.runtime()
 
+// require('regenerator').runtime()           // babel & browserifyするなら入れておく
 // var aa = require('aa');
-'use strict';
-
-var marked0$0 = [main, sub].map(regeneratorRuntime.mark);
-var aa = undefined && undefined.aa || require('aa');
-var Promise = aa.Promise;
+var aa = this && this.aa || require('aa'); // 普通は var aa = require('aa'); で良い
+var Promise = aa.Promise; // native Promiseがあれば不要
 
 console.log('main: start');
 aa(main()).then(function (val) {
 	console.log('main: finish:', val);
 });
 
-function main() {
+function* main() {
 	var result;
-	return regeneratorRuntime.wrap(function main$(context$1$0) {
-		while (1) switch (context$1$0.prev = context$1$0.next) {
-			case 0:
-				console.log('main: started');
+	console.log('main: started');
 
-				// シーケンシャル処理(逐次処理)
-				context$1$0.next = 3;
-				return sleep(2000, 'a1');
+	// シーケンシャル処理(逐次処理)
+	result = yield sleep(200, 'a1');
+	console.log('main-a1: sleep: a1 =', result);
+	result = yield sleep(100, 'a2');
+	console.log('main-a2: sleep: a2 =', result);
+	result = yield sleep(300, 'a3');
+	console.log('main-a3: sleep: a3 =', result);
 
-			case 3:
-				result = context$1$0.sent;
+	// パラレル処理(並行処理) ... 配列やオブジェクトで結果を取得
+	result = yield [sleep(200, 'b1'), sleep(100, 'b2'), sleep(300, 'b3')];
+	console.log('main-b : parallel Array :', stringify(result));
+	result = yield { x: sleep(200, 'c1'), y: sleep(100, 'c2'), z: sleep(300, 'c3') };
+	console.log('main-c : parallel Object:', stringify(result));
+	result = yield Promise.all([sleep(200, 'd1'), sleep(100, 'd2'), sleep(300, 'd3')]);
+	console.log('main-d : Promise.all([promises,...]): [d1, d2, d3] =', stringify(result));
 
-				console.log('main-a1: simple Promise: a1 =', result);
-				context$1$0.next = 7;
-				return sleep(2000, 'a2');
+	// generatorのsub()をyieldで呼ぶ
+	result = yield sub('e');
+	console.log('main-e : sub(e) =', result);
 
-			case 7:
-				result = context$1$0.sent;
+	// パラレル処理(並行処理) ... 配列やオブジェクトで結果を取得
+	// generatorのsub()を並行処理で呼ぶ ... 配列
+	result = yield [sub('f1'), sub('f2')];
+	console.log('main-f : [generator,...]: [f1, f2] =', stringify(result));
+	// generatorのsub()を並行処理で呼ぶ ... オブジェクト
+	result = yield { x: sub('g1'), y: sub('g2') };
+	console.log('main-g : {x:generator, y:...}: {x:g1, y:g2} =', stringify(result));
 
-				console.log('main-a2: simple Promise: a2 =', result);
+	// 必要ないけど無理やりgeneratorのsub()をpromiseにしてみた
+	result = yield Promise.all([aa(sub('h1')), aa(sub('h2'))]);
+	console.log('main-h : Promise.all([aa(generator),...]): [h1, h2] =', stringify(result));
 
-				// パラレル処理(並行処理) ... 配列やオブジェクトで結果を取得
-				context$1$0.next = 11;
-				return [sleep(2000, 'b1'), sleep(2000, 'b2')];
-
-			case 11:
-				result = context$1$0.sent;
-
-				console.log('main-b: parallel Array:', result);
-				context$1$0.next = 15;
-				return { x: sleep(2000, 'c1'), y: sleep(2000, 'c2') };
-
-			case 15:
-				result = context$1$0.sent;
-
-				console.log('main-c: parallel Object:', result);
-				context$1$0.next = 19;
-				return Promise.all([sleep(2000, 'd1'), sleep(2000, 'd2')]);
-
-			case 19:
-				result = context$1$0.sent;
-
-				console.log('main-d: Promise.all([promises,...]): [d1, d2] =', result);
-
-				// generatorのsub()をyieldで呼ぶ
-				context$1$0.next = 23;
-				return sub('e');
-
-			case 23:
-				result = context$1$0.sent;
-
-				console.log('main-e: sub(e) =', result);
-
-				// パラレル処理(並行処理) ... 配列やオブジェクトで結果を取得
-				// generatorのsub()を並行処理で呼ぶ ... 配列
-				context$1$0.next = 27;
-				return [sub('f1'), sub('f2')];
-
-			case 27:
-				result = context$1$0.sent;
-
-				console.log('main-f: [generators,...]: [d1, d2] =', result);
-				// generatorのsub()を並行処理で呼ぶ ... オブジェクト
-				context$1$0.next = 31;
-				return { x: sub('g1'), y: sub('g2') };
-
-			case 31:
-				result = context$1$0.sent;
-
-				console.log('main-g: {x:generator, y:...}: {x:g1, y:g2} =', result);
-
-				// 必要ないけど無理やりgeneratorのsub()をpromiseにしてみた
-				context$1$0.next = 35;
-				return Promise.all([aa(sub('h1')), aa(sub('h2'))]);
-
-			case 35:
-				result = context$1$0.sent;
-
-				console.log('main-f: Promise.all([aa(generator),...]): [h1, h2] =', result);
-
-				return context$1$0.abrupt('return', 'return value!');
-
-			case 38:
-			case 'end':
-				return context$1$0.stop();
-		}
-	}, marked0$0[0], this);
+	return 'return value!';
 }
 
-function sub(val) {
-	return regeneratorRuntime.wrap(function sub$(context$1$0) {
-		while (1) switch (context$1$0.prev = context$1$0.next) {
-			case 0:
-				context$1$0.next = 2;
-				return sleep(1000, val + '-x1');
+function* sub(val) {
+	yield sleep(100, val + '-x1');
+	console.log('sub-' + val + '-x1: sleep: ' + val + '-x1');
 
-			case 2:
-				console.log('sub-' + val + '-x1: simple Promise: ' + val + '-x1');
+	yield sleep(100, val + '-x2');
+	console.log('sub-' + val + '-x2: sleep: ' + val + '-x2');
 
-				context$1$0.next = 5;
-				return sleep(1000, val + '-x2');
-
-			case 5:
-				console.log('sub-' + val + '-x2: simple Promise: ' + val + '-x2');
-
-				return context$1$0.abrupt('return', val);
-
-			case 7:
-			case 'end':
-				return context$1$0.stop();
-		}
-	}, marked0$0[1], this);
+	return val;
 }
 
 function sleep(msec, val) {
@@ -228,6 +159,16 @@ function sleep(msec, val) {
 	});
 }
 
+function stringify(object) {
+	var str = '';
+	if (object instanceof Array) {
+		for (var i = 0, n = object.length; i < n; ++i) str += (str ? ', ' : '') + object[i];
+		return '[' + str + ']';
+	} else {
+		for (var key in object) str += (str ? ', ' : '') + key + ':' + object[key];
+		return '{' + str + '}';
+	}
+}
 
 },{"aa":3}],3:[function(require,module,exports){
 (function (process){
