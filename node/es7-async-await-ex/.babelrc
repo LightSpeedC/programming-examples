@@ -1,0 +1,3 @@
+{
+  "plugins": ["transform-es2015-block-scoping", "transform-async-to-generator", "transform-regenerator"]
+}

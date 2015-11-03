@@ -9,8 +9,11 @@
     "babel-plugin-syntax-async-generators": "^6.0.15",
     "babel-plugin-transform-async-to-generator": "^6.0.14",
     "babel-plugin-transform-async-to-module-method": "^6.0.14",
+    "babel-plugin-transform-es2015-block-scoping": "^6.0.18",
+    "babel-plugin-transform-regenerator": "^6.0.18",
     "babel-polyfill": "^6.0.16",
     "babel-preset-es2015": "^6.0.15",
+    "executors": "0.0.2",
     "promise-thunk": "^0.1.11",
     "regenerator": "^0.8.41"
   },

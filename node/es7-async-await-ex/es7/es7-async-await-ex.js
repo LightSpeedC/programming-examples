@@ -1,4 +1,5 @@
 // ES7 Async Await and Babel with npm regenerator.runtime()
+	'use strict';
 
 	require('babel-polyfill'); // おまじない
 	//require('regenerator').runtime();
