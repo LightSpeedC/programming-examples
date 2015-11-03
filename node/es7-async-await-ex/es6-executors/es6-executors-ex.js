@@ -4,7 +4,6 @@
 	var Executors = require('executors');
 
 	aa(function *main() {
-
 		var parallel9 = [];
 		console.time('parallel9');
 		for (var i = 0; i < 9; ++i)
