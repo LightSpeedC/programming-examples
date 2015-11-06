@@ -3,13 +3,12 @@
 this.dirTree = function () {
 	'use strict';
 
-	//var aa = require('co');
-	var aa = require('aa');
+	var aa = require('aa'), thunkify = aa.thunkify;
 	var fs = require('fs');
-	var cofs = require('co-fs');
 	var path = require('path');
 	var $totalsize = '*totalsize*';
 	//var $dirsize = '*dirsize*';
+	var fs_readdir = thunkify(fs.readdir);
 
 	function fs_stat(file) {
 		return function (cb) {
@@ -28,7 +27,7 @@ this.dirTree = function () {
 		if (!indent) indent = 0;
 
 		try {
-			var names = yield cofs.readdir(dir);
+			var names = yield fs_readdir(dir);
 		} catch (err) {
 			console.log('fs.readdir: ' + err);
 			children['*error'] = err;

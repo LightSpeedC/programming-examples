@@ -17,10 +17,9 @@
   "author": "LightSpeedC",
   "license": "MIT",
   "dependencies": {
-    "aa": ">=0.1.24",
-    "co-fs": ">=1.2.0"
+    "aa": ">=0.1.32"
   },
   "devDependencies": {
-    "co": ">=4.5.4"
+    "co": ">=4.6.0"
   }
 }
