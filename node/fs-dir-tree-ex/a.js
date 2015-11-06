@@ -9,21 +9,11 @@ this.dirTree = function () {
 	var $totalsize = '*totalsize*';
 	//var $dirsize = '*dirsize*';
 	var fs_readdir = thunkify(fs.readdir);
-
-	function fs_stat(file) {
-		return function (cb) {
-			fs.stat(file, function (err, stat) {
-				err && console.log('fs.stat: ' + err);
-				if (err) cb(null, err); // !!! error -> data !!!
-				else     cb(null, stat);
-			});
-		}
-	}
+	var fs_stat = thunkify(fs.stat);
 
 	function *dirTree(dir, minSize, indent) {
 		if (!dir) dir = '.';
 		dir = path.resolve(dir);
-		//console.log(dir);
 		if (!indent) indent = 0;
 
 		try {
