@@ -42,3 +42,22 @@ function *ga() { for (var v of a) yield v; }
 function *gb() { for (var v of b) yield v; }
 function *gc() { for (var v of c) yield v; }
 
+
+	/*
+	function cross2(a, b, f) {
+		var res = [];
+		for (var i in a)
+			for (var j in b)
+				res.push(f(a[i], b[j]));
+		return res;
+	}
+
+	function cross3(a, b, c, f) {
+		var res = [];
+		for (var i in a)
+			for (var j in b)
+				for (var k in c)
+					res.push(f(a[i], b[j], c[k]));
+		return res;
+	}
+	*/
