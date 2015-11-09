@@ -27,6 +27,8 @@ console.log('\n cross(a, b, c)\n',
 console.log('\n cross(a, b, c, (x, y, z) => [x, y, z])\n',
 				cross(a, b, c, (x, y, z) => [x, y, z]));
 
+var cross = require('./array-cross').extendPrototype();
+
 console.log('\n a.cross(b)\n',
 				a.cross(b));
 console.log('\n a.cross(b, (x, y) => x * y)\n',

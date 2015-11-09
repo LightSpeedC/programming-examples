@@ -39,6 +39,8 @@ console.log('\n cross(ga(), gb(), gc())\n',
 console.log('\n cross(ga(), gb(), gc(), (x, y, z) => [x, y, z])\n',
 				cross(ga(), gb(), gc(), (x, y, z) => [x, y, z]));
 
+var cross = require('./array-cross').extendPrototype();
+
 console.log('\n a.cross(b)\n',
 				a.cross(b));
 console.log('\n ga().cross(b)\n',
