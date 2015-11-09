@@ -6,7 +6,7 @@
 // [for (x of iterable) for (y of iterable) x + y]
 
 
-var cross = require('./array-cross');
+var cross = require('./cross-array');
 
 var a = [1, 2, 3], b = [4, 5, 6], c = [7, 8, 9];
 
@@ -27,7 +27,7 @@ console.log('\n cross(a, b, c)\n',
 console.log('\n cross(a, b, c, (x, y, z) => [x, y, z])\n',
 				cross(a, b, c, (x, y, z) => [x, y, z]));
 
-var cross = require('./array-cross').extendPrototype();
+var cross = require('./cross-array').extendPrototype();
 
 console.log('\n a.cross(b)\n',
 				a.cross(b));
