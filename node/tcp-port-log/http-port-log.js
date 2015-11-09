@@ -1,4 +1,4 @@
-// tcp-port-log
+// http-port-log
 
 (function () {
 	'use strict';
@@ -13,7 +13,7 @@
 
 	aa(function *() {
 
-		var config = require('./tcp-port-log-config.json');
+		var config = require('./http-port-log-config.json');
 		thunkifyAll(fs, {suffix: 'A'});
 
 		if (!(yield fs.existsA('./logs')))
