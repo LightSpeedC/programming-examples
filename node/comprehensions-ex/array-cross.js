@@ -18,58 +18,94 @@
 	'use strict';
 
 	module.exports = cross;
+	cross.extendPrototype = extendPrototype;
 
-	if (!Array.prototype.cross)
-		Object.defineProperty(Array.prototype, 'cross',
-			{value: cross, configurable: true});
-
-	try {
-		var proto = eval('(function *(){}()).constructor.prototype');
-		console.log(Object.getOwnPropertyNames(proto));
-		if (!proto.cross)
-			Object.defineProperty(proto, 'cross',
+	function extendPrototype() {
+		// Array.prototype.cross
+		if (!Array.prototype.cross)
+			Object.defineProperty(Array.prototype, 'cross',
 				{value: cross, configurable: true});
-		console.log(Object.getOwnPropertyNames(proto));
-	} catch (e) {}
 
+		// Generator.prototype.cross
+		try {
+			var proto = eval('(function *(){}()).constructor.prototype');
+			if (!proto.cross)
+				Object.defineProperty(proto, 'cross',
+					{value: cross, configurable: true});
+		} catch (e) {}
+
+		return cross; // for method chain
+	}
+
+	// cross
 	function cross() {
-		var args = this instanceof Array ? [this] : [];
+		var args = this instanceof Array || isIterator(this) ? [this] : [];
 		[].push.apply(args, arguments);
 
 		var res = args[0];
-		if (!(res instanceof Array)) res = Array.from(res);
+		if (!(res instanceof Array)) res = makeArrayFromIterator(res);
+
 		for (var n = 1; n < args.length; ++n) {
 			var a = res, b = args[n], res = [];
 			if (typeof b === 'function') {
 				res = a.map(function(v){return b.apply(null, v instanceof Array ? v : [v])});
 			}
 			else {
-				if (!(b instanceof Array)) b = Array.from(b);
+				if (!(b instanceof Array)) b = makeArrayFromIterator(b);
 				for (var i in a)
 					for (var j in b)
 						res.push([].concat(a[i], b[j]));
 			}
 		}
+
 		return res;
 	}
 
-	/*
-	function cross2(a, b, f) {
-		var res = [];
-		for (var i in a)
-			for (var j in b)
-				res.push(f(a[i], b[j]));
-		return res;
+	// isIterator(iter)
+	function isIterator(iter) {
+		return !!iter && (typeof iter.next === 'function' || isIterable(iter));
 	}
 
-	function cross3(a, b, c, f) {
-		var res = [];
-		for (var i in a)
-			for (var j in b)
-				for (var k in c)
-					res.push(f(a[i], b[j], c[k]));
-		return res;
+	// isIterable(iter)
+	function isIterable(iter) {
+		return !!iter && typeof Symbol === 'function' && Symbol &&
+				Symbol.iterator && typeof iter[Symbol.iterator] === 'function';
 	}
-	*/
+
+	// makeArrayFromIterator(iter or array)
+	function makeArrayFromIterator(iter) {
+		// is Array?
+		if (iter instanceof Array) return iter;
+
+		// Array.from(iter) supported?
+		if (typeof Array.from === 'function') {
+			try { return Array.from(iter); }
+			catch (e) {}
+		}
+
+		var array = [];
+
+		// for (val of iter) supported?
+		try { eval('for (var val of iter) array.push(val);'); return array; }
+		catch (e) {}
+
+		// primitive value or normal object?
+		if (!isIterator(iter)) return [iter];
+
+		// ES6 iterator?
+		if (isIterable(iter)) iter = iter[Symbol.iterator]();
+
+		// ES6 iterator & Firefox old iterator supported
+		try {
+			for (;;) {
+				var val = iter.next();
+				if (val && val.hasOwnProperty('done') && val.done) return array;
+				if (val && val.hasOwnProperty('value')) val = val.value;
+				array.push(val);
+			}
+		} catch (error) {
+			return array;
+		}
+	}
 
 })();
