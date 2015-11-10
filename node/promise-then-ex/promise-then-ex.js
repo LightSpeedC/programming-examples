@@ -28,12 +28,12 @@
 
 		Object.defineProperties($this, {
 			'$state': {writable: true, configurable: true, value: STATE_UNKNOWN},
-			'$result': {writable: true, configurable: true, value: []},
+			'$result': {writable: true, configurable: true, value: undefined},
 			'$callbacks': {writable: true, configurable: true, value: []}
 		});
 
 		// $this.$state = STATE_UNKNOWN;
-		// $this.$result = [];
+		// $this.$result = undefined;
 		// $this.$callbacks = [];
 
 		if (setup) setup((v) => $this.$resolve(v), (e) => $this.$reject(e));
@@ -65,7 +65,7 @@
 	proto.$resolve = function resolve(val) {
 		if (this.$state !== STATE_UNKNOWN) return;
 		this.$state = STATE_RESOLVED;
-		this.$result = [null, val];
+		this.$result = val;
 		this.$next();
 	};
 	proto.$reject = function reject(err) {
@@ -73,7 +73,7 @@
 		if (this.$state === STATE_REJECTED) return console.error(colors.purple('rejected twice: ' + this + ': ' + err));
 		//if (this.$state !== STATE_UNKNOWN) return; // TODO
 		this.$state = STATE_REJECTED;
-		this.$result = [err];
+		this.$result = err;
 		this.$next();
 	};
 	proto.$fire = function fire() {
@@ -86,13 +86,15 @@
 			try {
 				var p = callback[3], r = undefined;
 				if (callback[state])
-					r = callback[state].call(null, this.$result[state]), $this.proc = true;
+					$this.proc = true, r = callback[state].call(null, this.$result);
 				if (callback[2])
-					r = callback[2].apply(null, this.$result), $this.proc = true;
+					$this.proc = true, r = callback[2].apply(null,
+						state === STATE_RESOLVED ?
+							[null, this.$result] : [this.$result]);
 				if (r && r.then)
-					r.then((v)=>p.$resolve(v), (e)=>p.$reject(e));
+					r.then((v) => p.$resolve(v), (e) => p.$reject(e));
 				else if (typeof r === 'function')
-					r((e,v)=>e?p.$reject(e):p.$resolve(v));
+					r((e, v) => e ? p.$reject(e) : p.$resolve(v));
 				else
 					p.$resolve(r);
 			} catch (e) {
@@ -116,15 +118,15 @@
 	};
 	proto.toString = function toString() {
 		return colors.green('PromiseCore <' + (
-			this.$state === STATE_RESOLVED ? 'resolved ' + this.$result[this.$state] :
-			this.$state === STATE_REJECTED ? 'rejected ' + this.$result[this.$state] :
+			this.$state === STATE_RESOLVED ? 'resolved ' + this.$result :
+			this.$state === STATE_REJECTED ? 'rejected ' + this.$result :
 			'pending') + '>');
 	}
 	proto.toJSON = function toJSON() {
 		var obj = {'class': 'PromiseCore'};
 		obj.state = ['pending', 'rejected', 'resolved'][this.$state + 1];
-		if (this.$state === STATE_RESOLVED) obj.value = this.$result[this.$state];
-		if (this.$state === STATE_REJECTED) obj.error = ''+this.$result[this.$state];
+		if (this.$state === STATE_RESOLVED) obj.value = this.$result;
+		if (this.$state === STATE_REJECTED) obj.error = ''+this.$result;
 		return obj;
 	}
 	PromiseCore.resolve = function resolve(val) {
