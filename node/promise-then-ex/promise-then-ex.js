@@ -7,13 +7,12 @@
 	var STATE_REJECTED = 0;
 	var STATE_RESOLVED = 1;
 
-	var COLORS = {red: '31;1'};
+	var COLORS = {red: '31', green: '32', purple: '35'};
 	var colors = Object.keys(COLORS).reduce((obj, k) => {
 		obj[k] = typeof window === 'object' ? x => x :
-		else obj[k] = x => '\x1b[' + COLORS[k] + 'm' + x + '\x1b[m';
+			x => '\x1b[' + COLORS[k] + 'm' + x + '\x1b[m';
 		return obj;
 	}, {});
-	console.log(colors.red('OK?'));
 
 	var proto = PromiseCore.prototype;
 	function PromiseCore(setup) {
@@ -71,7 +70,7 @@
 	};
 	proto.$reject = function reject(err) {
 		if (this.$state === STATE_RESOLVED) return;
-		if (this.$state === STATE_REJECTED) return console.error('rejected twice: ' + this + ': ' + err);
+		if (this.$state === STATE_REJECTED) return console.error(colors.purple('rejected twice: ' + this + ': ' + err));
 		//if (this.$state !== STATE_UNKNOWN) return; // TODO
 		this.$state = STATE_REJECTED;
 		this.$result = [err];
@@ -101,14 +100,14 @@
 					p.$reject(e);
 				}
 				catch (e2) {
-					console.error('error in handler: ' + this + ': ' + e + ': ' + e2);
+					console.error(colors.purple('error in handler: ' + this + ': ' + e + ': ' + e2));
 				}
 			}
 		});
 		if (this.$state === STATE_REJECTED) setImmediate(() => this.$check());
 	};
 	proto.$check = function check() {
-		if (!this.proc) console.error('unhandled rejection: ' + this);
+		if (!this.proc) console.error(colors.purple('unhandled rejection: ' + this));
 		//if (this.$state === STATE_UNKNOWN) return;
 	};
 	proto.$next = function next() {
@@ -116,10 +115,10 @@
 		setImmediate(() => this.$fire());
 	};
 	proto.toString = function toString() {
-		return 'PromiseCore <' + (
+		return colors.green('PromiseCore <' + (
 			this.$state === STATE_RESOLVED ? 'resolved ' + this.$result[this.$state] :
 			this.$state === STATE_REJECTED ? 'rejected ' + this.$result[this.$state] :
-			'pending') + '>';
+			'pending') + '>');
 	}
 	proto.toJSON = function toJSON() {
 		var obj = {'class': 'PromiseCore'};
@@ -163,6 +162,6 @@
 	console.log('%j', PromiseCore.resolve(1));
 	console.log('%s', PromiseCore.reject(new Error('yyy')));
 	console.log('%j', PromiseCore.reject(new Error('zzz')));
-	console.log('xx?', PromiseCore.resolve(1).constructor.prototype);
+	console.log('prototype?', PromiseCore.resolve(1).constructor.prototype);
 
 })(typeof Promise === 'function' ? Promise : null);
