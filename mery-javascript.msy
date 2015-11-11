@@ -183,6 +183,9 @@ regular expression
 require
 screen
 self
+setImmediate
+setTimeout
+undefined
 window
 
 #Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
