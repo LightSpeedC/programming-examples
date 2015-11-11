@@ -87,7 +87,7 @@
 				},
 				(e) => {
 					this.$reject(e);
-				});
+				}), undefined;
 
 		this.$state = STATE_RESOLVED;
 		this.$result = val;
