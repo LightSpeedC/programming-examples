@@ -7,7 +7,7 @@
 	var STATE_REJECTED = 0;
 	var STATE_RESOLVED = 1;
 
-	var COLORS = {red: '31', green: '32', purple: '35'};
+	var COLORS = {red: '31', green: '32', purple: '35', cyan: '36'};
 	var colors = Object.keys(COLORS).reduce((obj, k) => {
 		obj[k] = typeof window === 'object' ? x => x :
 			x => '\x1b[' + COLORS[k] + 'm' + x + '\x1b[m';
@@ -117,10 +117,10 @@
 		setImmediate(() => this.$fire());
 	};
 	proto.toString = function toString() {
-		return colors.green('PromiseCore <' + (
-			this.$state === STATE_RESOLVED ? 'resolved ' + this.$result :
-			this.$state === STATE_REJECTED ? 'rejected ' + this.$result :
-			'pending') + '>');
+		return colors.cyan('PromiseCore ' + (
+			this.$state === STATE_RESOLVED ? colors.green('<resolved ' + this.$result + '>'):
+			this.$state === STATE_REJECTED ? colors.red('<rejected ' + this.$result + '>'):
+			'<pending>'));
 	}
 	proto.toJSON = function toJSON() {
 		var obj = {'class': 'PromiseCore'};
