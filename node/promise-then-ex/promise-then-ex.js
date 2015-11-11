@@ -50,24 +50,32 @@
 
 		return $this;
 	}
+
+	// then
 	proto.then = function then(resolved, rejected) {
 		var p = new PromiseCore();
 		this.$callbacks.push([rejected, resolved, null, p]);
 		if (this.$state !== STATE_UNKNOWN) this.$next();
 		return p;
 	};
+
+	// catch
 	proto['catch'] = function caught(rejected) {
 		var p = new PromiseCore();
 		this.$callbacks.push([rejected, null, null, p]);
 		if (this.$state !== STATE_UNKNOWN) this.$next();
 		return p;
 	};
+
+	// resolve
 	proto.$resolve = function resolve(val) {
 		if (this.$state !== STATE_UNKNOWN) return;
 		this.$state = STATE_RESOLVED;
 		this.$result = val;
 		this.$next();
 	};
+
+	// reject
 	proto.$reject = function reject(err) {
 		if (this.$state === STATE_RESOLVED) return;
 		if (this.$state === STATE_REJECTED) return console.error(colors.purple('rejected twice: ' + this + ': ' + err));
@@ -76,6 +84,8 @@
 		this.$result = err;
 		this.$next();
 	};
+
+	// fire
 	proto.$fire = function fire() {
 		if (this.$state === STATE_UNKNOWN) return;
 		var $this = this;
@@ -108,20 +118,28 @@
 		});
 		if (this.$state === STATE_REJECTED) setImmediate(() => this.$check());
 	};
+
+	// check
 	proto.$check = function check() {
 		if (!this.proc) console.error(colors.purple('unhandled rejection: ' + this));
 		//if (this.$state === STATE_UNKNOWN) return;
 	};
+
+	// next
 	proto.$next = function next() {
 		if (this.$state === STATE_UNKNOWN) return;
 		setImmediate(() => this.$fire());
 	};
+
+	// toString
 	proto.toString = function toString() {
 		return colors.cyan('PromiseCore ' + (
 			this.$state === STATE_RESOLVED ? colors.green('<resolved ' + this.$result + '>'):
 			this.$state === STATE_REJECTED ? colors.red('<rejected ' + this.$result + '>'):
 			'<pending>'));
 	}
+
+	// toJSON
 	proto.toJSON = function toJSON() {
 		var obj = {'class': 'PromiseCore'};
 		obj.state = ['pending', 'rejected', 'resolved'][this.$state + 1];
@@ -129,11 +147,15 @@
 		if (this.$state === STATE_REJECTED) obj.error = ''+this.$result;
 		return obj;
 	}
+
+	// resolve
 	PromiseCore.resolve = function resolve(val) {
 		var p = new PromiseCore();
 		p.$resolve(val);
 		return p;
 	};
+
+	// resolve
 	PromiseCore.reject = function reject(err) {
 		var p = new PromiseCore();
 		p.$reject(err);
@@ -146,6 +168,7 @@
 		Object.defineProperty(proto, p, {configurable: true, value: v});
 	}
 
+	// sleep
 	function sleep(ms, val) {
 		return new PromiseCore(function (resolve, reject) {
 			setTimeout(resolve, ms, val);
@@ -155,7 +178,8 @@
 	sleep(1000, 'a')
 	.then((v) => {console.log(v); throw new Error('xxx'); return sleep(1000, 'b'); })
 	.then((v) => {console.log(v); return sleep(1000, 'c'); })
-	.then(console.log);
+	.then(console.log)
+	.catch((e) => console.log('catch all: ' + e));
 
 	console.log(sleep(1000, 'a'));
 	console.log('%s', sleep(1000, 'a'));
