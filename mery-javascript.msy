@@ -94,6 +94,7 @@ apply
 call
 
 #Word Color=3, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
+.__proto__
 .filter
 .forEach
 .indexOf
@@ -130,7 +131,11 @@ Math
 MimeType
 Number
 Object
+Object.defineProperty
+Object.getOwnPropertyNames
+Object.getPrototypeOf
 Object.keys
+Object.setPrototypeOf
 Option
 Password
 Plugin
