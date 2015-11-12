@@ -24,28 +24,32 @@
 	// PromiseCore
 	function PromiseCore(setup) {
 
-		var $this = (callback) => $this.$addCallbacks(null, null, callback);
+		//var $this = (callback) => $this.$addCallbacks(null, null, callback);
 
-		// var $this = this;
+		var $this = this;
 
+		/*
 		Object.defineProperties($this, {
 			'$state': {writable: true, configurable: true, value: STATE_UNRESOLVED},
 			'$result': {writable: true, configurable: true, value: undefined},
 			'$callbacks': {writable: true, configurable: true, value: []},
 			'$handled': {writable: true, configurable: true, value: false}
 		});
+		*/
 
-		// $this.$state = STATE_UNRESOLVED;
-		// $this.$result = undefined;
-		// $this.$callbacks = [];
-		// $this.$handled = false;
+		$this.$callbacks = [];
+		//$this.$state = STATE_UNRESOLVED;
+		//$this.$result = undefined;
+		//$this.$handled = false;
 
-		if (!($this instanceof PromiseCore)) {
+		if ($this.constructor !== PromiseCore) {
 			setProto($this, proto);
 
+/*
 			if ($this.then !== proto.then)
 				Object.getOwnPropertyNames(proto).forEach(p =>
-					Object.defineProperty($this, p, {configurable: true, value: proto[p]}));
+					Object.defineProperty($this, p, {writable: true, configurable: true, value: proto[p]}));
+*/
 		}
 
 		if (typeof setup === 'function')
@@ -53,6 +57,10 @@
 
 		return $this;
 	}
+
+	proto.$state = STATE_UNRESOLVED;
+	proto.$result = undefined;
+	proto.$handled = false;
 
 	// then
 	proto.then = function then(resolved, rejected) {
@@ -175,6 +183,16 @@
 		return obj;
 	}
 
+	// defer
+	PromiseCore.defer = function defer() {
+		var resolved, rejected;
+		var p = new PromiseCore((res, rej) => (resolved = res, rejected = rej));
+		return {promise: p, resolve: resolved, reject:  rejected};
+	};
+
+	PromiseCore.all = Promise.all;
+	PromiseCore.race = Promise.race;
+
 	// resolve
 	PromiseCore.resolve = (val) => new PromiseCore((res, rej) => res(val));
 
@@ -182,6 +200,7 @@
 	PromiseCore.reject = (err) => new PromiseCore((res, rej) => rej(err));
 
 	// isPromise
+	PromiseCore.isPromise = isPromise;
 	function isPromise(p) {
 		return !!p && typeof p.then === 'function';
 	}
@@ -189,7 +208,7 @@
 	for (var p in proto) {
 		var v = proto[p];
 		delete proto[p];
-		Object.defineProperty(proto, p, {configurable: true, value: v});
+		Object.defineProperty(proto, p, {writable: true, configurable: true, value: v});
 	}
 
 	if (typeof module === 'object' && module && module.exports)
