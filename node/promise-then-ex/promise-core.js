@@ -122,47 +122,48 @@
 		if ($result instanceof Error) $state = STATE_REJECTED;
 
 		while (elem = $callbacks.shift()) {
-			(function (elem) {
-				var resolve = elem[ARGS_RESOLVE];
-				var reject = elem[ARGS_REJECT];
-				var completed = elem[$state];
+			var resolve = elem[ARGS_RESOLVE];
+			var reject = elem[ARGS_REJECT];
+			var completed = elem[$state];
 
-				function complete(val) {
-					try {
-						resolve(completed(val));
-					} catch (err) {
-						if ($state === STATE_REJECTED)
-							console.error(colors.purple(
-								'error in handler: ') + $this +
-								colors.purple(': ' + (val && val.stack || val)));
-						reject(err);
-					}
-				}
+			$this.$handled = true;
 
-				$this.$handled = true;
+			if ($state === STATE_RESOLVED) {
+				if (!completed)
+					return resolve($result); // TODO check spec: $result or undefined?
 
-				try {
-					if ($state === STATE_RESOLVED) {
-						if (!completed)
-							return resolve($result);
+				if ($result && $result.then || typeof $result === 'function')
+					var complete = function () {
+						return function complete(val) {
+							try {
+								resolve(completed(val));
+							} catch (err) {
+								if ($state === STATE_REJECTED)
+									console.error(colors.purple(
+										'error in handler: ') + $this +
+										colors.purple(': ' + (val && val.stack || val)));
+								reject(err);
+							}
+						};
+					} (resolve, reject);
 
-						if ($result && $result.then)
-							return $result.then(complete, reject);
+				if ($result && $result.then)
+					return function (complete, reject) {
+						return $result.then(complete, reject);
+					} (complete, reject);
 
-						if (typeof $result === 'function')
-							return $result(function (e, v) {
-								return e ? reject(e) : resolve(v);
-							});
-					}
-					else { // $state === STATE_REJECTED
-						if (!completed)
-							return reject($result);
-					}
-					complete($result);
-				} catch (err) {
-					reject(err);
-				}
-			})(elem);
+				if (typeof $result === 'function')
+					return $result(function (complete, reject) {
+						return function (e, v) {
+							return e ? reject(e) : complete(v);
+						}
+					} (complete, reject));
+			}
+			else { // $state === STATE_REJECTED
+				if (!completed)
+					return reject($result);
+			}
+			complete($result);
 
 		} // while
 
