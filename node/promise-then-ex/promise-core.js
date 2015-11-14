@@ -94,7 +94,7 @@
 */
 			var $this = this;
 
-			$this.$callbacks = [];
+			$this.$callbacks = new Queue;
 
 			if (setup === PROMISE_RESOLVE) {
 				$this.$state = STATE_RESOLVED;
