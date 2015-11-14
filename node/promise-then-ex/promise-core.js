@@ -14,8 +14,28 @@
 
 	// nextTickDo(fn)
 	var nextTickDo = typeof setImmediate === 'function' ? setImmediate :
-		typeof process !== 'undefined' && process && typeof process.nextTick === 'function' ? process.nextTick :
+		typeof process !== 'undefined' && process &&
+		typeof process.nextTick === 'function' ? process.nextTick :
 		function nextTickDo(fn) { setTimeout(fn, 0); };
+
+	// Queue
+	function Queue() {
+		if (!(this instanceof Queue)) return new Queue();
+		this.tail = this.head = undefined;
+	}
+	Queue.prototype.push = function push(x) {
+		if (this.tail)
+			this.tail = this.tail.next = {data:x, next:undefined};
+		else
+			this.tail = this.head = {data:x, next:undefined};
+	};
+	Queue.prototype.shift = function shift() {
+		if (!this.head) return undefined;
+		var x = this.head.data;
+		this.head = this.head.next;
+		if (!this.head) this.tail = undefined;
+		return x;
+	};
 
 	var STATE_UNRESOLVED = -1;
 	var STATE_REJECTED = 0;
@@ -128,25 +148,25 @@
 
 			$this.$handled = true;
 
+			if (!completed)
+				return ($state === STATE_RESOLVED ? resolve : reject) ($result);
+				// TODO check spec: resolve($result or undefined?)
+
+			var complete = function () {
+				return function complete(val) {
+					try {
+						resolve(completed(val));
+					} catch (err) {
+						if ($state === STATE_REJECTED)
+							console.error(colors.purple(
+								'error in handler: ') + $this +
+								colors.purple(': ' + (val && val.stack || val)));
+						reject(err);
+					}
+				};
+			} (resolve, reject);
+
 			if ($state === STATE_RESOLVED) {
-				if (!completed)
-					return resolve($result); // TODO check spec: $result or undefined?
-
-				if ($result && $result.then || typeof $result === 'function')
-					var complete = function () {
-						return function complete(val) {
-							try {
-								resolve(completed(val));
-							} catch (err) {
-								if ($state === STATE_REJECTED)
-									console.error(colors.purple(
-										'error in handler: ') + $this +
-										colors.purple(': ' + (val && val.stack || val)));
-								reject(err);
-							}
-						};
-					} (resolve, reject);
-
 				if ($result && $result.then)
 					return function (complete, reject) {
 						return $result.then(complete, reject);
@@ -158,10 +178,6 @@
 							return e ? reject(e) : complete(v);
 						}
 					} (complete, reject));
-			}
-			else { // $state === STATE_REJECTED
-				if (!completed)
-					return reject($result);
 			}
 			complete($result);
 
