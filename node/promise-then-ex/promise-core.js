@@ -440,13 +440,22 @@
 		// push
 		push: function push(x) {
 			var $this = this;
-			nextTick2(undefined, function () {
-				try {
-					x[ARGS_RESOLVE](x[STATE_RESOLVED]($this.$result));
-				} catch (e) {
-					x[ARGS_REJECT](e);
-				}
-			});
+			var val = $this.$result;
+			var resolve  = x[ARGS_RESOLVE];
+			var reject   = x[ARGS_REJECT];
+			var resolved = x[STATE_RESOLVED];
+			if (val && val.then)
+				val.then(function (val) {
+						resolve(resolved(val));
+				}, reject);
+			else
+				nextTick2(undefined, function () {
+					try {
+						resolve(resolved(val));
+					} catch (e) {
+						reject(e);
+					}
+				});
 		}
 	}); // PromiseCoreResolved
 	var promiseCoreResolved = new PromiseCoreResolved();
@@ -474,15 +483,18 @@
 		// push
 		push: function push(x) {
 			var $this = this;
+			var resolve  = x[ARGS_RESOLVE];
+			var reject   = x[ARGS_REJECT];
+			var rejected = x[STATE_REJECTED];
 			nextTick2(undefined, function () {
 				var err = $this.$result;
 				try {
-					x[ARGS_RESOLVE](x[STATE_REJECTED](err));
+					resolve(rejected(err));
 				} catch (e) {
 					console.error(colors.purple(
 						'error in handler: ') + $this +
 						colors.purple(': ' + (err && err.stack || err)));
-					x[ARGS_REJECT](e);
+					reject(e);
 				}
 			});
 		}
