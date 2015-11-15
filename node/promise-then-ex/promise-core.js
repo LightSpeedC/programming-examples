@@ -162,6 +162,7 @@
 
 			// Queue { head, tail }
 			$this.tail = $this.head = undefined;
+
 			$this.$state = STATE_UNRESOLVED;
 			$this.$result = undefined;
 			$this.$handled = false;
@@ -187,7 +188,11 @@
 			}
 */
 			else if (typeof setup === 'function') {
-				setup(resolve, reject);
+				try {
+					setup(resolve, reject);
+				} catch (err) {
+					resolve(err);
+				}
 			}
 
 			return $this;
@@ -319,6 +324,9 @@
 			); // return new this
 		},
 
+		// accept
+		accept: function accept(val) { return new PromiseCoreResolved(val); },
+
 		// resolve
 		//resolve: function (val) { return new this.constructor(PROMISE_RESOLVE, val); },
 		resolve: function resolve(val) { return new PromiseCoreResolved(val); },
@@ -416,7 +424,6 @@
 		constructor: function PromiseCoreResolved(val) {
 			this.$state = STATE_RESOLVED;
 			this.$result = val;
-			this.$fire = undefined;
 			this.$handled = false;
 		},
 
@@ -450,7 +457,6 @@
 		constructor: function PromiseCoreRejected(err) {
 			this.$state = STATE_REJECTED;
 			this.$result = err;
-			this.$fire = undefined;
 			this.$handled = false;
 			nextTick2(this, $check2);
 		},
