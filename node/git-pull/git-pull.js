@@ -52,6 +52,7 @@
 					if (testMode)
 						return log('*** ' + dir + ' --- test');
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
+					res = res.map(unescape);
 					if (res[0].indexOf('use "') === -1) {
 						if (res[0].replace(/\r\n/g, '\n') ===
 							"On branch master\n" +
@@ -82,5 +83,18 @@
 		} // tree
 
 	}); // aa(main)
+
+	function unescape(s) {
+		var t = s.replace(/(\r)|(\n)|(\')|\\(x(..)|(\d\d\d))/g,
+			function (match, r, n, sq, xo, x, o, offset, string) {
+				return x ? '\\x' + x :
+					o ? '\\x' + ('0' + parseInt(o,8).toString(16)).substr(-2,2) :
+					sq ? "\\'" :
+					r ? '\\r' :
+					n ? '\\n' :
+					string;
+			});
+		return new Buffer(eval("'" + t + "'"), 'binary').toString();
+	}
 
 })();
