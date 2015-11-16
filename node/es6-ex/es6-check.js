@@ -4,13 +4,38 @@
 	'use strict';
 
 	var features = [
-		[101, 'generators/yield', '(function*() { yield 101; })().next().value'],
-		[102, 'arrow function', '(()=>{ return 102; })()'],
-		[103, 'variable parameters/rest parameters', '(function(...args) { return args[0]; })(103)'],
-		[104, 'defult parameters', '(function(a = 104) { return a; })()'],
-		[105, 'let', '(function() { "use strict"; var foo = 105; { let foo = 106; } return foo; })()'],
-		[107, 'const', '(function() { "use strict"; const foo = 107; return foo; })()'],
-		[108, 'Map', '(function() { var myMap = new Map(); return 108; })()']
+		[108, 'Map',
+				'(function() { var x = new Map(); return 108; })()'],
+
+		[108, 'Set',
+				'(function() { var x = new Set(); return 108; })()'],
+
+		[108, 'WeakMap',
+				'(function() { var x = new WeakMap(); return 108; })()'],
+
+		[108, 'WeakSet',
+				'(function() { var x = new WeakSet(); return 108; })()'],
+
+		[107, 'const',
+				'(function() { "use strict"; const foo = 107; return foo; })()'],
+
+		[109, 'Promise',
+				'(function() { return new Promise(function () {}) instanceof Promise ? 109 : 0; })()'],
+
+		[101, 'generators/yield',
+				'(function*() { yield 101; })().next().value'],
+
+		[102, 'arrow function',
+				'(()=>{ return 102; })()'],
+
+		[103, 'variable parameters/rest parameters',
+				'(function(...args) { return args[0]; })(103)'],
+
+		[104, 'defult parameters',
+				'(function(a = 104) { return a; })()'],
+
+		[105, 'let',
+				'(function() { "use strict"; var foo = 105; { let foo = 106; } return foo; })()']
 	];
 
 	for (var i = 0; i < features.length; ++i) {
