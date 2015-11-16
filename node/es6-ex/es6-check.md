@@ -1,18 +1,18 @@
 # es6-check
 
-|機能                   |node|chrome|chrome canary|firefox|edge|ie11| x   |
-|-----------------------|----|-----|-------------|--------|----|----|-----|
-|Map                    | o  | o   | o           | o      | o  | o  |poly |
-|Set                    | o  | o   | o           | o      | o  | o  |poly |
-|WeakMap                | o  | o   | o           | o      | o  | o  |poly |
-|WeakSet                | o  | o   | o           | o      | o  | x  |poly |
-|const                  | o  | o   | o           | o      | o  | o  |syn  |
-|Promise                | o  | o   | o           | o      | o  | x  |poly |
-|generators (yield)     | o  | o   | o           | o      | o  | x  |syn  |
-|arrow function (=>)    | o  | o   | o           | o      | o  | x  |syn  |
-|rest parameters (...)  | △  | o   | o           | o      | o  | x  |syn  |
-|default parameters (=) | △  | x   | o           | o      | o  | x  |syn  |
-|let                    | o  | o   | o           | x      | o  | o  |syn  |
+|機能                   |node |chrome|chrome canary|firefox|edge|ie11| x   |
+|-----------------------|-----|-----|-------------|--------|----|----|-----|
+|Map                    | o   | o   | o           | o      | o  | o  |poly |
+|Set                    | o   | o   | o           | o      | o  | o  |poly |
+|WeakMap                | o   | o   | o           | o      | o  | o  |poly |
+|WeakSet                | o   | o   | o           | o      | o  | x  |poly |
+|Promise                | o   | o   | o           | o      | o  | x  |poly |
+|const                  | o   | o   | o           | o      | o  | o  |syn  |
+|let                    | o   | o   | o           | x      | o  | o  |syn  |
+|generators (yield)     | o   | o   | o           | o      | o  | x  |syn  |
+|arrow function (=>)    | o   | o   | o           | o      | o  | x  |syn  |
+|rest parameters (...)  | △4 | o   | o           | o      | o  | x  |syn  |
+|default parameters (=) | △5 | x   | o           | o      | o  | x  |syn  |
 
 ## ie11
 
