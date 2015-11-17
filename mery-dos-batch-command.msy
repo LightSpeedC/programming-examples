@@ -1,0 +1,42 @@
+﻿#TagBegin=
+#TagEnd=
+#CommentBegin1=
+#CommentEnd1=
+#LineComment1=rem
+#CommentBegin2=
+#CommentEnd2=
+#LineComment2=::
+#SpecialSyntax=None
+#ScriptBegin=
+#ScriptEnd=
+#QuoteSingle=False
+#QuoteDouble=True
+#QuoteContinue=False
+#EscapeCharacter=
+
+#Word Color=0, WholeWord=True, RightSide=False, MatchCase=False, InsideTag=False, RegEx=False
+CALL
+DO
+ENDLOCAL
+ERRORLEVEL
+EXIST
+FOR
+GOTO
+IF
+IN
+NOT
+OFF
+ON
+PAUSE
+POPD
+PUSHD
+SET
+SETLOCAL
+SHIFT
+
+#Word Color=2, WholeWord=False, RightSide=False, MatchCase=False, InsideTag=False, RegEx=False
+%
+@
+
+#Word Color=3, WholeWord=True, RightSide=True, MatchCase=False, InsideTag=False, RegEx=False
+ECHO
