@@ -1,6 +1,8 @@
 void function () {
 	'use strict';
 
+	var aa = require('aa');
+
 	// Channel (mini)
 	// チャネル (ミニ)
 	function Channel() {
@@ -13,7 +15,7 @@ void function () {
 				if (recvs.length) recvs.shift().apply(channel, arguments);
 				else sends.push(arguments);
 			return channel;
-		}
+		};
 	}
 
 	// Channel() creates a new channel.
@@ -77,6 +79,55 @@ void function () {
 		console.log('f2 values: ' + val.join(', '));
 		console.log('end');
 	})();
+
+	aa(function *() {
+		var chan = Channel();
+		setTimeout(chan, 6000, null, 'a3');
+		var val = yield chan;
+		console.log('a3? ' + val);
+		setTimeout(chan, 500, null, 'b3');
+		val = yield chan;
+		console.log('b3? ' + val);
+		setTimeout(chan, 500, null, 'c3');
+		val = yield chan;
+		console.log('c3? ' + val);
+		setTimeout(function () {
+			chan(null, 'd3');
+		}, 500);
+		val = yield chan;
+		console.log('d3? ' + val);
+		// parallel processing. which one is first?
+		// 並行処理。どちらが先に終わるのか...
+		setTimeout(chan, 300, null, 'e3X');
+		setTimeout(chan, 200, null, 'e3Y');
+		var val = yield [chan, chan];
+		console.log('e3 arr: ' + val.join(', '));
+		var chan2 = Channel(), chan3 = Channel();
+		setTimeout(chan2, 300, null, 'e3X');
+		setTimeout(chan3, 200, null, 'e3Y');
+		var val = yield [chan2, chan3];
+		console.log('e3 arr: ' + val.join(', '));
+		// you have to get an array for multiple values.
+		// 複数の値は配列で受けること
+		chan(null, ['f31', 'f32', 'f33']);
+		val = yield chan;
+		console.log('f3 values: ' + val.join(', '));
+		console.log('end');
+	});
+
+	aa(function *() {
+		console.log('a4? ' + (yield wait(9000, 'a4')));
+		console.log('b4? ' + (yield wait(500, 'b4')));
+		console.log('c4? ' + (yield wait(500, 'c4')));
+		console.log('d4? ' + (yield wait(500, 'd4')));
+		// parallel processing.
+		// 並行処理。
+		console.log('e4 arr: ' + (yield [wait(300, 'e4X'), wait(200, 'e4Y')]).join(', '));
+		console.log('end');
+	});
+	function wait(ms, val) {
+		return function (cb) { setTimeout(cb, ms, null, val); };
+	}
 
 }();
 // see also npm:co-chan, npm:aa.Channel

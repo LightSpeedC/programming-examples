@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "description": "channel light example",
   "main": "channel-ex.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "aa": ">=0.1.32",
+    "channel-light": ">=0.0.1"
   },
   "repository": {
     "type": "git",
@@ -14,5 +15,8 @@
     "channel"
   ],
   "author": "LightSpeedC",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
