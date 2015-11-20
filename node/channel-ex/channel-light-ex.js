@@ -29,6 +29,10 @@ void function () {
 	}, function (err, val) {
 		// process c. 処理c
 		console.log('c? ' + val);
+		throw new Error('d');
+	}, function (err, val) {
+		// process d. 処理d
+		console.log('d? err: ' + err);
 		console.log('end');
 	})();
 
@@ -71,6 +75,9 @@ void function () {
 		}));
 	}, function (err, val) {
 		console.log('g2? ' + val);
+		throw new Error('h2');
+	}, function (err, val) {
+		console.log('h2 err: ' + err);
 		console.log('end');
 	})();
 
