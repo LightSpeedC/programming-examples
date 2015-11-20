@@ -20,7 +20,7 @@ void function () {
 				try { callbacks.shift().apply(channel, values.shift()); }
 				catch (err) { values.unshift([err]); }
 			return channel;
-		}
+		};
 	}
 
 	// 新規にチャネルを作成する
