@@ -3,8 +3,7 @@ void function () {
 
 	var aa = require('aa');
 
-	//var slice = [].slice;
-	var push = [].push;
+	var push = Array.prototype.push;
 
 	// Channel (mini)
 	// チャネル (ミニ)
