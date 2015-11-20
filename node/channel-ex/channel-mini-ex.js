@@ -3,20 +3,33 @@ void function () {
 
 	var aa = require('aa');
 
+	//var slice = [].slice;
+	var push = [].push;
+
 	// Channel (mini)
 	// チャネル (ミニ)
 	function Channel() {
-		var recvs = [].slice.call(arguments), sends = [];
+		var values = [], callbacks = Array.apply(null, arguments);
 		return function channel(first) {
-			if (typeof first === 'function')
-				if (sends.length) first.apply(channel, sends.shift());
-				else recvs.push(first);
-			else
-				if (recvs.length) recvs.shift().apply(channel, arguments);
-				else sends.push(arguments);
+			if (typeof first !== 'function') values.push(arguments);
+			else push.apply(callbacks, arguments);
+			while (values.length && callbacks.length)
+				try { callbacks.shift().apply(channel, values.shift()); }
+				catch (err) { values.unshift([err]); }
 			return channel;
 		};
 	}
+
+	var chan = Channel(
+		function (err, val) { console.log('1:', err, val); },
+		function (err, val) { console.log('2:', err, val); })
+	(null, 1);
+	chan(null, 2)(null, 3)
+	(function (err, val) { console.log('3:', err, val); throw new Error('333'); })
+	(function (err, val) { console.log('4:', err, val); })
+	(function (err, val) { console.log('5:', err, val); })
+	(null, 4)(null, 5)
+	(function (err, val) { console.log('6:', err, val); });
 
 	// Channel() creates a new channel.
 	// Channel() は新規にチャネルを作成する。
@@ -31,7 +44,7 @@ void function () {
 	chan(function () {
 		console.log('start!'); // start! 開始!
 		setTimeout(this, 500, null, 'a');
-	})(function (err, val) {
+	}, function (err, val) {
 		// process a. 処理a
 		console.log('a? ' + val);
 		setTimeout(this, 500, null, 'b');
@@ -39,9 +52,13 @@ void function () {
 		// process b. 処理b
 		console.log('b? ' + val);
 		setTimeout(this, 500, null, 'c');
-	})(function (err, val) {
+	}, function (err, val) {
 		// process c. 処理c
 		console.log('c? ' + val);
+		throw new Error('d');
+	}, function (err, val) {
+		// process d. 処理d
+		console.log('d? err: ' + err);
 		console.log('end');
 	})();
 
@@ -77,6 +94,9 @@ void function () {
 		this(null, ['f21', 'f22', 'f23']);
 	}, function (err, val) {
 		console.log('f2 values: ' + val.join(', '));
+		throw new Error('g2');
+	}, function (err, val) {
+		console.log('g2 err: ' + err);
 		console.log('end');
 	})();
 
