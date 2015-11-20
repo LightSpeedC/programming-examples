@@ -1,29 +1,24 @@
 void function () {
 	'use strict';
 
+	var push = Array.prototype.push;
+
 	// Channel: チャネル
 	function Channel() {
-		var recvs = [].slice.call(arguments), sends = [];
-		return function channel(func) {
-			if (typeof func === 'function')
-				for (var i = 0; i < arguments.length; ++i) {
-					if (typeof arguments[i] !== 'function')
-						throw new TypeError('arguments must be a function!');
-					var args = sends.shift();
-					if (args) arguments[i].apply(channel, args);
-					else recvs.push(arguments[i]);
-				}
-			else if (func && typeof func.then === 'function')
-				func.then(channel, channel);
+		var values = [], callbacks = Array.apply(null, arguments);
+		return function channel(first) {
+			if (typeof first === 'function')
+				push.apply(callbacks, arguments);
+			else if (first && typeof first.then === 'function')
+				return first.then(channel, channel), channel;
 			else {
-				var args = [].slice.call(arguments);
-				if (func != null && !(func instanceof Error))
-					args = [null].concat(args);
-				if (args.length > 2) args = [args[0], args.slice(1)];
-				func = recvs.shift();
-				if (func) func.apply(channel, args);
-				else sends.push(args);
+				var args = arguments.length === 1 ? [first] : Array.apply(null, arguments);
+				if (!(first == null || first instanceof Error)) args.unshift(null);
+				values.push(args.length > 2 ? [args.shift(), args] : args);
 			}
+			while (callbacks.length && values.length)
+				try { callbacks.shift().apply(channel, values.shift()); }
+				catch (err) { values.unshift([err]); }
 			return channel;
 		}
 	}
@@ -48,6 +43,10 @@ void function () {
 	}, function (err, val) {
 		// 処理c
 		console.log('c? ' + val);
+		throw new Error('d');
+	}, function (err, val) {
+		// 処理d
+		console.log('d err: ' + err);
 		console.log('end');
 	})();
 
@@ -86,6 +85,9 @@ void function () {
 		}));
 	}, function (err, val) {
 		console.log('g2? ' + val);
+		throw new Error('h2');
+	}, function (err, val) {
+		console.log('h2 err: ' + err);
 		console.log('end');
 	})();
 
