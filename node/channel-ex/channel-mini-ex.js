@@ -24,9 +24,9 @@ void function () {
 		function (err, val) { console.log('2:', err, val); })
 	(null, 1);
 	chan(null, 2)(null, 3)
-	(function (err, val) { console.log('3:', err, val); throw new Error('333'); })
-	(function (err, val) { console.log('4:', err, val); })
-	(function (err, val) { console.log('5:', err, val); })
+	(function (err, val) { console.log('3:', err, val); throw new Error('333'); },
+	 function (err, val) { console.log('4:', err, val); },
+	 function (err, val) { console.log('5:', err, val); })
 	(null, 4)(null, 5)
 	(function (err, val) { console.log('6:', err, val); });
 
