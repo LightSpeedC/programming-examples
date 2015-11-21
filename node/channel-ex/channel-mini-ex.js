@@ -81,7 +81,8 @@ void function () {
 		console.log('d2? ' + val);
 		// parallel processing. which one is first?
 		// 並行処理。どちらが先に終わるのか...
-		var next = this, arr = [], chan2 = Channel(
+		var next = this, arr = [];
+		var chan2 = Channel(
 			function (err, val) { console.log('e2 1st? ' + val); arr.push(val); },
 			function (err, val) { console.log('e2 2nd? ' + val); arr.push(val); next(null, arr); });
 		setTimeout(chan2, 300, null, 'e2X');
