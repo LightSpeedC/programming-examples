@@ -5,7 +5,7 @@
   "main": "channel-ex.js",
   "dependencies": {
     "aa": ">=0.1.32",
-    "channel-light": ">=0.0.3"
+    "channel-light": ">=0.1.1"
   },
   "repository": {
     "type": "git",
