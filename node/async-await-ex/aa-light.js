@@ -71,6 +71,8 @@ void function () {
 }();
 
 
+var wait = (ms, val) => cb => setTimeout(cb, ms, null, val);
+
 aa(function *() {
 	console.log('aa1');
 	console.log('yield 1:',         yield 1);
@@ -91,9 +93,3 @@ aa(function *() {
 	(val) => console.log('@@@@@@@@@@@@@@', val),
 	(err) => console.log('**************', err.stack)
 );
-
-function wait(ms, val) {
-	return function (cb) {
-		setTimeout(cb, ms, null, val);
-	};
-}
