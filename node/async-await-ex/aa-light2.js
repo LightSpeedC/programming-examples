@@ -183,13 +183,16 @@ void function () {
 				var val = array[i] = xx(value[i]);
 				if (val && val.then) ++n;
 			}
+			console.log('xx arr1', n, array);
 			if (n === 0) return array;
+			console.log('xx arr2', n, array);
 			return new Promise(function (resolve, reject) {
 				value.forEach(function arrayEach(val, i) {
 					if (val && val.then) {
 						val.then(
 							function (val) {
 								array[i] = xx(val);
+								//if (--n === 0) resolve(array);
 								if (val && val.then) arrayEach(val, i);
 								else if (--n === 0) resolve(array);
 							},
