@@ -5,7 +5,7 @@ void function () {
 	catch (e) {}
 
 	function aa(value) {
-		if (!value || // null, undefined, false, 0, '',
+		if (!value || // null, undefined, false, 0, '', NaN,
 				typeof value === 'number' ||
 				typeof value === 'string' ||
 				typeof value === 'boolean')
