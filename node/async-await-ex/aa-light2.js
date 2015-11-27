@@ -6,6 +6,9 @@ void function () {
 
 	function aa(value) {
 		//console.log('\x1b[32maa:', value, '\x1b[m');
+		//prt(value, '32maa: ');
+		if (arguments.length > 1) return seq(arguments);
+
 		if (!value || // null, undefined, false, 0, '', NaN,
 				typeof value === 'number' ||
 				typeof value === 'string' ||
@@ -54,8 +57,8 @@ void function () {
 					value = xx(value);
 					if (value && value.then)
 						return value.then(next, error);
-					else
-						var object = gtor.next(value);
+
+					var object = gtor.next(value);
 
 					value = xx(object.value);
 					if (object.done) {
@@ -78,7 +81,8 @@ void function () {
 
 	function xx(value) {
 		//console.log('\x1b[36mxx:', value, '\x1b[m');
-		if (!value || // null, undefined, false, 0, '',
+		//prt(value, '36mxx: ');
+		if (!value || // null, undefined, false, 0, '', NaN,
 				typeof value === 'number' ||
 				typeof value === 'string' ||
 				typeof value === 'boolean')
@@ -92,12 +96,9 @@ void function () {
 		// promise
 		if (typeof value.then === 'function') return value;
 
-		// generator function
-		if (typeof value === 'function' && value.constructor === GeneratorFunction)
-			return aa(value);
-
-		// generator
-		if (typeof value === 'object' && typeof value.next === 'function')
+		// generator or generator function
+		if (typeof value === 'object' && typeof value.next === 'function' ||
+			typeof value === 'function' && value.constructor === GeneratorFunction)
 			return aa(value);
 
 		// thunk
@@ -157,8 +158,43 @@ void function () {
 			});
 		}
 
-		console.log('*********', value);
+		console.log('*********', value); // no one comes here!?
 		return aa(value);
+	}
+
+	// sequential
+	function seq2(args) {
+		var array = [];
+		for (var i = 0; i < args.length; ++i) array[i] = args[i];
+		return aa(function *() {
+			for (var i = 0; i < args.length; ++i)
+				array[i] = yield array[i];
+			return array;
+		});
+	}
+	function seq(args) {
+		return new Promise(function (resolve, reject) {
+			if (args.length === 0) return resolve([]);
+			var array = [];
+			for (var i = 0; i < args.length; ++i) array[i] = args[i];
+			i = 0;
+			next(array[i]);
+			function next(val) {
+				val = array[i] = xx(array[i] = val);
+				if (val && val.then) return val.then(next, reject);
+				i++;
+				if (i >= args.length) return resolve(array);
+				next(array[i]);
+			}
+		});
+	}
+
+
+	function prt() {
+		var color = arguments[--arguments.length];
+		process.stdout.write('\x1b[' + color);
+		console.log.apply(console, arguments);
+		process.stdout.write('\x1b[m');
 	}
 
 
@@ -168,6 +204,7 @@ void function () {
 
 
 var delay = (ms, val) => cb => setTimeout(cb, ms, null, val);
+var sleep = (ms, val) => new Promise(res => setTimeout(res, ms, val));
 
 aa(function *() {
 	console.log('aa-start');
@@ -191,6 +228,23 @@ aa(function *() {
 	console.log('yield [aa,bb]:',     yield [delay(100, delay(100, 'aa')), [delay(100, delay(100, 'bb'))]]);
 	console.log('yield {x:aa,y:bb}:', yield {x:delay(100, delay(100, 'aa')), y:{z:delay(100, delay(100, 'bb'))}});
 	console.log('yield Promise:',     yield Promise.resolve(delay(100, 'aa')));
+
+	console.log('yield par:',         yield [
+		function *() { var x = yield delay(350, 'par1'); console.log(x); return x; },
+		function *() { var x = yield delay(300, 'par2'); console.log(x); return x; },
+		sleep(250, 'par3').then(x => (console.log(x), x)),
+		sleep(200, 'par4').then(x => (console.log(x), x)),
+		cb => delay(150, 'par5')((e, x) => (console.log(x), cb(null, x))),
+		cb => delay(100, 'par6')((e, x) => (console.log(x), cb(null, x)))
+	]);
+	console.log('yield seq:',         yield aa(
+		function *() { var x = yield delay(350, 'seq1'); console.log(x); return x; },
+		function *() { var x = yield delay(300, 'seq2'); console.log(x); return x; },
+		cb => sleep(250, 'seq3').then(x => (console.log(x), cb(null, x))),
+		cb => sleep(200, 'seq4').then(x => (console.log(x), cb(null, x))),
+		cb => delay(150, 'seq5')((e, x) => (console.log(x), cb(null, x))),
+		cb => delay(100, 'seq6')((e, x) => (console.log(x), cb(null, x)))
+	));
 
 	//throw new Error('xxx');
 	console.log('aa-end');
