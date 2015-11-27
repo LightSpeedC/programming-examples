@@ -79,15 +79,17 @@ aa(function *() {
 	console.log('yield "str":',       yield "str");
 	console.log('yield []:',          yield []);
 	console.log('yield {}:',          yield {});
+	console.log('yield new Str():',   yield new String('str'));
 	console.log('yield null:',        yield null);
 
-	console.log('yield delay a:',     yield delay(100 ,'a'));
-	console.log('yield [a,b]:',       yield [delay(100, 'a'), [delay(100, 'b')]]);
+	console.log('yield delay a:',     yield delay(100, 'a'));
+	console.log('yield [a,b]:',       yield [delay(100, 'a'), delay(100, 'b')]);
+	console.log('yield [a,[b]]:',     yield [delay(100, 'a'), [delay(100, 'b')]]);
 	console.log('yield {x:a,y:b}:',   yield {x:delay(100, 'a'), y:{z:delay(100, 'b')}});
 	console.log('yield Promise:',     yield Promise.resolve('resolved'));
 
 	console.log('yield w w aa:',      yield delay(100, delay(100, 'aa')));
-	console.log('yield [aa,bb]:',     yield [delay(100 ,delay(100, 'aa')), [delay(100, delay(100, 'bb'))]]);
+	console.log('yield [aa,bb]:',     yield [delay(100, delay(100, 'aa')), [delay(100, delay(100, 'bb'))]]);
 	console.log('yield {x:aa,y:bb}:', yield {x:delay(100, delay(100, 'aa')), y:{z:delay(100, delay(100, 'bb'))}});
 	console.log('yield Promise:',     yield Promise.resolve(delay(100, 'aa')));
 
@@ -96,5 +98,5 @@ aa(function *() {
 	return 'aa-end';
 }).then(
 	val => console.log('@@@@@@@@@@@@@@', val),
-	err => console.log('**************', err.stack)
+	err => console.log('**************', err.stack || err)
 );
