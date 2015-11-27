@@ -21,7 +21,6 @@ void function() {
 
 			var dt = DateTime.toDateTimeString().replace(/[-:]/g, '').replace(/[ .]/g, '-');
 			var w = null;
-			//fs.createWriteStream(dt + '-' + (++seq) + '-' + setting.log_file);
 			var n = 2;
 			var mode = -1;
 
@@ -36,9 +35,7 @@ void function() {
 				mode = m;
 			}
 
-			var soc2 = net.createConnection(setting, function () {
-				console.log('soc2 connected!');
-			});
+			var soc2 = net.createConnection(setting, () => console.log('soc2 connected!'));
 
 			soc1.on('readable', function () {
 				var buff = soc1.read();
@@ -47,10 +44,7 @@ void function() {
 				setmode('send');
 				w.write(buff);
 			});
-			soc1.on('end', function () {
-				if (--n === 0) end();
-				// --n || end();
-			});
+			soc1.on('end', () => --n || end());
 			soc1.on('error', function (err) {
 				console.log('soc1: ' + err.stack);
 				setmode('err1');
@@ -64,10 +58,7 @@ void function() {
 				setmode('recv');
 				w.write(buff);
 			});
-			soc2.on('end', function () {
-				if (--n === 0) end();
-				// --n || end();
-			});
+			soc2.on('end', () => --n || end());
 			soc2.on('error', function (err) {
 				console.log('soc2: ' + err.stack);
 				setmode('err2');
