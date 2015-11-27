@@ -1,0 +1,5 @@
+[
+	{"service_port": 8880, "port": 8080, "host": "localhost", "log_file": "gbeu.log"},
+	{"service_port": 8881, "port": 8080, "host": "localhost", "log_file": "liis.log"},
+	{"service_port": 8882, "port": 8080, "host": "localhost", "log_file": "fe.log"}
+]
