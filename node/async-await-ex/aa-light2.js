@@ -15,7 +15,7 @@ void function () {
 		if (value instanceof String ||
 			value instanceof Boolean ||
 			value instanceof Number) return Promise.resolve(value);
-		if (value instanceof Error) return Promise.reject(value)
+		if (value instanceof Error) return Promise.reject(value);
 
 		// promise
 		if (typeof value.then === 'function') return value;

@@ -5,12 +5,16 @@ void function () {
 	catch (e) {}
 
 	function aa(value) {
+		//console.log('\x1b[32maa:', value, '\x1b[m');
 		if (!value || // null, undefined, false, 0, '', NaN,
 				typeof value === 'number' ||
 				typeof value === 'string' ||
 				typeof value === 'boolean')
 			return Promise.resolve(value);
 
+		if (value instanceof String ||
+			value instanceof Boolean ||
+			value instanceof Number) return Promise.resolve(value);
 		if (value instanceof Error) return Promise.reject(value);
 
 		// promise
