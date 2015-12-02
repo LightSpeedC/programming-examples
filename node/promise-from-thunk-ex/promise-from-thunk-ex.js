@@ -6,6 +6,7 @@ console.log('start');
 wait(1000, 'a1')
 .then(val => (console.log(val), wait(1000, 'b2')))
 .then(val => (console.log(val), wait(1000, 'c3')))
+.then(console.log);
 
 function delay(ms, val) {
 	return function (cb) {
