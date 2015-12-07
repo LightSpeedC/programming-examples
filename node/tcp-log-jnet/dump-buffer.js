@@ -4,13 +4,17 @@ void function () {
 	module.exports = dumpBuffer;
 
 	var N = 16;
+
+	var c1 = 0, c2 = 0;
+
 	function dumpBuffer(buf, dir) {
 		if (!buf) return;
+		if (!dir) dir = '';
 
 		if (buf.length === 0) return wr('Buffer <>\r\n');
 
 		for (var j = 0, n = buf.length; j < n; j += N) {
-			wr(dir + ('000' + j.toString(16)).slice(-4) + ': ');
+			wr(dir + ('000' + j.toString(16)).slice(-4) + ':');
 			for (var i = 0; i < N; ++i) {
 				var c = i + j < n ? buf[i + j] : '.'.charCodeAt(0);
 				var s = ('0' + c.toString(16)).slice(-2);
