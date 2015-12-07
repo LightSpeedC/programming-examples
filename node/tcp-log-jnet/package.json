@@ -1,0 +1,20 @@
+{
+  "name": "tcp-log",
+  "version": "0.0.0",
+  "description": "tcp port logger",
+  "main": "tcp-log.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "tcp"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

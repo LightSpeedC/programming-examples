@@ -1,0 +1,7 @@
+[
+	{"service_port": 3000, "connections": [
+		{"port": 50000, "host": "192.168.101.31", "from":"localhost", "log_file": "a.log"},
+		{"port": 50000, "host": "192.168.101.31", "from":"192.168.101.149", "log_file": "a.log"},
+		{"port": 50000, "host": "192.168.101.149", "from":"192.168.101.31", "log_file": "b.log"}
+	]}
+]
