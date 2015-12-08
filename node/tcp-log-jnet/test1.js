@@ -8,7 +8,6 @@ void function () {
 	//Object.keys(nets).forEach(n => nets[n].forEach(x => console.log(x.address)));
 
 	var settings = require('./settings.json');
-
 	var dumpBuffer = require('./dump-buffer');
 
 	var port = 3000;
