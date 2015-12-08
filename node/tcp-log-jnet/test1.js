@@ -8,7 +8,8 @@ void function () {
 	//Object.keys(nets).forEach(n => nets[n].forEach(x => console.log(x.address)));
 
 	var settings = require('./settings.json');
-	var dumpBuffer = require('./dump-buffer');
+	var DumpBuffer = require('./dump-buffer');
+	var dumpBuffer = new DumpBuffer();
 
 	var port = 3000;
 	var net = require('net');
@@ -24,7 +25,7 @@ void function () {
 			if (!buf) return;
 			//console.log('read', buf);
 			soc.write(buf);
-			dumpBuffer(buf, 'xxx ');
+			dumpBuffer.dump(buf);
 		});
 		soc.on('end', () => {
 			console.log('end');
