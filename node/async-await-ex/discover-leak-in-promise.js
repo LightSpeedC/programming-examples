@@ -1,5 +1,6 @@
-// Leak: native Promise and complex arrow functions with Generators
-// node v0.12.9, v4.2.3, v5.1.1
+// Memory Leak? native Promise and complex arrow functions with Generators
+// node version: v0.12.9, v4.2.3, v5.1.1, v5.2.0 (x86, x64)
+// I tried Windows version. OS: Windows 10 (64bit), Windows 8.1 (64bit).
 
 'use strict';
 
