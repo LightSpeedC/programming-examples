@@ -27,15 +27,16 @@ fork(function *() {
 	console.log('error caught!');
 	console.log('expected: 123 ==', yield cb => cb(null, 123));
 
-	var time = Date.now();
-	for (var i = 0; i < 1e5; ++i) if (i !== (yield test(i))) throw new Error('eh!?');
-	console.log('%s msec', Date.now() - time);
-
-	yield wait(1);
-
-	var time = Date.now();
-	for (var i = 0; i < 1e5; ++i) if (i !== (yield test(i))) throw new Error('eh!?');
-	console.log('%s msec', Date.now() - time);
+	var loops = [1e5, 2e5, 1e6, 2e6, 1e7];
+	for (var j in loops) {
+		var time = Date.now();
+		for (var i = 0, N = loops[j]; i < N; ++i)
+			if (i !== (yield test(i)))
+				throw new Error('eh!?');
+		var delta = (Date.now() - time) / 1000;
+		console.log('%s sec, %s tps', delta.toFixed(3), N / delta);
+		yield wait(0.1);
+	}
 
 	return 12345;
-}()).then(val => console.log('finished:', val));
+}()).then(val => console.log('finished:', val), err => console.error('eh!?:', err.stack || err));

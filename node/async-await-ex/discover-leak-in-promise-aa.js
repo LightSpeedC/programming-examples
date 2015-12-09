@@ -9,20 +9,8 @@
 
 var test = val => Promise.resolve(val);
 var wait = sec => new Promise((res, rej) => setTimeout(res, sec * 1000));
-var fork = gen => new Promise((res, rej, cb) => (
-	cb = (err, val) => (
-		(val = err ? gen.throw(err) : gen.next(val)),
-		(val.done ? res(val.value) : val.value.then(val => cb(null, val), cb))
-	), cb()
-));
-var forkSolved = gen => new Promise((res, rej) => {
-	var cb = (err, val) => {
-		try { val = err ? gen.throw(err) : gen.next(val); } catch (e) { rej(e); }
-		val.done ? res(val.value) : val.value.then(val => cb(null, val), cb);
-	}; cb();
-});
-// var fork = require('co');
-// var fork = require('aa');
+
+var fork = require('aa');
 
 fork(function *() {
 	console.log('start!');
