@@ -15,20 +15,23 @@ var read = fil => new Promise((res, rej) => fs.readFile(fil, 'utf8', (err, val) 
 var wait = sec => new Promise((res, rej) => setTimeout(res, sec * 1000));
 var xxxx = sec => new Promise((res, rej) => setTimeout(rej, sec * 1000, new Error('always error')));
 
-var fork = gen => new Promise((res, rej, cb) => (cb = (err, val) => (val = err ? gen.throw(err) : gen.next(val), val.done ? res(val.value) : val.value.then(val => cb(null, val), cb)), cb()));
+var fork = gen => new Promise((res, rej, cb) => (cb = (err, val) => {
+	val = err ? gen.throw(err) : gen.next(val),
+	val.done ? res(val.value) : val.value.then(val => cb(null, val), cb)
+}, cb()));
 
 fork(function *() {
 	console.log(yield read('README.md'));
-	yield wait(1);
+	yield wait(0.1);
 	console.log(yield read('package.json'));
 
-	try { yield xxxx(1); } 
+	try { yield xxxx(0.1); } 
 	catch (e) { console.log(e.stack || (e + '')); }
 
 	console.log('error caught!');
 	console.log('expected: 123 ==', yield Promise.resolve(123));
 
-	var loops = [1e5, 2e5, 1e6, 2e6, 1e7];
+	var loops = [1e5, 1e5, 1e5, 2e5, 1e6, 2e6, 1e7];
 	for (var j in loops) {
 		var time = Date.now();
 		for (var i = 0, N = loops[j]; i < N; ++i)
