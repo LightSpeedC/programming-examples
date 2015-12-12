@@ -40,7 +40,7 @@ fork(function *() {
 			if (i !== (yield test(i)))
 				throw new Error('eh!?');
 		var delta = (Date.now() - time) / 1000;
-		console.log('%s sec, %s tps', delta.toFixed(3), N / delta);
+		console.log('%s sec, %s Ktps', delta.toFixed(3), (Math.floor(N / delta) / 1000).toFixed(3));
 		yield wait(0.1);
 	}
 

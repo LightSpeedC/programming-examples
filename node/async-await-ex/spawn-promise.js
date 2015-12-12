@@ -15,10 +15,30 @@ var read = fil => new Promise((res, rej) => fs.readFile(fil, 'utf8', (err, val) 
 var wait = sec => new Promise((res, rej) => setTimeout(res, sec * 1000));
 var xxxx = sec => new Promise((res, rej) => setTimeout(rej, sec * 1000, new Error('always error')));
 
-var fork = gen => new Promise((res, rej, cb) => (cb = (err, val) => {
-	val = err ? gen.throw(err) : gen.next(val),
-	val.done ? res(val.value) : val.value.then(val => cb(null, val), cb)
-}, cb()));
+var fork = gen => new Promise((res, rej) => {
+		var cb = (err, val) => {
+		try {
+			val = err ? gen.throw(err) : gen.next(val);
+			val.done ? res(val.value) : val.value.then(val => cb(null, val), cb);
+		} catch (err) { rej(err); }
+	}; cb();
+});
+
+var fork2 = gen => new Promise((res, rej, cb) => (
+	cb = (err, val) => {
+		try {
+			val = err ? gen.throw(err) : gen.next(val);
+			val.done ? res(val.value) : val.value.then(val => cb(null, val), cb);
+		} catch (err) { rej(err); }
+	}, cb()
+));
+
+var fork3 = gen => new Promise((res, rej, cb) => (
+	cb = (err, val) => (
+			(val = err ? gen.throw(err) : gen.next(val)),
+			(val.done ? res(val.value) : val.value.then(val => cb(null, val), cb))
+	), cb()
+));
 
 fork(function *() {
 	console.log(yield read('README.md'));
@@ -38,7 +58,7 @@ fork(function *() {
 			if (i !== (yield test(i)))
 				throw new Error('eh!?');
 		var delta = (Date.now() - time) / 1000;
-		console.log('%s sec, %s tps', delta.toFixed(3), N / delta);
+		console.log('%s sec, %s Ktps', delta.toFixed(3), (Math.floor(N / delta) / 1000).toFixed(3));
 		yield wait(0.1);
 	}
 
