@@ -95,6 +95,7 @@ call
 
 #Word Color=3, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
 .__proto__
+.catch
 .filter
 .forEach
 .indexOf
@@ -105,7 +106,9 @@ call
 .next
 .prototype
 .reduce
+.slice
 .split
+.then
 .toString
 Anchor
 Applet
@@ -116,6 +119,7 @@ Boolean
 Button
 Checkbox
 Date
+Date.now()
 Error
 FileUpload
 Form
@@ -140,6 +144,7 @@ Object.setPrototypeOf
 Option
 Password
 Plugin
+Promise
 Radio
 RegExp
 Reset
