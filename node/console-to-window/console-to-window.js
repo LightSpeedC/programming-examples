@@ -7,7 +7,7 @@
 		log:   {color: 'black'},
 		info:  {color: 'green'},
 		debug: {color: 'blue'},
-		warn:  {color: 'orange'},
+		warn:  {color: 'brown'},
 		error: {color: 'red'},
 		time:  {color: 'blue'},
 		dir:   {color: 'black'},
