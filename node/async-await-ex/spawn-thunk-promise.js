@@ -26,7 +26,6 @@ Function.prototype.aa$callback = function (cb) { next(this, cb); };
 GeneratorFunction.prototype.aa$callback = function (cb) { gencb(this(), cb); };
 //var funcb = (fun, cb) => fun.constructor === GeneratorFunction ? gencb(fun(), cb) : next(fun, cb);
 var valcb = (val, cb) => next(cb, null, val);
-//var valcb = (val, cb) => next(cb, val);
 var errcb = (err, cb) => next(cb, err);
 var funcb = (fun, cb) => fun.aa$callback(cb);
 var anycb = (val, cb) => typecbs[typeof val](val, cb);
@@ -50,10 +49,22 @@ var ctorcbs = {
 		typeof val.next === 'function' && typeof val.throw === 'function' ? gencb(val, cb) :
 		typeof val.then === 'function' ? promisecb(val, cb) :
 		next(cb, null, val),
-	'Array':   (val, cb) => next(cb, null, val),
+	'Array':   parcb, //(val, cb) => next(cb, null, val),
 	'Error':   errcb,
 	'Promise': promisecb
 };
+function parcb(args, cb) {
+	var result = [], n = args.length;
+	if (n <= 0) return next(cb, null, []);
+	console.log('parcb:', args);
+	try {
+		args.forEach((arg, i) => anycb(arg, (err, val) => err ? cb(err) : chk(val, i)));
+	} catch (err) { cb(err); }
+	function chk(x, i) {
+		result[i] = x;
+		--n || next(cb, null, result);
+	}
+}
 
 /*
 var fork2 = gen => new Promise((res, rej) =>
