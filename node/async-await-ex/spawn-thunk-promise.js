@@ -104,18 +104,17 @@ var slice1 = (args, len) => slices1[len] ? slices1[len](args) : slice.call(args,
 var gencb = (gen, callback) => {
 	var cb = function (err, val) {
 		try {
-			//val = err != null ? err instanceof Error ? gen.throw(err) :
-			//	gen.next(slice0(arguments, arguments.length)) :
-			//	gen.next(slice1(arguments, arguments.length));
 			val = err != null ? err instanceof Error ? gen.throw(err) :
 				(err = null, val = slice0(arguments, arguments.length)) :
 				(err = null, val = slice1(arguments, arguments.length));
 			if (!err) {
-				if (typeof val === 'function') return anycb(val, cb);
-				else if (typeof val === 'object' && val) {
-					if (typeof val.next === 'function' && typeof val.throw === 'function') return gencb(val, cb);
+				if (typeof val === 'object' && val) {
+					if (typeof val.next === 'function' &&
+						typeof val.throw === 'function')
+							return gencb(val, cb);
 					else if (typeof val.then === 'function') return promisecb(val, cb);
 				}
+				else if (typeof val === 'function') return funcb(val, cb);
 				val = gen.next(val);
 			}
 			val.done ? callback(null, val.value) : anycb(val.value, cb);
@@ -138,11 +137,13 @@ var fork = gen => {
 				(err = null, val = slice0(arguments, arguments.length)) :
 				(err = null, val = slice1(arguments, arguments.length));
 			if (!err) {
-				if (typeof val === 'function') return anycb(val, cb);
-				else if (typeof val === 'object' && val) {
-					if (typeof val.next === 'function' && typeof val.throw === 'function') return gencb(val, cb);
+				if (typeof val === 'object' && val) {
+					if (typeof val.next === 'function' &&
+						typeof val.throw === 'function')
+							return gencb(val, cb);
 					else if (typeof val.then === 'function') return promisecb(val, cb);
 				}
+				else if (typeof val === 'function') return funcb(val, cb);
 				val = gen.next(val);
 			}
 			val.done ? res(val.value) : anycb(val.value, cb);
