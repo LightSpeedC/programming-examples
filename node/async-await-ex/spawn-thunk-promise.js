@@ -46,20 +46,19 @@ function nextTask() {
 }
 
 var GeneratorFunction = function *() {}.constructor;
-console.log('GeneratorFunction.name ==', GeneratorFunction.name);
-Function.prototype.aa$callback = function (cb) { next(this, cb); };
+//console.log('GeneratorFunction.name ==', GeneratorFunction.name);
 GeneratorFunction.prototype.aa$callback = function (cb) { gencb(this(), cb); };
-//var funcb = (fun, cb) => fun.constructor === GeneratorFunction ? gencb(fun(), cb) : next(fun, cb);
+         Function.prototype.aa$callback = function (cb) { next(this, normalcb(cb)); };
 var valcb = (val, cb) => next(cb, null, val);
 var errcb = (err, cb) => next(cb, err);
 var funcb = (fun, cb) => fun.aa$callback(cb);
 var anycb = (val, cb) => typecbs[typeof val](val, cb);
-var objcb = (val, cb) => val ? ctorcb(val.constructor.name || 'other', val, cb) : next(cb, null, val);
+var clscb = (val, cb) => val ? ctorcb(val.constructor.name || 'other', val, cb) : next(cb, null, val);
 var ctorcb = (name, val, cb) => (ctorcbs[name] ? ctorcbs[name] : ctorcbs.other)(val, cb);
 var promisecb = (promise, cb) => promise.then(val => cb(null, val), cb);
 var typecbs = {
 	'function':  funcb,
-	'object':    objcb,
+	'object':    clscb,
 	'number':    valcb,
 	'string':    valcb,
 	'boolean':   valcb,
@@ -71,7 +70,7 @@ var ctorcbs = {
 	'Object':  (val, cb) =>
 		typeof val.next === 'function' && typeof val.throw === 'function' ? gencb(val, cb) :
 		typeof val.then === 'function' ? promisecb(val, cb) :
-		ooocb(val, cb),
+		objcb(val, cb),
 	'Array':   parcb, //valcb, //(val, cb) => next(cb, null, val),
 	'Error':   errcb,
 	'Promise': promisecb,
@@ -80,35 +79,29 @@ var ctorcbs = {
 		typeof val.then === 'function' ? promisecb(val, cb) :
 		val instanceof Error ? next(cb, val) :
 		val.constructor === Array ? parcb(val, cb) :
-		ooocb(val, cb)
+		objcb(val, cb)
 };
 function parcb(args, cb) {
 	var n = args.length;
 	if (n === 0) return next(cb, null, []);
 	var result = Array(n);
 	try {
-		args.forEach((arg, i) => anycb(arg, function cb2(err, val) {
-			if (err != null)
-				if (err instanceof Error) return cb(err);
-				else val = slice0(arguments, arguments.length);
-			else val = slice1(arguments, arguments.length);
-			
-			chk(val, i);
-		}
-		));
-	} catch (err) { err instanceof Error ? cb(err) : cb(Error(err)); }
+		args.forEach((arg, i) => anycb(arg,
+			(err, val) => err ? cb(err) : chk(val, i)));
+	} catch (err) { cb(err); }
 	function chk(val, i) {
 		result[i] = val;
 		--n || next(cb, null, result);
 	}
 }
-function ooocb(args, cb) {
+function objcb(args, cb) {
 	var keys = (Object.getOwnPropertyNames || Object.keys)(args);
 	var n = keys.length;
 	if (n === 0) return next(cb, null, {});
 	var result = {};
 	try {
-		keys.forEach((key, i) => (result[key] = undefined, anycb(args[key], (err, val) => err ? cb(err) : chk(val, key))));
+		keys.forEach((key, i) => (result[key] = undefined, anycb(args[key],
+			(err, val) => err ? cb(err) : chk(val, key))));
 	} catch (err) { cb(err); }
 	function chk(val, key) {
 		result[key] = val;
@@ -120,10 +113,7 @@ function ooocb(args, cb) {
 var co3 = gen => callback => {
 	var cb = function (err, val) {
 		try {
-			//val = err != null ? gen.throw(err) : gen.next(val);
-			val = err != null ? err instanceof Error ? gen.throw(err) :
-				gen.next(arguments.length <= 1 ? err : slice.call(arguments)) :
-				gen.next(arguments.length <= 2 ? val : slice.call(arguments, 1));
+			val = err ? gen.throw(err) : gen.next(val);
 			val.done ? callback(null, val.value) : anycb(val.value, cb);
 		} catch (err) { callback(err); }
 	}; cb();
@@ -132,10 +122,7 @@ var co3 = gen => callback => {
 var co4 = gen => new Promise((res, rej) => {
 	var cb = function (err, val) {
 		try {
-			//val = err != null ? gen.throw(err) : gen.next(val);
-			val = err != null ? err instanceof Error ? gen.throw(err) :
-				gen.next(arguments.length <= 1 ? err : slice.call(arguments)) :
-				gen.next(arguments.length <= 2 ? val : slice.call(arguments, 1));
+			val = err ? gen.throw(err) : gen.next(val);
 			val.done ? res(val.value) : anycb(val.value, cb);
 		} catch (err) { rej(err); }
 	}; cb();
@@ -159,66 +146,37 @@ var slices1 = [
 var slice0 = (args, len) => slices0[len] ? slices0[len](args) : slice.call(args);
 var slice1 = (args, len) => slices1[len] ? slices1[len](args) : slice.call(args, 1);
 
+function normalcb(cb) {
+	return function (err, val) {
+		if (err != null)
+			if (err instanceof Error) return cb(err);
+			else cb(null, slice0(arguments, arguments.length));
+		else cb(null, slice1(arguments, arguments.length));
+		//cb(null, val);
+	};
+}
+
 var gencb = (gen, callback) => {
-	var cb = function (err, val) {
+	next(cb);
+	function cb(err, val) {
 		try {
-			val = err != null ? err instanceof Error ? gen.throw(err) :
-				(err = null, slice0(arguments, arguments.length)) :
-				slice1(arguments, arguments.length);
-			if (!err) {
+			if (err) val = gen.throw(err);
+			else {
+				if (typeof val === 'function')
+					return funcb(val, cb);
 				if (typeof val === 'object' && val) {
+					if (typeof val.then === 'function')
+						return promisecb(val, cb);
 					if (typeof val.next === 'function' &&
 					    typeof val.throw === 'function')
 						return gencb(val, cb);
-					else if (typeof val.then === 'function')
-						return promisecb(val, cb);
 				}
-				else if (typeof val === 'function')
-					return funcb(val, cb);
 				val = gen.next(val);
 			}
-			val.done ? callback(null, val.value) : anycb(val.value, cb);
+			val.done ? anycb(val.value, callback) : anycb(val.value, cb);
 		} catch (err) { callback(err); }
-	};
-	next(cb);
-};
-
-/*
-function val2rr(value, res, rej) {
-	next(cb, null, value);
-	function cb(err, val) {
-		if (err != null)
-			if (err instanceof Error) return rej(err);
-			else val = slice0(arguments, arguments.length);
-		else val = slice1(arguments, arguments.length);
-
-		if (typeof val === 'object' && val) {
-			if (typeof val.next === 'function' &&
-			    typeof val.throw === 'function')
-				return gencb(val, cb);
-			else if (typeof val.then === 'function')
-				return promisecb(val, cb);
-		}
-		else if (typeof val === 'function')
-			return funcb(val, cb);
-		res(val);
 	}
 };
-
-function gen2rr(gen, res, rej) {
-	next(val2rr, undefined, res2, rej2);
-	function res2(val) {
-		try { val = gen.next(val); }
-		catch (err) { return rej(err); }
-		val.done ? val2rr(val.value, res, rej) : val2rr(val.value, res2, rej2);
-	}
-	function rej2(err) {
-		try { var val = gen.throw(err); }
-		catch (err) { return rej(err); }
-		val.done ? val2rr(val.value, res, rej) : val2rr(val.value, res2, rej2);
-	}
-};
-*/
 
 function fork(gen) {
 	var resolve, reject, callback, result;
@@ -227,7 +185,6 @@ function fork(gen) {
 		callback = cb;
 		result && callback.apply(null, result);
 	}
-	//nextTick(gen2rr, gen, res, rej);
 	nextTick(cb);
 	thunk.then = p.then.bind(p);
 	thunk['catch'] = p['catch'].bind(p);
@@ -235,24 +192,22 @@ function fork(gen) {
 
 	function cb(err, val) {
 		try {
-			val = err != null ? err instanceof Error ? gen.throw(err) :
-				(err = null, slice0(arguments, arguments.length)) :
-				slice1(arguments, arguments.length);
-			//console.log('---ty:', typeof val, val);
-			if (!err) {
+			if (err) val = gen.throw(err);
+			else {
+				if (typeof val === 'function')
+					return funcb(val, cb);
 				if (typeof val === 'object' && val) {
+					if (typeof val.then === 'function')
+						return promisecb(val, cb);
 					if (typeof val.next === 'function' &&
 					    typeof val.throw === 'function')
 						return gencb(val, cb);
-					else if (typeof val.then === 'function')
-						return promisecb(val, cb);
 				}
-				else if (typeof val === 'function')
-					return funcb(val, cb);
 				val = gen.next(val);
-				//console.log('---22:', typeof val.value, val.value);
 			}
-			val.done ? res(val.value) : anycb(val.value, cb);
+			val.done ?
+				anycb(val.value, (err, val) => err ? rej(err) : res(val)) :
+				anycb(val.value, cb);
 		} catch (err) { rej(err); }
 	}
 
@@ -271,10 +226,7 @@ function fork(gen) {
 }
 
 function errmsg(e) {
-	if (e instanceof Error) return '\x1b[31m' + e.stack + '\x1b[m';
-	return e;
-	//var x = (e.stack || e + '').split('\n');
-	//return '\x1b[31m' + x[0] + ' ' + x[1] + '\x1b[m';
+	return e instanceof Error ? '\x1b[31m' + e.stack + '\x1b[m' : e;
 }
 
 fork(function *() {
@@ -287,27 +239,29 @@ fork(function *() {
 	catch (e) { console.error(errmsg(e)); }
 
 	console.log('error caught!');
-	console.log('expected: 123       ==', yield cb => cb(null, 123));
+	console.log('expected: cb 123    ==', yield cb => cb(null, 123));
 	console.log('expected: 123       ==', yield 123);
-
 	console.log('expected: undefined ==', yield undefined);
 	console.log('expected: null      ==', yield null);
-	console.log('expected: 1.2       ==', yield 1.2);
+	console.log('expected: 1.23      ==', yield 1.23);
 	console.log('expected: "str"     ==', yield 'str');
 	console.log('expected: true      ==', yield true);
 	console.log('expected: false     ==', yield false);
 	console.log('expected: {}        ==', yield {});
 	console.log('expected: []        ==', yield []);
 	console.log('expected: Promise 1 ==', yield Promise.resolve(1));
+	console.log('expected: Promise 2 ==', yield Promise.resolve(Promise.resolve(2)));
+	console.log('expected: cb cb 123 ==', yield cb => cb(null, cb => cb(null, 123)));
 
+	if (123       !== (yield 123))       throw new Error('eh!?');
 	if (undefined !== (yield undefined)) throw new Error('eh!?');
 	if (null      !== (yield null))      throw new Error('eh!?');
-	if (1.2       !== (yield 1.2))       throw new Error('eh!?');
+	if (1.23      !== (yield 1.23))      throw new Error('eh!?');
 	if ('str'     !== (yield 'str'))     throw new Error('eh!?');
 	if (true      !== (yield true))      throw new Error('eh!?');
 	if (false     !== (yield false))     throw new Error('eh!?');
-	if ((yield {}).constructor !== Object) throw new Error('eh!?');
-	if ((yield []).constructor !== Array)  throw new Error('eh!?');
+	if (JSON.stringify(yield {}) !== '{}') throw new Error('eh!?');
+	if (JSON.stringify(yield []) !== '[]') throw new Error('eh!?');
 
 	var loops = [5e4, 5e4, 5e4, 5e4, 1e5, 1e5, 1e5, 1e5, 2e5, 1e6, 2e6, 1e7];
 	for (var j in loops) {
@@ -335,19 +289,16 @@ fork(function *() {
 	for (var i = 0; i < N; ++i) if ((yield {}).constructor !== Object) throw new Error('eh!?');
 	for (var i = 0; i < N; ++i) if ((yield []).constructor !== Array)  throw new Error('eh!?');
 
-	console.log('GeneratorFunction() start');
 	console.log('GeneratorFunction() 123 ==', yield function*() { yield wait(0.1); return 123; }());
-	console.log('GeneratorFunction   start');
 	console.log('GeneratorFunction   123 ==', yield function*() { yield wait(0.1); return 123; });
-	console.log('GeneratorFunction() start');
 	console.log('GeneratorFunction() 456 ==', yield function*() { yield wait(0.1); return Promise.resolve(456); }());
-	console.log('GeneratorFunction   start');
 	console.log('GeneratorFunction   456 ==', yield function*() { yield wait(0.1); return Promise.resolve(456); });
-	console.log('[w, w] start');
+	console.log('GeneratorFunction() 789 ==', yield function*() { yield wait(0.1); return cb => cb(null, 789); }());
+	console.log('GeneratorFunction   789 ==', yield function*() { yield wait(0.1); return cb => cb(null, 789); });
 	console.log('[w, w]         ==', yield [wait(0.2, 0.2), wait(0.1, 0.1)]);
 	console.log('{x:w, y:w}     ==', yield {x:wait(0.2, 0.2), y:wait(0.1, 0.1)});
 	console.log('[[w, w]]       ==', yield [[wait(0.2, 0.2), wait(0.1, 0.1)]]);
-	console.log('{x:[w], y:[w]} ==', yield {x:[wait(0.2, 0.2)], y:[wait(0.1, 0.1)]});
+	console.log('{x:[w], y:{z:w}} ==', yield {x:[wait(0.2, 0.2)], y:{z:wait(0.1, 0.1)}});
 
 	console.log('expected: 100           ==', yield cb => cb(null, 100));
 	console.log('expected: [101,102]     ==', yield cb => cb(null, 101, 102));
@@ -359,6 +310,8 @@ fork(function *() {
 	//console.log('err?', yield new TypeError('09876'));
 	//console.log('err?', yield new Error('54321'));
 	//throw new Error('67890');
+	//return Promise.resolve('12345');
+	//return Promise.reject(new Error('12345'));
 	return 12345;
 //}()).then(val => console.log('finished: val:', val), err => console.error('finished: err:', errmsg(err)));
 }())((err, val) => console.log('finished: err:', errmsg(err), 'val:', val));
