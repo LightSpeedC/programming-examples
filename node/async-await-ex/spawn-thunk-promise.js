@@ -295,9 +295,9 @@ fork(function *() {
 	console.log('GeneratorFunction   456 ==', yield function*() { yield wait(0.1); return Promise.resolve(456); });
 	console.log('GeneratorFunction() 789 ==', yield function*() { yield wait(0.1); return cb => cb(null, 789); }());
 	console.log('GeneratorFunction   789 ==', yield function*() { yield wait(0.1); return cb => cb(null, 789); });
-	console.log('[w, w]         ==', yield [wait(0.2, 0.2), wait(0.1, 0.1)]);
-	console.log('{x:w, y:w}     ==', yield {x:wait(0.2, 0.2), y:wait(0.1, 0.1)});
-	console.log('[[w, w]]       ==', yield [[wait(0.2, 0.2), wait(0.1, 0.1)]]);
+	console.log('[w, w]           ==', yield [wait(0.2, 0.2), wait(0.1, 0.1)]);
+	console.log('{x:w, y:w}       ==', yield {x:wait(0.2, 0.2), y:wait(0.1, 0.1)});
+	console.log('[[w, w]]         ==', yield [[wait(0.2, 0.2), wait(0.1, 0.1)]]);
 	console.log('{x:[w], y:{z:w}} ==', yield {x:[wait(0.2, 0.2)], y:{z:wait(0.1, 0.1)}});
 
 	console.log('expected: 100           ==', yield cb => cb(null, 100));
