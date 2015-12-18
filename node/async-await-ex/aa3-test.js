@@ -1,3 +1,5 @@
+void function () {
+
 var fork = require('./aa3');
 var fs = require('fs');
 
@@ -5,6 +7,10 @@ var test = val => cb => cb(null, val);
 var read = fil => cb => fs.readFile(fil, 'utf8', cb);
 var wait = (sec, val) => cb => setTimeout(cb, sec * 1000, null, val);
 var xxxx = sec => cb => setTimeout(cb, sec * 1000, new Error('always error'));
+
+function errmsg(e) {
+	return e instanceof Error ? '\x1b[31m' + e.stack + '\x1b[m' : e;
+}
 
 fork(function *() {
 	//console.log(yield read('README.md'));
@@ -92,3 +98,5 @@ fork(function *() {
 	return 12345;
 //}()).then(val => console.log('finished: val:', val), err => console.error('finished: err:', errmsg(err)));
 }())((err, val) => console.log('finished: err:', errmsg(err), 'val:', val));
+
+}();
