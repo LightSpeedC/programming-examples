@@ -151,9 +151,7 @@ function co3(gtor) {
 function co4(gtor) {
 	return new Promise(function (resolve, reject) {
 		nextTick(cb);
-		function callback(err, val) {
-			err ? reject(err) : resolve(val);
-		}
+		function callback(err, val) { err ? reject(err) : resolve(val); }
 		function cb(err, val) {
 			try {
 				val = err ? gtor.throw(err) : gtor.next(val);
@@ -214,7 +212,8 @@ function gtorcb(gtor, callback) {
 	}
 } // gtorcb
 
-function fork(val) {
+// aa
+function aa(val) {
 	var resolve, reject, callback, result;
 	var promise = new Promise(function (res, rej) { resolve = res; reject = rej; });
 	if (arguments.length <= 1)
@@ -236,7 +235,7 @@ function fork(val) {
 		try { callback && callback.apply(null, result); }
 		catch (err) { return reject(err); }
 	}
-} // fork
+} // aa
 
-module.exports = fork;
+module.exports = aa;
 }();
