@@ -1,18 +1,18 @@
 void function () {
 
-var fork = require('./aa3');
+var aa = require('./aa3');
 var fs = require('fs');
 
-var test = val => cb => cb(null, val);
-var read = fil => cb => fs.readFile(fil, 'utf8', cb);
-var wait = (sec, val) => cb => setTimeout(cb, sec * 1000, null, val);
-var xxxx = sec => cb => setTimeout(cb, sec * 1000, new Error('always error'));
+function test(val) { return function (cb) { cb(null, val); }; }
+function read(fil) { return function (cb) { fs.readFile(fil, 'utf8', cb); }; }
+function wait(sec, val) { return function (cb) { setTimeout(cb, sec * 1000, null, val); }; }
+function xxxx(sec) { return function (cb) { setTimeout(cb, sec * 1000, new Error('always error')); }; }
 
 function errmsg(e) {
 	return e instanceof Error ? '\x1b[31m' + e.stack + '\x1b[m' : e;
 }
 
-fork(function *() {
+aa(function *() {
 	//console.log(yield read('README.md'));
 	yield wait(0.1);
 	//console.log(yield read('package.json'));
@@ -95,8 +95,23 @@ fork(function *() {
 	//throw new Error('67890');
 	//return Promise.resolve('12345');
 	//return Promise.reject(new Error('12345'));
+
+	// parallel
+	console.log(yield [
+		function *() { console.log(yield wait(0.2, 0.2)); return 0.2; },
+		function *() { console.log(yield wait(0.3, 0.3)); return 0.3; },
+		function *() { console.log(yield wait(0.1, 0.1)); return 0.1; }
+	]);
+
+	// sequential
+	console.log(yield aa(
+		function *() { console.log(yield wait(0.2, 0.2)); return 0.2; },
+		function *() { console.log(yield wait(0.3, 0.3)); return 0.3; },
+		function *() { console.log(yield wait(0.1, 0.1)); return 0.1; }
+	));
+
 	return 12345;
-//}()).then(val => console.log('finished: val:', val), err => console.error('finished: err:', errmsg(err)));
-}())((err, val) => console.log('finished: err:', errmsg(err), 'val:', val));
+}()).then(val => console.log('finished: val:', val), err => console.error('finished: err:', errmsg(err)));
+//}())((err, val) => console.log('finished: err:', errmsg(err), 'val:', val));
 
 }();
