@@ -19,7 +19,6 @@ abstract
 arguments
 async
 await
-boolean
 break
 byte
 byvalue
