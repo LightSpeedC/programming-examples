@@ -9,27 +9,27 @@ void function () {
 'use strict';
 
 var slice = [].slice;
-var nextTick = typeof process === 'object' && process ? process.nextTick :
+var nextTickDo = typeof process === 'object' && process ? process.nextTick :
 	typeof setImmediate === 'function' ? setImmediate :
 	function (cb) {
 		var args = [cb, 0].concat(slice.call(arguments, 1));
 		setTimeout.apply(null, args);
 	};
 
-var next = function () {
+var nextTick = function () {
 	var NEXT_MAX = 50;
 	var count = 0;
 	var progress = false;
 	var head = undefined;
 	var tail = undefined;
 
-	function next(/* cb, err, val,... */) {
+	function nextTick(/* cb, err, val,... */) {
 		if (head)
 			return tail = tail.next_next = arguments;
 		head = tail = arguments;
 		if (progress) return;
 		progress = true;
-		++count >= NEXT_MAX ? (count = 0, nextTick(nextTask)) : nextTask();
+		++count >= NEXT_MAX ? (count = 0, nextTickDo(nextTask)) : nextTask();
 	}
 	var argscbs = [
 		function (args) { return undefined; },
@@ -51,18 +51,18 @@ var next = function () {
 		progress = false;
 	}
 
-	return next;
+	return nextTick;
 }();
 
 var GeneratorFunction = function *() {}.constructor;
 GeneratorFunction.prototype.aa$callback = function (cb) { gtorcb(this(), cb); };
-         Function.prototype.aa$callback = function (cb) { next(this, normalcb(cb)); };
+         Function.prototype.aa$callback = function (cb) { nextTick(this, normalcb(cb)); };
 
-function valcb(val, cb) { next(cb, null, val); }
-function errcb(err, cb) { next(cb, err); }
+function valcb(val, cb) { nextTick(cb, null, val); }
+function errcb(err, cb) { nextTick(cb, err); }
 function funcb(fun, cb) { fun.aa$callback(cb); }
 function anycb(val, cb) { typecbs[typeof val](val, cb); }
-function clscb(val, cb) { val ? ctorcb(val.constructor.name || '$', val, cb) : next(cb, null, val); }
+function clscb(val, cb) { val ? ctorcb(val.constructor.name || '$', val, cb) : nextTick(cb, null, val); }
 function ctorcb(name, val, cb) { (ctorcbs[name] ? ctorcbs[name] : ctorcbs.$)(val, cb); }
 function promisecb(promise, cb) { promise.then(function (val) { cb(null, val); }, cb); }
 
@@ -81,16 +81,16 @@ var typecbs = {
 // ctorcbs(val, cb) by constructor.name
 var ctorcbs = {
 	Object: function (val, cb) {
-		typeof val.next === 'function' && typeof val.throw === 'function' ? gtorcb(val, cb) :
+		typeof val.next === 'function' && typeof val['throw'] === 'function' ? gtorcb(val, cb) :
 		typeof val.then === 'function' ? promisecb(val, cb) :
 		objcb(val, cb); },
 	Array: parcb,
 	Error: errcb,
 	Promise: promisecb,
 	$: function (val, cb) {
-		typeof val.next === 'function' && typeof val.throw === 'function' ? gtorcb(val, cb) :
+		typeof val.next === 'function' && typeof val['throw'] === 'function' ? gtorcb(val, cb) :
 		typeof val.then === 'function' ? promisecb(val, cb) :
-		val instanceof Error ? next(cb, val) :
+		val instanceof Error ? nextTick(cb, val) :
 		val.constructor === Array ? parcb(val, cb) :
 		objcb(val, cb); }
 };
@@ -98,11 +98,11 @@ var ctorcbs = {
 // parcb(args, cb) for Array
 function parcb(args, cb) {
 	var n = args.length, result = Array(n);
-	if (n === 0) return next(cb, null, result);
+	if (n === 0) return nextTick(cb, null, result);
 	args.forEach(function (arg, i) {
 		anycb(arg, function (err, val) {
 			err ? (n = 0, cb(err)) :
-				((result[i] = val), (--n || next(cb, null, result)));
+				((result[i] = val), (--n || nextTick(cb, null, result)));
 		});
 	});
 }
@@ -111,12 +111,12 @@ function parcb(args, cb) {
 function objcb(args, cb) {
 	var keys = (Object.getOwnPropertyNames || Object.keys)(args);
 	var n = keys.length, result = {};
-	if (n === 0) return next(cb, null, result);
+	if (n === 0) return nextTick(cb, null, result);
 	keys.forEach(function (key, i) {
 		result[key] = undefined;
 		anycb(args[key], function (err, val) {
 			err ? (n = 0, cb(err)) :
-				((result[key] = val), (--n || next(cb, null, result)));
+				((result[key] = val), (--n || nextTick(cb, null, result)));
 		});
 	});
 }
@@ -124,11 +124,11 @@ function objcb(args, cb) {
 // seqcb(args, cb) for sequential tasks
 function seqcb(args, cb) {
 	var n = args.length, result = Array(n);
-	if (n === 0) return next(cb, null, result);
+	if (n === 0) return nextTick(cb, null, result);
 	anycb(args[0], function (err, val) { chk(val, 0); });
 	function chk(x, i) {
 		result[i] = x;
-		if (++i < n) next(anycb, args[i], function (err, val) { chk(val, i); });
+		if (++i < n) nextTick(anycb, args[i], function (err, val) { chk(val, i); });
 		else cb(null, result);
 	}
 }
@@ -137,10 +137,10 @@ function seqcb(args, cb) {
 // co3
 function co3(gtor) {
 	return function (callback) {
-		nextTick(cb);
+		nextTickDo(cb);
 		function cb(err, val) {
 			try {
-				val = err ? gtor.throw(err) : gtor.next(val);
+				val = err ? gtor['throw'](err) : gtor.next(val);
 				anycb(val.value, val.done ? callback : cb);
 			} catch (err) { callback(err); }
 		}
@@ -150,11 +150,11 @@ function co3(gtor) {
 // co4
 function co4(gtor) {
 	return new Promise(function (resolve, reject) {
-		nextTick(cb);
+		nextTickDo(cb);
 		function callback(err, val) { err ? reject(err) : resolve(val); }
 		function cb(err, val) {
 			try {
-				val = err ? gtor.throw(err) : gtor.next(val);
+				val = err ? gtor['throw'](err) : gtor.next(val);
 				anycb(val.value, val.done ? callback : cb);
 			} catch (err) { reject(err); }
 		}
@@ -191,10 +191,14 @@ function normalcb(cb) {
 } // normalcb
 
 function gtorcb(gtor, callback) {
-	next(cb);
+	nextTick(cb);
 	function cb(err, val) {
 		try {
-			if (err) val = gtor.throw(err);
+			if (err) {
+				if (typeof gtor['throw'] !== 'function')
+					return callback(err);
+				val = gtor['throw'](err);
+			}
 			else {
 				if (typeof val === 'function')
 					return val.aa$callback(cb); //funcb(val, cb);
@@ -202,7 +206,7 @@ function gtorcb(gtor, callback) {
 					if (typeof val.then === 'function')
 						return promisecb(val, cb);
 					if (typeof val.next === 'function' &&
-					    typeof val.throw === 'function')
+					    typeof val['throw'] === 'function')
 						return gtorcb(val, cb);
 				}
 				val = gtor.next(val);
@@ -212,14 +216,14 @@ function gtorcb(gtor, callback) {
 	}
 } // gtorcb
 
-// aa
+// aa - async-await
 function aa(val) {
 	var resolve, reject, callback, result;
 	var promise = new Promise(function (res, rej) { resolve = res; reject = rej; });
 	if (arguments.length <= 1)
-		nextTick(anycb, val, cb);
+		nextTickDo(anycb, val, cb);
 	else
-		nextTick(seqcb, arguments, cb);
+		nextTickDo(seqcb, arguments, cb);
 	thunk.then = promise.then.bind(promise);
 	thunk['catch'] = promise['catch'].bind(promise);
 	return thunk;
