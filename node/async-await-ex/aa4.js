@@ -51,12 +51,14 @@ void function () {
 	// GeneratorFunction
 	try {
 		var GeneratorFunction = Function('return function*(){}.constructor')();
+		GeneratorFunction.toString();
 		setValue(aa, 'GeneratorFunction', GeneratorFunction);
 	} catch (e) {}
 
 	// GeneratorFunctionPrototype
 	try {
 		var GeneratorFunctionPrototype = Function('return (function*(){})().constructor')();
+		GeneratorFunctionPrototype.toString();
 		setValue(aa, 'GeneratorFunctionPrototype', GeneratorFunctionPrototype);
 	} catch (e) {}
 
@@ -137,7 +139,7 @@ void function () {
 	function errcb(err, cb) { nextTick(cb, err); }
 	function funcb(fun, cb) { fun.aa$callback(cb); }
 	function anycb(val, cb) { typecbs[typeof val](val, cb); }
-	function clscb(val, cb) { val ? ctorcb(val.constructor.name || '$', val, cb) : nextTick(cb, null, val); }
+	function clscb(val, cb) { val ? ctorcb(val.constructor.displayName || val.constructor.name || '$', val, cb) : nextTick(cb, null, val); }
 	function ctorcb(name, val, cb) { (ctorcbs[name] ? ctorcbs[name] : ctorcbs.$)(val, cb); }
 	function promisecb(promise, cb) { promise.then(function (val) { cb(null, val); }, cb); }
 
