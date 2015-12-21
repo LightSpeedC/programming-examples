@@ -229,13 +229,13 @@ function aa(val) {
 	function thunk(cb) {
 		callback = cb;
 		try { result && callback.apply(null, result); }
-		catch (err) { return reject(err); }
+		catch (err) { reject(err); }
 	}
 	function cb(err, val) {
 		err ? reject(err) : resolve(val);
 		result = arguments;
 		try { callback && callback.apply(null, result); }
-		catch (err) { return reject(err); }
+		catch (err) { reject(err); }
 	}
 } // aa
 
