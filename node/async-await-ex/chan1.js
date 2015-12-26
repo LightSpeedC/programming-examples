@@ -42,12 +42,12 @@ void function () {
 		function (args) { return [args[1], args[2], args[3], args[4]]; }
 	];
 	function normalcb(cb) {
-		return function ncb(err, val) {
+		return function (err, val) {
 			if (err != null)
 				if (err instanceof Error) cb.apply(this, arguments);
 				else cb.call(this, null, slices0[arguments.length](arguments));
 			else cb.call(this, null, slices1[arguments.length](arguments));
-			return ncb;
+			return this;
 		};
 	} // normalcb
 

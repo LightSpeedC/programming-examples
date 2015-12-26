@@ -271,9 +271,10 @@ void function () {
 	function normalcb(cb) {
 		return function (err, val) {
 			if (err != null)
-				if (err instanceof Error) return cb(err);
-				else cb(null, slices0[arguments.length](arguments));
-			else cb(null, slices1[arguments.length](arguments));
+				if (err instanceof Error) cb.apply(this, arguments);
+				else cb.call(this, null, slices0[arguments.length](arguments));
+			else cb.call(this, null, slices1[arguments.length](arguments));
+			return this;
 		};
 	} // normalcb
 
