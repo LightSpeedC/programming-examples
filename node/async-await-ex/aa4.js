@@ -10,8 +10,8 @@ void function () {
 
 	var slice = [].slice;
 
-	// Object_keys
-	var Object_keys = Object.getOwnPropertyNames || Object.keys ||
+	// Object_getOwnPropertyNames
+	var Object_getOwnPropertyNames = Object.getOwnPropertyNames || Object.keys ||
 		function (obj) {
 			var keys = [];
 			for (var prop in obj)
@@ -191,7 +191,7 @@ void function () {
 
 	// objcb(args, cb) for Object
 	function objcb(args, cb) {
-		var keys = Object_keys(args);
+		var keys = Object_getOwnPropertyNames(args);
 		var n = keys.length, result = {};
 		if (n === 0) return nextTick(cb, null, result);
 		keys.forEach(function (key) {
@@ -632,7 +632,7 @@ void function () {
 	// aa.thunkifyAll(object, options)
 	setValue(aa, 'thunkifyAll', thunkifyAll);
 	function thunkifyAll(object, options) {
-		var keys = Object_keys(object);
+		var keys = Object_getOwnPropertyNames(object);
 
 		keys.forEach(function (method) {
 			if (typeof object[method] === 'function' &&
@@ -646,7 +646,7 @@ void function () {
 	// aa.promisifyAll(object, options)
 	setValue(aa, 'promisifyAll', promisifyAll);
 	function promisifyAll(object, options) {
-		var keys = Object_keys(object);
+		var keys = Object_getOwnPropertyNames(object);
 
 		keys.forEach(function (method) {
 			if (typeof object[method] === 'function' &&
