@@ -1,6 +1,7 @@
 // require the dependencies
 // 依存関係 require
-var aa = require('./aa5');var Channel = aa.Channel;
+var aa = require('./aa5');
+var Channel = aa.Channel;
 var co = aa;
 
 // make two channels
