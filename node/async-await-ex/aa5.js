@@ -9,6 +9,7 @@ void function () {
 	'use strict';
 
 	var slice = [].slice;
+	var push = [].push;
 
 	// Object_getOwnPropertyNames
 	var Object_getOwnPropertyNames = Object.getOwnPropertyNames || Object.keys ||
@@ -269,12 +270,12 @@ void function () {
 	//var slice1 = function (args, len) { return len <= 5 ? slices1[len](args) : slice.call(args, 1); };
 
 	function normalcb(cb) {
-		return function (err, val) {
+		return function callback(err, val) {
 			if (err != null)
 				if (err instanceof Error) cb.apply(this, arguments);
 				else cb.call(this, null, slices0[arguments.length](arguments));
 			else cb.call(this, null, slices1[arguments.length](arguments));
-			return this;
+			return callback;
 		};
 	} // normalcb
 
