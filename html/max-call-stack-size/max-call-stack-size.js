@@ -7,6 +7,7 @@ function recursiveFunction(i) {
 
 console.info(typeof navigator !== 'undefined' && navigator.userAgent || 'Node.js');
 var err = recursiveFunction(0);
+console.warn(err);
 var keys = (Object.getOwnPropertyNames || Object.keys)(err);
 for (var i in keys)
 	console.warn(keys[i] + ': ' + err[keys[i]]);
