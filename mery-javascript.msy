@@ -108,6 +108,7 @@ call
 .slice
 .split
 .then
+.toJSON
 .toString
 Anchor
 Applet
