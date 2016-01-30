@@ -1,0 +1,23 @@
+{
+  "name": "async-await-jxcore",
+  "version": "0.0.0",
+  "description": "async await example for jxcore",
+  "main": "async-await-jxcore.js",
+  "private": true,
+  "dependencies": {
+    "aa": "^0.1.32"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "async",
+    "await"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
