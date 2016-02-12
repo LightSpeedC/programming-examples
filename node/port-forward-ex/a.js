@@ -7,7 +7,7 @@
   var ControlC = require('control-c');
 
   var logFile = 'log/a-%s.log';
-  var logLevel = 'trace';
+  var logLevel = 'debug';
   var log = require('log-manager').setWriter(new require('log-writer')(logFile)).getLogger();
   log.setLevel(logLevel);
   var IS_TRACE = log.isTrace();
