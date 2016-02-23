@@ -4,25 +4,47 @@ void function () {
 	'use strict';
 
 	var net = require('net');
-	var configs = require('./configs');
-	var servicePort = configs.servicePort || 8001;
-	var serviceHost = configs.serviceHost || '127.0.0.1';
-	var forwardPort = configs.forwardPort || 8002;
-	var forwardHost = configs.forwardHost || 'localhost';
+
+	try { var configs = require('./local-configs'); }
+	catch (e) { var configs = require('./configs'); }
+
+	if (!configs ||
+		!configs.servicePort ||
+		!configs.serviceHost ||
+		!configs.forwardPort ||
+		!configs.forwardHost)
+		throw new Error('no configs {servicePort, serviceHost, forwardPort, forwardHost}!');
+
+	var servicePort = configs.servicePort;
+	var serviceHost = configs.serviceHost;
+	var forwardPort = configs.forwardPort;
+	var forwardHost = configs.forwardHost;
 
 	var isInfo = true;
 
-	var server = net.createServer({allowHalfOpen:true},
-			function connection(s) {
+	var liveConnections = 0;
 
-		if (isInfo) console.info('s connected');
+	// server 'connection'
+	var server = net.createServer(
+			{allowHalfOpen:true},
+			function connectionServer(s) {
+
+		++liveConnections;
+		if (isInfo) console.info('#(' + liveConnections + ') s connected');
+
 		var c = net.createConnection(
-				{port: forwardPort, host: forwardHost, localAddress: serviceHost},
-				function () {
-			if (isInfo) console.info('c connected');
+				{port: forwardPort,
+				 host: forwardHost,
+				 localAddress: serviceHost},
+				function connectionRemote() {
+
+			if (isInfo) console.info('#(' + liveConnections + ') c connected');
+
 		});
+
 		c.on('error', makeError('c err:'));
 		s.on('error', makeError('s err:'));
+		s.on('end', function endConnection() { --liveConnections; });
 		c.pipe(s);
 		s.pipe(c);
 
@@ -35,8 +57,14 @@ void function () {
 		}
 
 	});
-	server.on('error', function (err) { console.error('server err:', err); });
-	server.listen(servicePort, function listening() {
+
+	// server 'error'
+	server.on('error', function errorServer(err) {
+		console.error('server err:', err);
+	});
+
+	// server listen
+	server.listen(servicePort, function listeningServer() {
 		console.info('service port: %s listening...', servicePort);
 	});
 
