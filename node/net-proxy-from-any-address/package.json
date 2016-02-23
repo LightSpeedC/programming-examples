@@ -1,0 +1,22 @@
+{
+  "name": "net-proxy-from-any-address",
+  "version": "0.0.0",
+  "description": "proxy from any address",
+  "main": "proxy-from.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "proxy"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "log-manager": "0.0.10",
+    "log-writer": "0.0.9"
+  }
+}

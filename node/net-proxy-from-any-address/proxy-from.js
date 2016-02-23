@@ -5,67 +5,87 @@ void function () {
 
 	var net = require('net');
 
+	var log = require('log-manager').setWriter(new require('log-writer')('proxy-%s.log')).getLogger();
+
 	try { var configs = require('./local-configs'); }
 	catch (e) { var configs = require('./configs'); }
 
-	if (!configs ||
-		!configs.servicePort ||
-		!configs.serviceHost ||
-		!configs.forwardPort ||
-		!configs.forwardHost)
+	if (!configs)
 		throw new Error('no configs {servicePort, serviceHost, forwardPort, forwardHost}!');
 
-	var servicePort = configs.servicePort;
-	var serviceHost = configs.serviceHost;
-	var forwardPort = configs.forwardPort;
-	var forwardHost = configs.forwardHost;
+	log.setLevel(configs.logLevel || 'debug');
+	log.info('node', process.version);
 
-	var isInfo = true;
+	configs.services.forEach(function (config) {
 
-	var liveConnections = 0;
+		if (!config)
+			throw new Error('no config {servicePort, serviceHost, forwardPort, forwardHost}!');
 
-	// server 'connection'
-	var server = net.createServer(
-			{allowHalfOpen:true},
-			function connectionServer(s) {
+		var servicePort = config.servicePort;
+		var serviceHost = config.serviceHost;
+		var forwardPort = config.forwardPort;
+		var forwardHost = config.forwardHost;
 
-		++liveConnections;
-		if (isInfo) console.info('#(' + liveConnections + ') s connected');
+		if (!servicePort || !serviceHost || !forwardPort || !forwardHost)
+			throw new Error('no config {servicePort, serviceHost, forwardPort, forwardHost}!');
 
-		var c = net.createConnection(
-				{port: forwardPort,
-				 host: forwardHost,
-				 localAddress: serviceHost},
-				function connectionRemote() {
+		var liveConnections = 0;
+		var connectionId = config.connectionId || 10000;
 
-			if (isInfo) console.info('#(' + liveConnections + ') c connected');
+		// server 'connection'
+		var server = net.createServer(
+				{allowHalfOpen:true},
+				function connectionServer(s) {
+
+			++liveConnections;
+			++connectionId;
+			log.trace('(' + liveConnections + ')#' + connectionId + ' s connected');
+
+			var c = net.createConnection(
+					{port: forwardPort,
+					 host: forwardHost,
+					 localAddress: serviceHost},
+					function connectionRemote() {
+
+				log.trace('(' + liveConnections + ')#' + connectionId + ' c connected');
+
+			});
+
+			c.on('error', makeError('c err:'));
+			s.on('error', makeError('s err:'));
+			s.on('end', function endConnection() {
+				--liveConnections;
+				log.trace('(' + liveConnections + ')#' + connectionId + ' s end');
+			});
+			c.on('end', function endConnection() {
+				log.trace('(' + liveConnections + ')#' + connectionId + ' c end');
+			});
+			c.pipe(s);
+			s.pipe(c);
+
+			function makeError(msg) {
+				return function error(err) {
+					log.warn('(' + liveConnections + ')#' + connectionId, msg, err);
+					--liveConnections;
+					c.destroy();
+					s.destroy();
+					//c.end();
+					//s.end();
+				};
+			}
 
 		});
 
-		c.on('error', makeError('c err:'));
-		s.on('error', makeError('s err:'));
-		s.on('end', function endConnection() { --liveConnections; });
-		c.pipe(s);
-		s.pipe(c);
+		// server 'error'
+		server.on('error', function errorServer(err) {
+			log.warn('server err:', err);
+		});
 
-		function makeError(msg) {
-			return function error(err) {
-				console.error(msg, err);
-				c.destroy();
-				s.destroy();
-			};
-		}
+		// server listen
+		server.listen(servicePort, function listeningServer() {
+			log.info('service port: %s listening...', servicePort);
+		});
 
-	});
-
-	// server 'error'
-	server.on('error', function errorServer(err) {
-		console.error('server err:', err);
-	});
-
-	// server listen
-	server.listen(servicePort, function listeningServer() {
-		console.info('service port: %s listening...', servicePort);
-	});
+	}); // services.forEach
 
 }();
