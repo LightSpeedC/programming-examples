@@ -4,6 +4,8 @@ void function () {
 	'use strict';
 
 	var net = require('net');
+	var os = require('os');
+	var netIfs = os.networkInterfaces();
 
 	var log = require('log-manager').setWriter(new require('log-writer')('proxy-%s.log')).getLogger();
 
@@ -28,6 +30,9 @@ void function () {
 
 		if (!servicePort || !serviceHost || !forwardPort || !forwardHost)
 			throw new Error('no config {servicePort, serviceHost, forwardPort, forwardHost}!');
+
+		var checked = false;
+		Object.keys(netIfs).map(i => netIfs[i]);
 
 		var liveConnections = 0;
 		var connectionId = config.connectionId || 10000;
