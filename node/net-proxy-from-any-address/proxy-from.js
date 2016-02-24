@@ -35,7 +35,8 @@ void function () {
 		Object.keys(netIfs).map(i => netIfs[i]);
 
 		var liveConnections = 0;
-		var connectionId = config.connectionId || 10000;
+		if (!config.connectionId) config.connectionId = 10000;
+		var connectionId = config.connectionId;
 
 		// server 'connection'
 		var server = net.createServer(
@@ -44,6 +45,7 @@ void function () {
 
 			++liveConnections;
 			++connectionId;
+			if (connectionId > config.connectionId + 9999) connectionId = config.connectionId;
 			log.trace('(' + liveConnections + ')#' + connectionId + ' s connected');
 
 			var c = net.createConnection(
