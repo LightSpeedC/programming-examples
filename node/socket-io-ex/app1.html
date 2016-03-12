@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+</head>
+
+<body>
+日本語
+<script src="console-to-window.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+void function () {
+	'use strict';
+
+	// time 時刻
+	var tm = function () { return new Date().toLocaleTimeString(); };
+	var time = 500;
+
+	console.log(tm(), 'location.origin:', location.origin);
+	var socket = io(location.origin);
+
+	socket.on('news', function (msg) {
+		console.log(tm(), 'news:', msg);
+		msg = {my:'other data', tm:tm()};
+		console.log(tm(), 'other:', msg);
+		socket.emit('my other event', msg);
+	});
+	socket.on('connect', function () {
+		time = 500;
+		console.log(tm(), 'connect');
+	});
+	socket.on('disconnect', function () {
+		console.log(tm(), 'disconnect');
+	});
+
+	setTimeout(function timer() {
+		time *= 2;
+		if (time >= 60000) time = 60000;
+		setTimeout(timer, time);
+
+		var msg = {my:'timer data', tm:tm()};
+		console.log(tm(), 'timer:', msg);
+		socket.emit('my timer event', msg);
+		//socket.emit('my timer event', new Buffer('abc'));
+	}, time);
+}();
+</script>
+
+</body>
+</html>

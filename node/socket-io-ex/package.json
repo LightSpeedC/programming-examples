@@ -1,0 +1,26 @@
+{
+  "name": "socket-io-ex",
+  "version": "0.0.0",
+  "description": "socket.io example",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "date-time-string": "0.0.9",
+    "log-manager": "0.0.10",
+    "log-writer": "0.0.9",
+    "socket.io": "^1.4.5",
+    "socket.io-client": "^1.4.5"
+  },
+  "keywords": [
+    "socket.io"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
