@@ -54,7 +54,7 @@
 
 	function addItem(item) {
 		itemList.push(item);
-		if (itemList.length > 5) itemList.shift();
+		if (itemList.length > 20) itemList.shift();
 		itemList.save();
 	}
 
