@@ -2,9 +2,9 @@ void function () {
 	'use strict';
 
 	var fs = require('fs');
+	var aa = require('aa');
 	var fetch = require('./fetch');
 
-	var aa = require('aa');
 	var writeFileA = aa.thunkify(fs, fs.writeFile);
 
 	aa(function *() {
@@ -13,8 +13,7 @@ void function () {
 				'https://nodejs.org/dist/'),
 			fetch({writeFile:'npm-versions.log'},
 				'https://nodejs.org/dist/npm-versions.txt'),
-			fetch({},
-				'https://nodejs.org/dist/'),
+			fetch('https://nodejs.org/dist/'),
 		];
 		console.log('fetch results[]:', a);
 		yield writeFileA('b.log', a[2].data);

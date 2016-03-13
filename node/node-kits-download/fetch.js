@@ -14,7 +14,13 @@ void function () {
 	//   [data]: String | Buffer | Object(JSON)
 	//   [cb]: Function
 	function fetch(opts, uri, data) {
-		//if (opts && typeof opts !== 
+		if (typeof opts !== 'object' || !opts)
+			data = uri, uri = opts, opts = {};
+		if (typeof uri !== 'string')
+			throw new TypeError('uri must be string');
+		if (typeof data === 'function')
+			data = undefined;
+
 		var cb = arguments[arguments.length -1];
 
 		if (typeof cb === 'function')
