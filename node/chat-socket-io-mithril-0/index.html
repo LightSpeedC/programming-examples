@@ -1,0 +1,61 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>chat</title>
+<script src="/socket.io/socket.io.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.2.0/mithril.min.js"></script>
+<!--[if IE]><script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/4.1.11/es5-shim.min.js"></script><![endif]-->
+<body>
+<div id="$appElement"></div>
+</body>
+<script>
+
+(function () {
+	'use strict';
+
+	var socket = io();
+
+	// msgs: リスト
+	var msgs = [];
+
+	function addMsg(msg) {
+		msgs.push(msg);
+		if (msgs.length > 20) msgs.shift();
+		m.redraw(true);
+		return msg;
+	}
+
+	socket.on('msg', addMsg);
+	socket.on('all', function (data) {
+		msgs = data;
+		m.redraw(true);
+	});
+
+	// text: メッセージ
+	var text = m.prop('');
+	function sendMessage() {
+		socket.emit('msg', text() ||
+			document.getElementById('$text').value); // ie8
+		text('');
+		return false;
+	}
+
+	m.mount($appElement, {view: function () {
+		return [
+			m('form', {onsubmit: sendMessage},
+				m('input', m_on('change', 'value', text, {id: '$text'}))),
+			m('div', msgs.map(function (msg) {
+				return m('div', {key: msg.key}, msg.text); }))
+		];
+	}});
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+})();
+
+</script>
