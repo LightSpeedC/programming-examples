@@ -33,7 +33,7 @@
 
 	function addMsg(msg) {
 		msgs.push(msg);
-		if (msgs.length > 10) msgs.shift();
+		if (msgs.length > 20) msgs.shift();
 		saveMsgs();
 		return msg;
 	}

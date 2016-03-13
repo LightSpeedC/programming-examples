@@ -23,7 +23,7 @@
 
 	function addMsg(msg) {
 		msgs.push(msg);
-		if (msgs.length > 15) msgs.shift();
+		if (msgs.length > 20) msgs.shift();
 		m.redraw(true);
 		return msg;
 	}
