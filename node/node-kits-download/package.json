@@ -1,0 +1,24 @@
+{
+  "name": "node-kit-download",
+  "version": "0.0.0",
+  "description": "node kit download",
+  "main": "down.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "node",
+    "kit",
+    "download"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "aa": "^0.1.34",
+    "promise-thunk": "^0.1.13"
+  }
+}
