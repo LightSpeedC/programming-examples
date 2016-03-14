@@ -8,14 +8,16 @@ void function () {
 	var writeFileA = aa.thunkify(fs, fs.writeFile);
 
 	aa(function *() {
-		var a = yield [
-			fetch({writeFile:'a.log'},
+		var res = yield {
+			a:fetch({writeFile:'a.log'},
 				'https://nodejs.org/dist/'),
-			fetch({writeFile:'npm-versions.log'},
+			n:fetch({writeFile:'npm-versions.log'},
 				'https://nodejs.org/dist/npm-versions.txt'),
-			fetch('https://nodejs.org/dist/'),
-		];
-		console.log('fetch results[]:', a);
-		yield writeFileA('b.log', a[2].data);
+			i:fetch({writeFile:'index.log'},
+				'https://nodejs.org/dist/index.json'),
+			b:fetch('https://nodejs.org/dist/'),
+		};
+		console.log('fetch results[]:', res);
+		yield writeFileA('b.log', res.b.data);
 	});
 }();
