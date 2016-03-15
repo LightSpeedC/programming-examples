@@ -1,1 +1,1 @@
-  require('./fwd').fwd(require('./config').config);
+	require('./fwd').fwd(require('./config').config);
