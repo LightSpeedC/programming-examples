@@ -1,0 +1,120 @@
+<html>
+<body>
+<canvas id="recta_anime" width="600" height="400"></canvas>
+
+<script>
+'use strict'
+const canvas = document.getElementById('recta_anime');
+
+//アニメーション対象
+const rect   = {
+  x: 0,
+  y: 0,
+  maxx: canvas.width,
+  maxy: canvas.height,
+  width: 100,
+  height: 100,
+  vx: 10,
+  vy: 10,
+  ctx: canvas.getContext('2d'),
+  frame: 50,
+  syncTime: 200,
+
+  // 再描画
+  redraw: () => {
+    // 図形削除
+    rect.ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+
+    //図形描画
+    rect.ctx.beginPath();
+    rect.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+  },
+
+  // 加速( カーソルキーを使う )
+  accel: e => {
+    switch (e.keyCode) {
+      case 37:
+        rect.vx = rect.vx - 1;
+        break;
+      case 39:
+        rect.vx = rect.vx + 1;
+        break;
+      case 38:
+        rect.vy = rect.vy - 1;
+        break;
+      case 40:
+        rect.vy = rect.vy + 1;
+    }
+  },
+
+  // 速度から、位置を更新する
+  update: () => {
+    let base = rect.frame / 1000.0;
+    rect.x = rect.x + rect.vx * base;
+    rect.y = rect.y + rect.vy * base;
+
+    if (rect.x > rect.maxx - rect.width) {
+      rect.x = rect.maxx - rect.width;
+      rect.vx = -rect.vx;
+    }
+
+    if (rect.x < 0) {
+      rect.x = 0;
+      rect.vx = -rect.vx;
+    }
+
+    if (rect.y > rect.maxy - rect.height) {
+      rect.y = rect.maxy - rect.height;
+      rect.vy = -rect.vy;
+    }
+
+    if (rect.y < 0) {
+      rect.y = 0;
+      rect.vy = -rect.vy;
+    }
+
+    rect.redraw();
+  },
+
+  // 運動状態は位置と速度で規定する
+  packData: () => {
+    return JSON.stringify({
+      x: rect.x,
+      y: rect.y,
+      vx: rect.vx,
+      vy: rect.vy
+    });
+  }
+};
+
+// 規定のフレームで描画更新
+setInterval(rect.update, rect.frame);
+
+// カーソルキーを押して運動状態を変化
+document.addEventListener('keydown', rect.accel);
+
+// websocket による同期処理
+const ws = new WebSocket('ws://localhost:8888/');
+ws.onmessage = event => {
+  const str = event.data;
+
+  // 一番初めに接続した場合はmasterとなり、同期元となる
+  if (str === 'master') {
+    setInterval(() => {
+      ws.send(rect.packData());
+    }, rect.syncTime);
+    return true;
+  }
+
+  // masterでなければ、データを受け取って描画を更新する
+  const data = JSON.parse(str);
+  rect.x = data.x;
+  rect.y = data.y;
+  rect.vx = data.vx;
+  rect.vy = data.vy;
+  rect.update();
+}
+</script>
+</body>
+</html>
