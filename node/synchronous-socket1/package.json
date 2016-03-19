@@ -1,0 +1,18 @@
+{
+  "name": "synchronous",
+  "version": "1.0.0",
+  "description": "websocket movement synchronizing",
+  "main": "app.js",
+  "dependencies": {
+    "socket.io": "^1.4.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}

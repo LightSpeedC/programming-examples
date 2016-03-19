@@ -1,0 +1,136 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>chat</title>
+<script src="/socket.io/socket.io.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/mithril/0.2.3/mithril.min.js"></script>
+<!--[if IE]><script src="//cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script><![endif]-->
+<body>
+<table border="1" cellspacing="0">
+<tr><td>
+<div id="$appElement"></div>
+</td></tr>
+<tr><td>
+<canvas id="$canvas" width="500" height="200"></canvas>
+</td></tr>
+</table>
+</body>
+<script>
+void function () {
+	'use strict';
+	const canvas = $canvas;
+
+	//アニメーション対象
+	const rect = {
+		x: 0, y: 0,
+		vx: 10, vy: 10,
+		width: 50, height: 50,
+		maxx: canvas.width, maxy: canvas.height,
+		ctx: canvas.getContext('2d'),
+		frame: 1000/50,
+		syncTime: 1000,
+
+		// 再描画
+		redraw: function () {
+			// 図形削除
+			rect.ctx.clearRect(0, 0, rect.maxx, rect.maxy);
+
+			// 図形描画
+			rect.ctx.beginPath();
+			rect.ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+		},
+
+		// 加速 (カーソルキーを使う)
+		accel: function (e) {
+			switch (e.keyCode) {
+				case 37: rect.vx -= 1; break; // ←
+				case 39: rect.vx += 1; break; // →
+				case 38: rect.vy -= 1; break; // ↑
+				case 40: rect.vy += 1; break; // ↓
+			}
+		},
+
+		// 速度から、位置を更新する
+		update: function () {
+			let base = rect.frame / 100.0;
+			rect.x += rect.vx * base;
+			rect.y += rect.vy * base;
+
+			if (rect.x < 0) rect.vx = Math.abs(rect.vx);
+			if (rect.y < 0) rect.vy = Math.abs(rect.vy);
+			if (rect.x > rect.maxx - rect.width)
+				rect.vx = -Math.abs(rect.vx);
+			if (rect.y > rect.maxy - rect.height)
+				rect.vy = -Math.abs(rect.vy);
+
+			rect.redraw();
+		},
+
+		// 運動状態は位置と速度で規定する
+		packData: function () {
+			return {
+				x:  rect.x  | 0, y:  rect.y  | 0,
+				vx: rect.vx | 0, vy: rect.vy | 0
+			};
+		}
+	};
+
+	// 規定のフレームで描画更新
+	setInterval(rect.update, rect.frame);
+
+	// カーソルキーを押して運動状態を変化
+	document.addEventListener('keydown', rect.accel);
+
+	// socket.io による同期処理
+	var socket = io();
+	var isMaster = false;
+	var onlineCount = 0;
+
+	setInterval(function () {
+		isMaster && socket.emit('move', rect.packData());
+	}, rect.syncTime);
+	//setInterval(function () { console.log('rect:', isMaster, rect.packData()); }, 3000);
+
+	// 切断時には、masterじゃなくなる
+	socket.on('disconnect', function () { isMaster = false; onlineCount = 0; m.redraw(); });
+
+	// masterとなり、同期元となる
+	socket.on('master', function () {isMaster = true; m.redraw(); });
+	socket.on('up', function () { isMaster && socket.emit('move', rect.packData()); });
+
+	socket.on('move', function (data) {
+		if (onlineCount !== data.onlineCount) {
+			onlineCount = data.onlineCount;
+			m.redraw();
+		}
+
+		// masterは人のいう事を聞かない
+		if (isMaster) return;
+		// masterでなければ、データを受け取って描画を更新する
+		rect.x = data.x;   rect.y = data.y;
+		rect.vx = data.vx; rect.vy = data.vy;
+		rect.update();
+	});
+
+	m.mount($appElement, {view: function () {
+		return [
+			//m('form', {onsubmit: sendMessage},
+			//	m('input', m_on('change', 'value', text, {id: '$text'}))),
+			//m('div', msgs.map(function (msg) {
+			//	return m('div', {key: msg.key}, msg.text); }))
+			//m('checkbox', m_on('click', 'value')),
+			//m('input[type=checkbox]', m_on('click', 'checked', isMaster)),
+			m(isMaster ? 'b' : 'span', {}, 'online: ' + onlineCount),
+			m('span', {}, isMaster ? ' - MASTER' : '')
+		];
+	}});
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	function m_on(eventName, propName, propFunc, attrs) {
+		attrs = attrs || {};
+		attrs['on' + eventName] = m.withAttr(propName, propFunc);
+		attrs[propName] = propFunc();
+		return attrs;
+	}
+
+}();
+</script>
