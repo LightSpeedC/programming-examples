@@ -5,39 +5,58 @@ void function () {
 
 	var fs = require('fs');
 	var http = require('http');
-	var app = http.createServer(function(req, res) {
-		res.writeHead(200, {'Content-Type': 'text/html'});
-		fs.createReadStream('index.html').pipe(res)
-	});
+	var path = require('path');
+	var util = require('util');
 
+	var app = http.createServer(httpRequestHandler);
 	var io = require('socket.io')(app);
 	app.listen(port);
 
-	var master = null;
+	var mimes = {'.ico': 'image/x-icon', '.js':'text/javascript'};
+
+	function httpRequestHandler(req, res) {
+		console.log(req.method, req.url);
+		var file = path.resolve(__dirname, '.' +
+			(req.url === '/' ? '/index.html' : req.url));
+		res.statusCode = 200;
+		res.setHeader('content-type',
+			mimes[path.extname(file)] || 'text/html');
+		var reader = fs.createReadStream(file);
+		reader.pipe(res)
+		reader.on('error', function (err) {
+			console.log(err);
+			res.statusCode = 404;
+			res.setHeader('content-type', 'text/plain');
+			res.end(util.inspect(err).replace(/\\\\/g, '\\')
+				.replace(__dirname, '*').replace(__dirname, '*'));
+		});
+	}
+
+	var master;
 	var conns = [];
 
 	io.on('connection', socket => {
 		conns.push(socket);
-		console.log('connection', master != null);
+		console.log('connection', !!master);
 
 		// masterが存在しなければ、コネクション成立したものをmasterにする
 		if (!master) {
 			master = socket;
-			socket.emit('master');
+			socket.emit('sync-canvas-you-are-master');
 		}
-		// master以外の接続の場合masterに位置情報を送信を依頼
+		// master以外の接続の場合masterに位置情報を送信を依頼(新規ユーザーのため)
 		else if (master !== socket)
-			master.emit('up');
+			master.emit('sync-canvas-send-update');
 
 		// masterからの位置情報が来れば全員に知らせる
-		socket.on('move', data => {
-			//console.log('move', data);
+		socket.on('sync-canvas-broadcast', data => {
+			console.log('move', data);
 
 			data.onlineCount = conns.length;
 
 			//運動状態を送信
 			if (master === socket)
-				io.emit('move', data);
+				io.emit('sync-canvas-move', data);
 		});
 
 		// 切断時
@@ -47,6 +66,7 @@ void function () {
 			// masterが死んだら誰かを新しくmasterに昇格させる
 			if (socket === master)
 				(master = conns[0]) && master.emit('master');
+			console.log('typeof master:', typeof master);
 		});
 	});
 }();
