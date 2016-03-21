@@ -1,0 +1,24 @@
+<body></body>
+<script src="virtual.js"></script>
+<script>
+var yourName = 'virtual JS';
+var $text = vv.text(yourName);
+
+var $app = {
+	view: function () {
+		return vv('div', [
+			'Hello, what is your name?',
+			vv('hr'),
+			vv('input', {value: yourName,
+				onkeyup:   function (e) { $text.nodeValue = this.value; },
+				onkeydown: function (e) { $text.nodeValue = this.value; }
+			}),
+			vv('hr'),
+			vv('p', ['Hello ', $text, '!']),
+			vv('hr')
+		]);
+	}
+};
+
+vv.mount($app, document.body)
+</script>

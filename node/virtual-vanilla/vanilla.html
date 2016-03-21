@@ -1,0 +1,24 @@
+<body><div id="$view"></div></body>
+<script src="vanilla.js"></script>
+<script>
+void function () {
+	var x = vv;
+	var yourName = 'Vanilla JS';
+	var $text = x.text(yourName);
+
+	var view = x.div([
+		x.text('Hello, what is your name?'),
+		x.hr(),
+		x.input({value: yourName,
+			onkeyup: function (e) { $text.nodeValue = this.value; }
+		}),
+		x.hr(),
+		x.a({href: location.href}, 'link'),
+		x.hr(),
+		x.p(['Hello, ', $text, '!']),
+		x.hr()
+	]);
+
+	x.mount(view, $view);
+}();
+</script>
