@@ -20,15 +20,16 @@ void function () {
 	'use strict';
 	var canvas = $canvas;
 	var ctx = canvas.getContext('2d');
+	var fps = 50;
+	var frameInterval = 1000 / fps;
+	var maxx = canvas.width, maxy = canvas.height;
+	var syncInterval = 1000;
 
 	//アニメーション対象
 	var rect = {
 		x: 0, y: 0,
-		vx: 10, vy: 10,
+		vx: 1, vy: 1,
 		width: 50, height: 50,
-		maxx: canvas.width, maxy: canvas.height,
-		frame: 1000/50,
-		syncTime: 1000
 	};
 
 	// 加速 (カーソルキーを使う)
@@ -45,7 +46,7 @@ void function () {
 	// 再描画
 	function redrawCanvas() {
 		// 図形削除
-		ctx.clearRect(0, 0, rect.maxx, rect.maxy);
+		ctx.clearRect(0, 0, maxx, maxy);
 
 		// 図形描画
 		ctx.beginPath();
@@ -53,23 +54,23 @@ void function () {
 		ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
 	}
 
-	var startTime = new Date() - 0;
+	var lastTime = new Date() - 0;
 
 	// 速度から、位置を更新する
 	function updateCanvas() {
-		var deltaTime = new Date() - startTime;
+		var nextTime = new Date() - 0, deltaTime = nextTime - lastTime;
 		//console.log(deltaTime);
-		startTime = new Date() - 0;
+		lastTime = nextTime;
 
-		let base = rect.frame / 100.0;
+		let base = frameInterval / 20.0;
 		rect.x += rect.vx * base;
 		rect.y += rect.vy * base;
 
 		if (rect.x < 0) rect.vx = Math.abs(rect.vx);
 		if (rect.y < 0) rect.vy = Math.abs(rect.vy);
-		if (rect.x > rect.maxx - rect.width)
+		if (rect.x > maxx - rect.width)
 			rect.vx = -Math.abs(rect.vx);
-		if (rect.y > rect.maxy - rect.height)
+		if (rect.y > maxy - rect.height)
 			rect.vy = -Math.abs(rect.vy);
 
 		redrawCanvas();
@@ -84,17 +85,17 @@ void function () {
 	}
 
 	// 規定のフレームで描画更新
-	setInterval(updateCanvas, rect.frame);
+	setInterval(updateCanvas, frameInterval);
 
-	var isFocus = false;
+	var isFocus = true;
 
 	// カーソルキーを押して運動状態を変化
 	document.addEventListener('keydown', keydownHandler);
-	window.onblur = function () {
+	onblur = function () {
 		isFocus = false;
 		m.redraw();
 	};
-	window.onfocus = function () {
+	onfocus = function () {
 		isFocus = true;
 		m.redraw();
 	};
@@ -119,15 +120,17 @@ void function () {
 		m.redraw();
 	});
 
+	// 最新状態の更新情報を送る
 	socket.on('sync-canvas-send-update', function () {
 		if (isMaster)
 			socket.emit('sync-canvas-broadcast', getWorld());
 	});
 
+	// 最新状態を定期的に送る
 	setInterval(function () {
 		if (isMaster)
 			socket.emit('sync-canvas-broadcast', getWorld());
-	}, rect.syncTime);
+	}, syncInterval);
 	//setInterval(function () {
 	//	console.log('rect:', isMaster, getWorld());
 	//}, 3000);
@@ -141,7 +144,7 @@ void function () {
 		// masterは人のいう事を聞かない
 		if (isMaster) return;
 		// masterでなければ、データを受け取って描画を更新する
-		rect.x = data.x;   rect.y = data.y;
+		rect.x  = data.x;  rect.y  = data.y;
 		rect.vx = data.vx; rect.vy = data.vy;
 		updateCanvas();
 	});
