@@ -21,8 +21,8 @@ void function () {
 	var canvas = $canvas;
 	var ctx = canvas.getContext('2d');
 	var fps = 50;
-	var frameInterval = 1000 / fps;
 	var maxx = canvas.width, maxy = canvas.height;
+	var frameInterval = 1000 / fps;
 	var syncInterval = 1000;
 
 	//アニメーション対象
@@ -55,25 +55,35 @@ void function () {
 	}
 
 	var lastTime = new Date() - 0;
+	var syncDelta = 0;
 
 	// 速度から、位置を更新する
 	function updateCanvas() {
-		var nextTime = new Date() - 0, deltaTime = nextTime - lastTime;
-		//console.log(deltaTime);
+		var nextTime = new Date() - 0;
+		var deltaTime = nextTime - lastTime;
 		lastTime = nextTime;
 
-		let base = frameInterval / 20.0;
-		rect.x += rect.vx * base;
-		rect.y += rect.vy * base;
+		for (var i = 0, n = deltaTime / 10; i < n; ++i) {
+			rect.x += rect.vx;
+			rect.y += rect.vy;
 
-		if (rect.x < 0) rect.vx = Math.abs(rect.vx);
-		if (rect.y < 0) rect.vy = Math.abs(rect.vy);
-		if (rect.x > maxx - rect.width)
-			rect.vx = -Math.abs(rect.vx);
-		if (rect.y > maxy - rect.height)
-			rect.vy = -Math.abs(rect.vy);
+			if (rect.x < 0) rect.vx = Math.abs(rect.vx);
+			if (rect.y < 0) rect.vy = Math.abs(rect.vy);
+			if (rect.x > maxx - rect.width)
+				rect.vx = -Math.abs(rect.vx);
+			if (rect.y > maxy - rect.height)
+				rect.vy = -Math.abs(rect.vy);
+		}
 
 		redrawCanvas();
+
+		// 最新状態を定期的に送る
+		syncDelta += deltaTime;
+		if (syncDelta > syncInterval) {
+			syncDelta -= syncInterval;
+			if (isMaster)
+				socket.emit('sync-canvas-broadcast', getWorld());
+		}
 	}
 
 	// 運動状態は位置と速度で規定する
@@ -125,15 +135,6 @@ void function () {
 		if (isMaster)
 			socket.emit('sync-canvas-broadcast', getWorld());
 	});
-
-	// 最新状態を定期的に送る
-	setInterval(function () {
-		if (isMaster)
-			socket.emit('sync-canvas-broadcast', getWorld());
-	}, syncInterval);
-	//setInterval(function () {
-	//	console.log('rect:', isMaster, getWorld());
-	//}, 3000);
 
 	socket.on('sync-canvas-move', function (data) {
 		if (onlineCount !== data.onlineCount) {
