@@ -65,7 +65,7 @@ void function () {
 			conns = conns.filter(s => s !== socket);
 			// masterが死んだら誰かを新しくmasterに昇格させる
 			if (socket === master)
-				(master = conns[0]) && master.emit('master');
+				(master = conns[0]) && master.emit('sync-canvas-you-are-master');
 			console.log('typeof master:', typeof master);
 		});
 	});
