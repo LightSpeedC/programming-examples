@@ -55,8 +55,8 @@
 					res = res.map(unescape);
 					if (res[0].indexOf('use "') === -1) {
 						if (res[0].replace(/\r\n/g, '\n').match(RegExp(
-							"On branch [-a-zA-Z0-9]+\n" +
-							"Your branch is up-to-date with 'origin/[-a-zA-Z0-9]+'\\.\n\n" +
+							"On branch [-a-zA-Z0-9/]+\n" +
+							"Your branch is up-to-date with '[-a-zA-Z0-9/]+'\\.\n\n" +
 							"nothing to commit, working directory clean\n" +
 							"Already up-to-date\\.\n")))
 							log('*** ' + dir + ' ===> ' + COLOR_OK + 'OK' + COLOR_NORMAL);
