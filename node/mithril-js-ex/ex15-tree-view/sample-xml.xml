@@ -1,0 +1,21 @@
+<doc>
+  <title id="doc-title">テストXML文書</title>
+  <chapter class="chapter first-chapter" id="chapter-1">
+    <paragraph class="paragraph first-paragraph last-paragraph">
+    </paragraph>
+  </chapter>
+  <chapter class="chapter" id="chapter-2">
+    <paragraph class="paragraph first-paragraph">
+    </paragraph>
+    <paragraph class="paragraph">
+    </paragraph>
+    <paragraph class="paragraph last-paragraph">
+    </paragraph>
+  </chapter>
+  <chapter class="chapter last-chapter" id="chapter-3">
+    <paragraph class="paragraph first-paragraph">
+    </paragraph>
+    <paragraph class="paragraph last-paragraph">
+    </paragraph>
+  </chapter>
+</doc>

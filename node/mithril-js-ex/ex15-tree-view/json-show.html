@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="UTF-8">
+<meta http-equiv="Content-Language" content="ja">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge, Chrome=1">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache">
+<meta http-equiv="Expires" content="Thu, 01 Dec 1994 16:00:00 GMT">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON show - Mithril.js</title>
+
+<script src="mithril.min.js"></script>
+<!--[if IE]><script src="mithril.ie.polyfill.min.js"></script><![endif]-->
+
+<body>
+<div id="$consoleElement"></div>
+
+↓項目△等をクリックしてみてください。
+
+<div id="$jsonShowElement"></div>
+</body>
+
+<script src="console-component.js"></script>
+<script>
+m.mount($consoleElement, m.component(consoleComponent, {limit: 10}));
+</script>
+
+<script src="json-show.js"></script>
+<script>
+m.mount($jsonShowElement, {
+	controller: function () {
+		this.comps = [
+			m.component(jsonShowComponent, {title:'何かのデータ', url:'data-json.json'})
+		];
+		this.ctrls = this.comps.map(function (comp) { return new comp.controller(); });
+		this.views = this.comps.map(function (comp) { return comp.view; });
+	},
+	view: function (ctrl) {
+		return ctrl.views.map(function (view, i) { return view(ctrl.ctrls[i]); });
+	}
+});
+</script>
