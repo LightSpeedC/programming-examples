@@ -6,23 +6,30 @@
 
 var fs = require('fs');
 
-thread(function *(){
+co4(function *() {
 	console.log(yield read('README.md'));
 	yield wait(1000);
 	console.log(yield read('package.json'));
 });
 
-function thread(fn) {
-	var gen = fn();
-	next();
-	function next(val) {
-		var ret = gen.next(val);
-		if (ret.done) return;
-		ret.value.then(next, error);
-	}
-	function error(err) {
-		gen.throw(err);
-	}
+function co4(fn) {
+	return new Promise((resolve, reject) => {
+		try {
+			var gen = fn();
+			next();
+		} catch (err) { reject(err); }
+		function next(val) {
+			try {
+				var ret = gen.next(val);
+				if (ret.done) return resolve(ret.value);
+				ret.value.then(next, error);
+			} catch (err) { reject(err); }
+		}
+		function error(err) {
+			try { gen.throw(err); }
+			catch (err) { reject(err); }
+		}
+	});
 }
 
 function read(path) {
