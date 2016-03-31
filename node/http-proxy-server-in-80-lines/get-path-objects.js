@@ -9,7 +9,7 @@ void function () {
 		var x = url.parse(uri.includes('//') ? uri : uri = 'http://' + uri);
 		return [x.protocol.split(':')[0]]
 			.concat(x.hostname.split('.').reverse())
-			.concat('port' + (x.port || ports[x.protocol]))
+			.concat(x.port || ports[x.protocol])
 			.concat(x.path.split('/').filter(elem => elem));
 	}
 
@@ -21,12 +21,12 @@ void function () {
 				obj[elem] = {};
 
 			obj = obj[elem];
-			if (!obj[_stat])
-				obj[_stat] = {count:0, time:Date.now(), size:0};
+//			if (!obj[_stat])
+//				obj[_stat] = {count:0, time:Date.now(), size:0};
 
-			obj[_stat].count++;
-			obj[_stat].time = Date.now();
-			obj[_stat].size += 100;
+//			obj[_stat].count++;
+//			obj[_stat].time = Date.now();
+//			obj[_stat].size += 100;
 			arr.push(obj);
 		});
 		return arr;
