@@ -6,7 +6,8 @@ void function () {
   var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
   var PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
 
-  function printError(err, msg, url) {
+  function printError(err, msg, url, soc) {
+    if (soc) soc.end();
     console.log('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
   }
 
@@ -29,10 +30,8 @@ void function () {
     });
   }).listen(HTTP_PORT);
 
-  server.on('clientError', function onCliErr(err, cliSoc) {
-    cliSoc.end();
-    printError(err, 'cliErr', '');
-  });
+  server.on('clientError', (err, cliSoc) =>
+    printError(err, 'cliErr', '', cliSoc));
 
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
     var svrSoc, x = url.parse('https://' + cliReq.url);
@@ -61,12 +60,9 @@ void function () {
       svrSoc.pipe(cliSoc);
       svrSoc.on('error', funcOnSocErr(cliSoc, 'svrSoc', cliReq.url));
     }
-    cliSoc.on('error', function onCliSocErr(err) {
-      if (svrSoc) svrSoc.end();
-      printError(err, 'cliSoc', cliReq.url);
-    });
+    cliSoc.on('error', err => printError(err, 'cliSoc', cliReq.url, svrSoc));
     function funcOnSocErr(soc, msg, url) {
-      return err => (soc.end(), printError(err, msg, url));
+      return err => printError(err, msg, url, soc);
     }
   });
 
