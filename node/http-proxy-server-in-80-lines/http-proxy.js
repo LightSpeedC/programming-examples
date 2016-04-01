@@ -1,24 +1,52 @@
 void function () {
   'use strict';
-  var http = require('http'), url = require('url'), net  = require('net');
-  var HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
-  var PROXY_URL = process.argv[3] || null;  // external proxy server URL
-  var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
-  var PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
+  const LogManager = require('log-manager'), LogWriter = require('log-writer');
+  const log = new LogManager().setWriter(new LogWriter('proxy-%s.log')).getLogger();
+  const http = require('http'), url = require('url'), net  = require('net');
+  const fs = require('fs'), util = require('util');
+  const HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
+  const PROXY_URL = process.argv[3] || null;  // external proxy server URL
+  const PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
+  const PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
+  const getPathObjects = require('./get-path-objects');
+  try { var root1 = require('./root1'); } catch (err) { root1 = {}; }
+  try { var root2 = require('./root2'); } catch (err) { root2 = {}; }
+  console.log(root1, root2);
+  var count1 = 0, count2 = 0;
+  setInterval(function () {
+    if (count1 > 0) {
+      --count1;
+      if (count1 === 0) fs.writeFile('./root1.js',
+        'module.exports =\n' + util.inspect(root1, {depth:null}) + '\n');
+    }
+    if (count2 > 0) {
+      --count2;
+      if (count2 === 0) fs.writeFile('./root2.js',
+        'module.exports =\n' + util.inspect(root2, {depth:null}) + '\n');
+    }
+  }, 1000);
 
   function printError(err, msg, url, soc) {
     if (soc) soc.end();
-    console.log('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
+    if (soc && soc.$startTime) log.warn((Date.now() - soc.$startTime) / 1000,
+        'sec from', soc.$startTime);
+    log.warn('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
   }
 
-  var server = http.createServer(function onCliReq(cliReq, cliRes) {
-    var cliSoc = cliReq.socket || cliReq.connection;
-    var x = url.parse(cliReq.url);
-    var svrReq = http.request({host: PROXY_HOST || x.hostname,
+  const server = http.createServer(function onCliReq(cliReq, cliRes) {
+    var svrSoc;
+    const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
+    getPathObjects(root1, x.href);
+    //console.log(root1);
+    count1 = 3;
+    const svrReq = http.request({host: PROXY_HOST || x.hostname,
         port: PROXY_PORT || x.port || 80,
         path: PROXY_URL ? cliReq.url : x.path,
         method: cliReq.method, headers: cliReq.headers,
         agent: cliSoc.$agent}, function onSvrRes(svrRes) {
+      svrSoc = svrRes.socket;
+      //log.info(svrSoc);
+      if (svrSoc && !svrSoc.$startTime) svrSoc.$startTime = new Date();
       cliRes.writeHead(svrRes.statusCode, svrRes.headers);
       svrRes.pipe(cliRes);
     });
@@ -26,22 +54,26 @@ void function () {
     svrReq.on('error', function onSvrReqErr(err) {
       cliRes.writeHead(400, err.message, {'content-type': 'text/html'});
       cliRes.end('<h1>' + err.message + '<br/>' + cliReq.url + '</h1>');
-      printError(err, 'svrReq', x.hostname + ':' + (x.port || 80));
+      printError(err, 'svrReq', x.hostname + ':' + (x.port || 80), svrSoc);
     });
   }).listen(HTTP_PORT);
 
-  server.on('clientError', (err, cliSoc) =>
-    printError(err, 'cliErr', '', cliSoc));
+  server.on('clientError', (err, soc) => printError(err, 'cliErr', '', soc));
 
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
-    var svrSoc, x = url.parse('https://' + cliReq.url);
+    const x = url.parse('https://' + cliReq.url);
+    getPathObjects(root1, x.href);
+    //console.log(root1);
+    count1 = 3;
+    var svrSoc;
     if (PROXY_URL) {
-      var svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
+      const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
           path: cliReq.url, method: cliReq.method, headers: cliReq.headers,
           agent: cliSoc.$agent});
       svrReq.end();
       svrReq.on('connect', function onSvrConn(svrRes, svrSoc2, svrHead) {
         svrSoc = svrSoc2;
+        if (!svrSoc.$startTime) svrSoc.$startTime = new Date();
         cliSoc.write('HTTP/1.0 200 Connection established\r\n\r\n');
         if (cliHead && cliHead.length) svrSoc.write(cliHead);
         if (svrHead && svrHead.length) cliSoc.write(svrHead);
@@ -57,6 +89,7 @@ void function () {
         if (cliHead && cliHead.length) svrSoc.write(cliHead);
         cliSoc.pipe(svrSoc);
       });
+      if (!svrSoc.$startTime) svrSoc.$startTime = new Date();
       svrSoc.pipe(cliSoc);
       svrSoc.on('error', funcOnSocErr(cliSoc, 'svrSoc', cliReq.url));
     }
@@ -69,9 +102,10 @@ void function () {
   server.on('connection', function onConn(cliSoc) {
     cliSoc.$agent = new http.Agent({keepAlive: true});
     cliSoc.$agent.on('error', err => console.log('agent:', err));
-    cliSoc.$startTime = Date.now();
+    if (cliSoc.$startTime) log.warn('eh!? cliSoc reused!?'); //@@@@@@@@@@@
+    cliSoc.$startTime = new Date();
   });
 
-  console.log('http proxy server started on port ' + HTTP_PORT +
+  log.info('http proxy server started on port ' + HTTP_PORT +
       (PROXY_URL ? ' -> ' + PROXY_HOST + ':' + PROXY_PORT : ''));
 }();

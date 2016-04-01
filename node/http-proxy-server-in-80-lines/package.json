@@ -1,0 +1,28 @@
+{
+  "name": "http-proxy-server-in-80-lines",
+  "version": "0.0.0",
+  "description": "http proxy server in 80 lines",
+  "main": "index.js",
+  "dependencies": {
+    "date-time-string": "0.0.9",
+    "log-manager": "0.0.10",
+    "log-writer": "0.0.9"
+  },
+  "keywords": [
+    "http",
+    "proxy"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "bugs": {
+    "url": "https://github.com/LightSpeedC/programming-examples/issues"
+  },
+  "homepage": "https://github.com/LightSpeedC/programming-examples#readme",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}

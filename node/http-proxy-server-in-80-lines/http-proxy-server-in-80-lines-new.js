@@ -1,24 +1,25 @@
 void function () {
   'use strict';
-  var http = require('http'), url = require('url'), net  = require('net');
-  var HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
-  var PROXY_URL = process.argv[3] || null;  // external proxy server URL
-  var PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
-  var PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
+  const http = require('http'), url = require('url'), net  = require('net');
+  const HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
+  const PROXY_URL = process.argv[3] || null;  // external proxy server URL
+  const PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
+  const PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
 
   function printError(err, msg, url, soc) {
     if (soc) soc.end();
     console.log('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
   }
 
-  var server = http.createServer(function onCliReq(cliReq, cliRes) {
-    var cliSoc = cliReq.socket || cliReq.connection;
-    var x = url.parse(cliReq.url);
-    var svrReq = http.request({host: PROXY_HOST || x.hostname,
+  const server = http.createServer(function onCliReq(cliReq, cliRes) {
+    var svrSoc;
+    const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
+    const svrReq = http.request({host: PROXY_HOST || x.hostname,
         port: PROXY_PORT || x.port || 80,
         path: PROXY_URL ? cliReq.url : x.path,
         method: cliReq.method, headers: cliReq.headers,
         agent: cliSoc.$agent}, function onSvrRes(svrRes) {
+      svrSoc = svrRes.socket;
       cliRes.writeHead(svrRes.statusCode, svrRes.headers);
       svrRes.pipe(cliRes);
     });
@@ -26,17 +27,17 @@ void function () {
     svrReq.on('error', function onSvrReqErr(err) {
       cliRes.writeHead(400, err.message, {'content-type': 'text/html'});
       cliRes.end('<h1>' + err.message + '<br/>' + cliReq.url + '</h1>');
-      printError(err, 'svrReq', x.hostname + ':' + (x.port || 80));
+      printError(err, 'svrReq', x.hostname + ':' + (x.port || 80), svrSoc);
     });
   }).listen(HTTP_PORT);
 
-  server.on('clientError', (err, cliSoc) =>
-    printError(err, 'cliErr', '', cliSoc));
+  server.on('clientError', (err, soc) => printError(err, 'cliErr', '', soc));
 
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
-    var svrSoc, x = url.parse('https://' + cliReq.url);
+    const x = url.parse('https://' + cliReq.url);
+    var svrSoc;
     if (PROXY_URL) {
-      var svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
+      const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
           path: cliReq.url, method: cliReq.method, headers: cliReq.headers,
           agent: cliSoc.$agent});
       svrReq.end();
