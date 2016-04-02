@@ -11,21 +11,38 @@ void function () {
   const getPathObjects = require('./get-path-objects');
   try { var root1 = require('./root1'); } catch (err) { root1 = {}; }
   try { var root2 = require('./root2'); } catch (err) { root2 = {}; }
-  console.log(root1, root2);
+
   var count1 = 0, count2 = 0;
+
+  // interval
   setInterval(function () {
     if (count1 > 0) {
       --count1;
-      if (count1 === 0) fs.writeFile('./root1.js',
-        'module.exports =\n' + util.inspect(root1, {depth:null}) + '\n');
+      if (count1 === 0) saveObject('./root1.js', root1);
     }
     if (count2 > 0) {
       --count2;
-      if (count2 === 0) fs.writeFile('./root2.js',
-        'module.exports =\n' + util.inspect(root2, {depth:null}) + '\n');
+      if (count2 === 0) saveObject('./root2.js', root2);
     }
   }, 1000);
 
+  // sortObject
+  function sortObject(obj) {
+    if (typeof obj === 'object' && obj) {
+      return Object.keys(obj).sort().reduce((a, b) => {
+        a[b] = sortObject(obj[b]); return a;
+      }, {});
+    }
+    else return obj;
+  }
+
+  // saveObject
+  function saveObject(file, obj) {
+    fs.writeFile(file, 'module.exports =\n' +
+      util.inspect(sortObject(obj), {depth:null}) + '\n');
+  }
+
+  // printError
   function printError(err, msg, url, soc) {
     if (soc) soc.end();
     if (soc && soc.$startTime) log.warn((Date.now() - soc.$startTime) / 1000,
@@ -33,12 +50,28 @@ void function () {
     log.warn('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
   }
 
+  // accessCheck
+  function accessCheck(chk, o) {
+    return chk && !(o[' '] && o[' '].exclude);
+  }
+
+  // accessLog
+  function accessLog(o) {
+    var s = o[' '] = o[' '] || {count:0, firstTime:Date.now()};
+    s.count++;
+    s.lastTime = Date.now();
+  }
+
   const server = http.createServer(function onCliReq(cliReq, cliRes) {
     var svrSoc;
     const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
-    getPathObjects(root1, x.href);
-    //console.log(root1);
     count1 = 3;
+    if (!getPathObjects(root1, x.href).reduce(accessCheck, true)) {
+      cliRes.end('access denied');
+      return;
+    }
+    count2 = 3;
+    getPathObjects(root2, x.href).forEach(accessLog);
     const svrReq = http.request({host: PROXY_HOST || x.hostname,
         port: PROXY_PORT || x.port || 80,
         path: PROXY_URL ? cliReq.url : x.path,
@@ -62,9 +95,12 @@ void function () {
 
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
     const x = url.parse('https://' + cliReq.url);
-    getPathObjects(root1, x.href);
-    //console.log(root1);
     count1 = 3;
+    if (!getPathObjects(root1, x.href).reduce(accessCheck, true)) {
+      cliSoc.end();
+      return;
+    }
+    count2 = 3; getPathObjects(root2, x.href).forEach(accessLog);
     var svrSoc;
     if (PROXY_URL) {
       const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
