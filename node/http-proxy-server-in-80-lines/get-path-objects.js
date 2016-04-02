@@ -9,11 +9,12 @@ void function () {
 		var x = url.parse(uri.includes('//') ? uri : uri = 'http://' + uri);
 		return [x.protocol.split(':')[0]]
 			.concat(x.hostname.split('.').reverse())
-			.concat(x.port || ports[x.protocol])
-			.concat(x.path.split('/').filter(elem => elem));
+			.concat(':' + (x.port || ports[x.protocol]))
+			.concat(x.pathname.split('/').filter(elem => elem));
 	}
 
 	function getPathObjects(root, uri) {
+		//console.log(url.parse(uri));
 		var elems = uri2arr(uri);
 		var obj = root, arr = [obj];
 		elems.forEach(elem => {
