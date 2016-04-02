@@ -67,7 +67,7 @@ void function () {
     const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
     count1 = 3;
     if (!getPathObjects(root1, x.href).reduce(accessCheck, true)) {
-      cliRes.end('access denied');
+      cliRes.end('// access denied');
       return;
     }
     count2 = 3;
