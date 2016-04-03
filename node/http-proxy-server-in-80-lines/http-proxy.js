@@ -13,6 +13,7 @@ void function () {
   try { var root2 = require('./root2'); } catch (err) { root2 = {}; }
 
   var count1 = 0, count2 = 0;
+  var denyCount = 0, grantCount = 0;
 
   // interval
   setInterval(function () {
@@ -24,6 +25,9 @@ void function () {
       --count2;
       if (count2 === 0) saveObject('./root2.js', root2);
     }
+    if (denyCount || grantCount) log.info('grant', grantCount, 'deny', denyCount);
+    if (denyCount > 0) --denyCount;
+    if (grantCount > 0) --grantCount;
   }, 1000);
 
   // sortObject
@@ -65,13 +69,14 @@ void function () {
   const server = http.createServer(function onCliReq(cliReq, cliRes) {
     var svrSoc;
     const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
+    if (cliReq.url.indexOf('$grant-all$') > -1) grantCount = 10;
+    if (cliReq.url.indexOf('$deny-all$') > -1)  denyCount = 10;
     count1 = 3;
-    if (!getPathObjects(root1, x.href).reduce(accessCheck, true)) {
-      cliRes.end('// access denied');
-      return;
-    }
+    if (!grantCount && !getPathObjects(root1, x.href).reduce(accessCheck, true))
+      return cliRes.end('// access denied');
     count2 = 3;
     getPathObjects(root2, x.href).forEach(accessLog);
+    if (denyCount) return cliRes.end('// access denied');
     const svrReq = http.request({host: PROXY_HOST || x.hostname,
         port: PROXY_PORT || x.port || 80,
         path: PROXY_URL ? cliReq.url : x.path,
@@ -96,11 +101,10 @@ void function () {
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
     const x = url.parse('https://' + cliReq.url);
     count1 = 3;
-    if (!getPathObjects(root1, x.href).reduce(accessCheck, true)) {
-      cliSoc.end();
-      return;
-    }
+    if (!grantCount && !getPathObjects(root1, x.href).reduce(accessCheck, true))
+      return cliSoc.end();
     count2 = 3; getPathObjects(root2, x.href).forEach(accessLog);
+    if (denyCount) return cliSoc.end();
     var svrSoc;
     if (PROXY_URL) {
       const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
