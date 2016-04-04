@@ -1,12 +1,12 @@
-// port-client.js
+// port-server.js
 
 void function () {
-	const port = process.argv[2] || 9998;
+	const port = process.argv[2] || 8080;
 	const proxyHost = process.argv[3] || 'localhost';
-	const proxyPort = process.argv[4] || 9997;
+	const proxyPort = process.argv[4] || 80;
 	const net = require('net');
 	const TransformXor = require('./transform-xor');
-	var log = new (require('log-manager'))().setWriter(new require('log-writer')('port-client-%s.log')).getLogger();
+	var log = new (require('log-manager'))().setWriter(new require('log-writer')('port-server-%s.log')).getLogger();
 	const server = net.createServer(cliSoc => {
 		const x1 = new TransformXor(0xCD);
 		const x2 = new TransformXor(0xCD);
