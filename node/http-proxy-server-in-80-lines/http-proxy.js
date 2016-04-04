@@ -48,10 +48,10 @@ void function () {
 
   // printError
   function printError(err, msg, url, soc) {
-    if (soc) soc.end();
+    if (soc) soc.destroy();
     if (soc && soc.$startTime) log.warn((Date.now() - soc.$startTime) / 1000,
         'sec from', soc.$startTime);
-    log.warn('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
+    log.warn('%s: %s', msg, url, err);
   }
 
   // accessCheck
@@ -83,7 +83,6 @@ void function () {
         method: cliReq.method, headers: cliReq.headers,
         agent: cliSoc.$agent}, function onSvrRes(svrRes) {
       svrSoc = svrRes.socket;
-      //log.info(svrSoc);
       if (svrSoc && !svrSoc.$startTime) svrSoc.$startTime = new Date();
       cliRes.writeHead(svrRes.statusCode, svrRes.headers);
       svrRes.pipe(cliRes);
@@ -96,7 +95,7 @@ void function () {
     });
   }).listen(HTTP_PORT);
 
-  server.on('clientError', (err, soc) => printError(err, 'cliErr', '', soc));
+  //server.on('clientError', (err, soc) => printError(err, 'cliErr', '', soc));
 
   server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
     const x = url.parse('https://' + cliReq.url);
