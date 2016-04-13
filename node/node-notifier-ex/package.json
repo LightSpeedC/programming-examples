@@ -1,0 +1,22 @@
+{
+  "name": "node-notifier-ex",
+  "version": "0.0.0",
+  "description": "node notifier example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "node",
+    "notifier"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "node-notifier": "^4.5.0"
+  }
+}
