@@ -8,7 +8,7 @@ void function () {
     module.exports = ai;
 
     function ai(config) {
-        net.createServer(c => {
+        net.createServer(config.ai, c => {
             //
         });
     }
