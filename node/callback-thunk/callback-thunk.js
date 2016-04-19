@@ -2,23 +2,15 @@ void function () {
 	'use strict';
 
 	function Thunk(args) {
-		this.callbacks = [];
-	}
+		var callbacks = [], called, error, value;
 
-	function someProc(msec) {
-		//const thunk = new Thunk(arguments);
-		const callbacks = [];
-		var error, value, called;
-		if (typeof arguments[arguments.length - 1] === 'function')
-			callbacks.push(arguments[arguments.length - 1]);
+		if (typeof args[args.length - 1] === 'function')
+			callbacks.push(args[args.length - 1]);
 
-		setTimeout(function () { callback(); }, msec);
-
-		return function (cb) {
+		function thunk(cb) {
 			callbacks.push(cb);
-			if (error || value)
-				callback(error, value);
-		};
+			if (called) cb(error, value);
+		}
 
 		function callback(err, val) {
 			called = true;
@@ -26,6 +18,15 @@ void function () {
 			value = val;
 			callbacks.forEach(cb => cb(error, value));
 		}
+
+		thunk.callback = callback;
+		return thunk;
+	}
+
+	function someProc(msec) {
+		var thunk = new Thunk(arguments);
+		setTimeout(thunk.callback, msec);
+		return thunk;
 	}
 
 	someProc(100, function () { console.log('100'); });
