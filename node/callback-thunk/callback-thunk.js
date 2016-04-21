@@ -3,37 +3,33 @@ void function () {
 
 	const Thunk = require('./thunk');
 
-	function someProc(msec) {
+	function someProc(msec, val) {
 		var thunk = Thunk(this, arguments);
-		setTimeout(thunk.callback, msec);
+		setTimeout(thunk.callback, msec, null, val);
 		return thunk;
 	}
 
-	someProc(100, function () { console.log('100'); });
-	someProc(200)(function () { console.log('200'); });
+	someProc(1000, () => console.log('1000-1'));
+	someProc(2000)(() => console.log('2000-1'));
 
-	var exec = require('child_process').exec;
-	function exec2(cmd) {
-		var thunk = Thunk(this, arguments);
-		exec(cmd, thunk.callback);
-		return thunk;
-	}
+	someProc(3000, '3000-1')
+	((err, val) => err ? err : (console.log('3000-1', err, val), '3000-2'))
+	((err, val) => err ? err : (console.log('3000-2', err, val), '3000-3'))
+	((err, val) => { throw new Error('err in ' + val); })
+	((err, val) => (console.log('3000-4', err, val), '3000-5'))
+	((err, val) => (console.log('3000-5', err, val), someProc(1000, '3000-6')))
+	((err, val) => (console.log('3000-6', err, val), Promise.resolve('3000-7')))
+	((err, val) => (console.log('3000-7', err, val), '3000-8'))
+	;
 
-	exec2('cmd /c dir /b', exec2cb3);
-	exec2('cmd /c dir /b')(exec2cb3);
-	exec2('cmd /c dir /b', exec2cb2);
-	exec2('cmd /c dir /b')(exec2cb2);
-	exec2('cmd /c dir /b', exec2cb1);
-	exec2('cmd /c dir /b')(exec2cb1);
+	someProc(5000, '5000-0', function () { console.log('5000-0', arguments); });
+	someProc(5000, '5000-1', (result) => console.log('5000-1', result));
+	someProc(5000, '5000-2', (err, val) => console.log('5000-2', err, val));
+	someProc(5000, '5000-3', (err, val, val2) => console.log('5000-3', err, val, val2));
 
-	function exec2cb3(error, stdout, stderr) {
-		console.log({error: error, stdout: stdout, stderr: stderr});
-	}
-	function exec2cb2(error, result) {
-		console.log({error: error, result: result});
-	}
-	function exec2cb1(result) {
-		console.log({result: result});
-	}
+	someProc(6000, '6000-0', function () { console.log('6000-0', arguments); });
+	someProc(6000, '6000-1', (result) => console.log('6000-1', result));
+	someProc(6000, '6000-2', (err, val) => console.log('6000-2', err, val));
+	someProc(6000, '6000-3', (err, val, val2) => console.log('6000-3', err, val, val2));
 
 }();
