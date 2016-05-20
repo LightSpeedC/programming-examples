@@ -1,0 +1,22 @@
+{
+  "name": "async-iterator-ex",
+  "version": "0.0.0",
+  "description": "async iterator example",
+  "main": "async-iterator-ex.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "async",
+    "iterator"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "aa": "^0.1.34"
+  }
+}
