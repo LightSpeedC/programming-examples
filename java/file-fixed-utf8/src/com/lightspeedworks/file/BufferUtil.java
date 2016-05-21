@@ -104,7 +104,7 @@ public class BufferUtil {
 	 */
 	static byte[] padStart(byte[] str, int len, byte fill) {
 		if (str.length > len)
-			return subbyte(str, 0, len);
+			return subbyte(str, str.length - len, len);
 
 		byte[] buff = new byte[len];
 		int pos = fill(buff, 0, len, fill, len - str.length);
@@ -151,7 +151,7 @@ public class BufferUtil {
 	/**
 	 * BYTES_PER_LINE.
 	 */
-	static int BYTES_PER_LINE = 8;
+	static int BYTES_PER_LINE = 16;
 
 	/**
 	 * dump.
@@ -165,11 +165,23 @@ public class BufferUtil {
 
 		for (int j = 0; j < str.length; j += BYTES_PER_LINE) {
 			buff.append(padStart(Integer.toHexString(j), 4, '0'));
-			buff.append(": ");
+			buff.append(":");
+			StringBuilder buff1 = new StringBuilder();
+			StringBuilder buff2 = new StringBuilder();
 			for (int i = 0; i < BYTES_PER_LINE; ++i) {
-				buff.append(" ");
-				buff.append(padStart(Integer.toHexString(str[j + i]), 2, '0'));
+				if (j + i >= str.length)
+					break;
+				if (i % 8 == 0)
+					buff1.append(" ");
+				buff1.append(" ");
+				buff1.append(padStart(Integer.toHexString(str[j + i]), 2, '0'));
+				if (str[j + i] >= 0x20 && str[j + i] <= 0x7e)
+					buff2.append(new Character((char) str[j + i]));
+				else
+					buff2.append('*');
 			}
+			buff.append(padEnd(buff1.toString(), BYTES_PER_LINE * 3 + 5, ' '));
+			buff.append(buff2);
 			buff.append("\n");
 		}
 

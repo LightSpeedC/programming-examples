@@ -27,10 +27,10 @@ public class FileFixedUTF8 {
 					"fieldDefs引数の個数 " + fieldDefs.length + " はobjects引数の個数 " + objects.length + " の倍");
 
 		// buffのためのsizeを計算
-		int i = 0, size = 0;
-		for (Object obj : objects) {
-			int typ = fieldDefs[i++];
-			int len = fieldDefs[i++];
+		int size = 0;
+		for (int i = 0; i < fieldDefs.length; i += 2) {
+			int typ = fieldDefs[i];
+			int len = fieldDefs[i + 1];
 			size += len;
 			if (typ == BufferUtil.TYPEN)
 				size += len * 2;
@@ -41,9 +41,10 @@ public class FileFixedUTF8 {
 		int pos = 0;
 
 		// buffにセット
-		i = 0;
+		int i = 0;
 		for (Object obj : objects) {
-			System.out.println(obj);
+			// System.out.print(obj);
+			// System.out.print(", ");
 
 			int typ = fieldDefs[i++];
 			int len = fieldDefs[i++];
@@ -55,12 +56,16 @@ public class FileFixedUTF8 {
 				obj = "";
 
 			if (typ == BufferUtil.TYPE9) {
-				int val;
+				long val;
 				if (obj instanceof String)
 					val = Integer.valueOf((String) obj);
-				else
+				else if (obj instanceof Integer)
 					val = (int) obj;
-				// Interger, Long, or Exception
+				else if (obj instanceof Long)
+					val = (long) obj;
+				else
+					val = (long) obj;
+				// else: Interger, Long, or Exception
 
 				// マイナスの時は先頭に'-'を埋めて、残りをプラスとして処理
 				if (val < 0) {
@@ -86,6 +91,7 @@ public class FileFixedUTF8 {
 		}
 		if (pos != size)
 			throw new RuntimeException("pos " + pos + " != size " + size);
+		// System.out.println();
 		return buff;
 	}
 }
