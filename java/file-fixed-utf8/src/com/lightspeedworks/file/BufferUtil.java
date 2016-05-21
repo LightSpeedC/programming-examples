@@ -3,17 +3,17 @@ package com.lightspeedworks.file;
 public class BufferUtil {
 
 	/**
-	 * 9: 半角数字
+	 * TYPE9. 半角数字
 	 */
-	public static int TYPE9 = '9';
+	public static int TYPE9 = '9'; // 半角数字
 	/**
-	 * N: 日本語(全角;漢字)
+	 * TYPEX. 半角文字
 	 */
-	public static int TYPEN = 'N';
+	public static int TYPEX = 'X'; // 半角文字
 	/**
-	 * X: 半角文字
+	 * TYPEN. 日本語(全角;漢字)
 	 */
-	public static int TYPEX = 'X';
+	public static int TYPEN = 'N'; // 日本語(全角;漢字)
 
 	/**
 	 * copy.
@@ -59,7 +59,7 @@ public class BufferUtil {
 	}
 
 	/**
-	 * padEnd.
+	 * padEnd. padRight. 左寄せ。右にパディング。
 	 *
 	 * @param str
 	 * @param len
@@ -77,7 +77,7 @@ public class BufferUtil {
 	}
 
 	/**
-	 * padEnd.
+	 * padEnd. padRight. 左寄せ。右にパディング。
 	 *
 	 * @param str
 	 * @param len
@@ -95,7 +95,7 @@ public class BufferUtil {
 	}
 
 	/**
-	 * padStart.
+	 * padStart. padLeft. 右寄せ。左にパディング。
 	 *
 	 * @param str
 	 * @param len
@@ -113,7 +113,7 @@ public class BufferUtil {
 	}
 
 	/**
-	 * padStart.
+	 * padStart. padLeft. 右寄せ。左にパディング。
 	 *
 	 * @param str
 	 * @param len
@@ -149,15 +149,15 @@ public class BufferUtil {
 	}
 
 	/**
-	 * BYTES_PER_LINE.
+	 * BYTES_PER_LINE. 1行当たりのバイト数
 	 */
-	static int BYTES_PER_LINE = 16;
+	static int BYTES_PER_LINE = 16; // 1行当たりのバイト数
 
 	/**
-	 * dump.
+	 * dump. ダンプ
 	 *
 	 * @param str
-	 * @return
+	 * @return String
 	 */
 	static String dump(byte[] str) {
 		StringBuilder buff = new StringBuilder();
