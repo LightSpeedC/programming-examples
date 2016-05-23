@@ -3,19 +3,6 @@ package com.lightspeedworks.file;
 public class BufferUtil {
 
 	/**
-	 * TYPE9. 半角数字
-	 */
-	public static int TYPE9 = '9'; // 半角数字
-	/**
-	 * TYPEX. 半角文字
-	 */
-	public static int TYPEX = 'X'; // 半角文字
-	/**
-	 * TYPEN. 日本語(全角;漢字)
-	 */
-	public static int TYPEN = 'N'; // 日本語(全角;漢字)
-
-	/**
 	 * copy.
 	 *
 	 * コピー

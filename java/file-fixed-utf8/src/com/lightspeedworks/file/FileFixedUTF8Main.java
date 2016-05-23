@@ -9,11 +9,11 @@ public class FileFixedUTF8Main {
 
 	static void run1() {
 		// フィールド定義
-		int[] fieldDefs = new int[] { //
-				BufferUtil.TYPE9, 8, // xxx
-				BufferUtil.TYPEX, 8, // xxx
-				BufferUtil.TYPEN, 8, // xxx
-		};
+		FieldDefs fieldDefs = new FieldDefs( //
+				FieldDefs.TYPE9, 8, "数字", // xxx
+				FieldDefs.TYPEX, 8, "英数", // xxx
+				FieldDefs.TYPEN, 8, "日本語" // xxx
+		);
 
 		byte[] buff;
 
@@ -41,11 +41,11 @@ public class FileFixedUTF8Main {
 
 	static void run2() {
 		// フィールド定義
-		int[] fieldDefs = new int[] { //
-				BufferUtil.TYPE9, 4, // xxx
-				BufferUtil.TYPEX, 4, // xxx
-				BufferUtil.TYPEN, 4, // xxx
-		};
+		FieldDefs fieldDefs = new FieldDefs( //
+				FieldDefs.TYPE9, 4, "数字", // xxx
+				FieldDefs.TYPEX, 4, "英数", // xxx
+				FieldDefs.TYPEN, 4, "日本語" // xxx
+		);
 
 		byte[] buff;
 
