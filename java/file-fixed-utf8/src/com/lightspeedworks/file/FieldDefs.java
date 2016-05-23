@@ -18,7 +18,7 @@ public class FieldDefs {
 	/**
 	 * fieldDefs. フィールド定義
 	 */
-	Object[] fieldDefs;
+	FieldDef[] fieldDefs;
 
 	/**
 	 * FieldDefs. フィールド定義
@@ -29,6 +29,8 @@ public class FieldDefs {
 		if (fieldDefs.length % 3 != 0)
 			throw new RuntimeException("引数の個数: " + fieldDefs.length);
 
+		this.fieldDefs = new FieldDef[fieldDefs.length/3];
+
 		// 型のチェック
 		for (int i = 0; i < fieldDefs.length; i += 3) {
 			if (!(fieldDefs[i] instanceof Character))
@@ -37,9 +39,12 @@ public class FieldDefs {
 				throw new RuntimeException("int?");
 			if (!(fieldDefs[i + 2] instanceof String))
 				throw new RuntimeException("String?");
+			FieldDef fieldDef = new FieldDef();
+			this.fieldDefs[i / 3] = fieldDef;
+			fieldDef.typ = (char) fieldDefs[i];
+			fieldDef.len = (int) fieldDefs[i + 1];
+			fieldDef.desc = (String) fieldDefs[i + 2];
 		}
-
-		this.fieldDefs = fieldDefs;
 	}
 
 	/**
@@ -47,7 +52,7 @@ public class FieldDefs {
 	 *
 	 * @return int[] フィールド定義
 	 */
-	public Object[] getFieldDefs() {
+	public FieldDef[] getFieldDefs() {
 		return fieldDefs;
 	}
 }

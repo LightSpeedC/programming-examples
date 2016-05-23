@@ -17,7 +17,7 @@ public class FileFixedUTF8 {
 	 * @return byte[]
 	 */
 	public static byte[] convert(FieldDefs argFieldDefs, Object... objects) {
-		Object[] fieldDefs = argFieldDefs.getFieldDefs();
+		FieldDef[] fieldDefs = argFieldDefs.getFieldDefs();
 
 		// 引数のチェック
 		if (fieldDefs.length % 3 != 0)
@@ -30,12 +30,13 @@ public class FileFixedUTF8 {
 
 		// buffのためのsizeを計算
 		int size = 0;
-		for (int i = 0; i < fieldDefs.length; i += 3) {
-			char typ = (char) fieldDefs[i];
-			int len = (int) fieldDefs[i + 1];
-			size += len;
+		for (int i = 0; i < fieldDefs.length; ++i) {
+			char typ = fieldDefs[i].typ;
+			int len = fieldDefs[i + 1].len;
 			if (typ == FieldDefs.TYPEN)
-				size += len * 2;
+				size += len * 3;
+			else
+				size += len;
 		}
 
 		// buffを用意
@@ -48,9 +49,9 @@ public class FileFixedUTF8 {
 			// System.out.print(obj);
 			// System.out.print(", ");
 
-			char typ = (char) fieldDefs[i++];
-			int len = (int) fieldDefs[i++];
-			i++;
+			char typ = fieldDefs[i].typ;
+			int len = fieldDefs[i].len;
+			++i;
 
 			if (obj == null && typ == FieldDefs.TYPE9)
 				typ = FieldDefs.TYPEX;
