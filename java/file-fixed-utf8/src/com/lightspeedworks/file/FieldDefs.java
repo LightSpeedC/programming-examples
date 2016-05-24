@@ -41,17 +41,19 @@ public class FieldDefs {
 			if (!(fieldDefs[i + 2] instanceof String))
 				throw new IllegalArgumentException("String?");
 
-			this.fieldDefs[j++] = new FieldDef((Character) fieldDefs[i],
-					(Integer) fieldDefs[i + 1], (String) fieldDefs[i + 2]);
+			this.fieldDefs[j++] = new FieldDef(//
+					(Character) fieldDefs[i], //
+					(Integer) fieldDefs[i + 1], //
+					(String) fieldDefs[i + 2]);
 		}
 	}
 
-//	/**
-//	 * FieldDefs. フィールド定義
-//	 * 
-//	 * @return int[] フィールド定義
-//	 */
-//	public FieldDef[] getFieldDefs() {
-//		return fieldDefs;
-//	}
+	// /**
+	// * FieldDefs. フィールド定義
+	// *
+	// * @return int[] フィールド定義
+	// */
+	// public FieldDef[] getFieldDefs() {
+	// return fieldDefs;
+	// }
 }
