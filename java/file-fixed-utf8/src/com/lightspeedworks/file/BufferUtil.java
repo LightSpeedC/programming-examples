@@ -49,7 +49,7 @@ public class BufferUtil {
 	 * padEnd. padRight. 左寄せ。右にパディング。
 	 *
 	 * @param str
-	 * @param len
+	 * @param length
 	 * @param fill
 	 * @return byte[]
 	 */
@@ -67,7 +67,7 @@ public class BufferUtil {
 	 * padEnd. padRight. 左寄せ。右にパディング。
 	 *
 	 * @param str
-	 * @param len
+	 * @param length
 	 * @param fill
 	 * @return String
 	 */
@@ -85,7 +85,7 @@ public class BufferUtil {
 	 * padStart. padLeft. 右寄せ。左にパディング。
 	 *
 	 * @param str
-	 * @param len
+	 * @param length
 	 * @param fill
 	 * @return byte[]
 	 */
@@ -103,7 +103,7 @@ public class BufferUtil {
 	 * padStart. padLeft. 右寄せ。左にパディング。
 	 *
 	 * @param str
-	 * @param len
+	 * @param length
 	 * @param fill
 	 * @return String
 	 */
