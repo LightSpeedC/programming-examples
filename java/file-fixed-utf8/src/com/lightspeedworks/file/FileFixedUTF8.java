@@ -21,11 +21,6 @@ public class FileFixedUTF8 {
 	public byte[] aggregate(FieldDefs argFieldDefs, Object... objects) {
 		FieldDef[] fieldDefs = argFieldDefs.fieldDefs;
 
-		// 引数のチェック
-		if (fieldDefs.length % 3 != 0)
-			throw new IllegalArgumentException("fieldDefs引数の個数 " + fieldDefs.length
-					+ " は3の倍数で指定");
-
 		if (fieldDefs.length == 0)
 			throw new IllegalArgumentException("fieldDefs引数は必須");
 
