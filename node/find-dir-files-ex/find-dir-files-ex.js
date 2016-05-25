@@ -12,26 +12,18 @@ void function () {
 	function findDirFiles(dir, pattern) {
 		const names = fs.readdirSync(dir);
 		const result = {};
-		//names.forEach(name => result[name] = undefined);
 		names.forEach(name => {
 			const subDir = path.resolve(dir, name);
 			const stat = fs.statSync(subDir);
 			if (stat.isDirectory()) {
 				const r = findDirFiles(subDir, pattern);
-				if (r)
-					result[name] = r;
-				else if (name.includes(pattern))
-					result[name] = [];
+				if (r || name.includes(pattern))
+					result[name + path.sep] = r || {};
 			}
-			else {
-				if (name.includes(pattern))
-					result[name] = null;
-			}
+			else if (name.includes(pattern))
+				result[name] = null;
 		});
-		//console.log(Object.keys(result));
-		if (Object.keys(result).length === 0)
-			return null;
-		return result;
+		return (Object.keys(result).length || null) && result;
 	}
 
 	// メイン
