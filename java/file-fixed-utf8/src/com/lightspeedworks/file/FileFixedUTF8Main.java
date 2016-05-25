@@ -109,5 +109,9 @@ public class FileFixedUTF8Main {
 						new Object[] {"コード2", "番号2"} //
 				}, "$\n");
 		System.out.println(BufferUtil.dump(buff));
+
+		// FIXME 修正しないと動かない
+		// TODO 繰り返し機能
+		// XXX なんか動く
 	}
 }
