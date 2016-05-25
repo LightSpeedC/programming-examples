@@ -1,0 +1,99 @@
+トピック
+    Windows PowerShell のヘルプ システム
+
+概要
+    Windows PowerShell のコマンドレットと概念に関するヘルプを表示します。
+
+詳細説明
+    Windows PowerShell ヘルプでは、Windows PowerShell コマンドレット、
+    関数、スクリプト、およびモジュールと、Windows PowerShell 言語の
+    要素などの概念について説明します。
+
+    Windows PowerShell にヘルプ ファイルが含まれていなくても、オンラインでヘルプ トピックを
+    参照できます。また、Update-Help コマンドレットを使用してヘルプ ファイルを
+    コンピューターにダウンロードし、Get-Help コマンドレットを使用してコマンド ラインで
+    ヘルプ トピックを表示できます。
+
+    Update-Help コマンドレットを使用すると、更新されたヘルプ ファイルをリリース時に
+    ダウンロードして、ローカルのヘルプ コンテンツが古くならないようにすることもできます。
+
+    ヘルプ ファイルがない場合は、Get-Help を実行すると、コマンドレット、関数、
+    およびスクリプトについて、自動生成されたヘルプが表示されます。
+
+
+  オンライン ヘルプ
+    Windows PowerShell のオンライン ヘルプは、TechNet ライブラリにあります。
+    まずは、http://go.microsoft.com/fwlink/?LinkID=108518 を参照してください。
+
+    任意のコマンドレッドまたは関数のオンライン ヘルプを表示するには、次のように入力します。
+
+        Get-Help <コマンドレット名> -Online
+
+  UPDATE-HELP
+    コンピューターにヘルプ ファイルをダウンロードしてインストールするには、次の手順を実行します。
+
+       1.[管理者として実行] オプションを使用して Windows PowerShell を起動します。
+       2.次のように入力します。
+
+          Update-Help
+
+    ヘルプ ファイルがインストールされたら、Get-Help コマンドレットを使用して、
+    ヘルプ トピックを表示できます。また、Update-Help コマンドレットを使用すると、
+    ローカルのヘルプ ファイルが常に最新の状態で保たれるように、更新された
+    ヘルプ ファイルをダウンロードできます。
+    
+    Update-Help コマンドレットの詳細を確認するには、次のように入力します。
+
+       Get-Help Update-Help -Online
+
+    または、http://go.microsoft.com/fwlink/?LinkID=210614 を参照してください。
+
+
+  GET-HELP
+    Get-Help コマンドレットを実行すると、コンピューターに保存されているヘルプ ファイルのコンテンツから、
+    コマンド ラインにヘルプが表示されます。ヘルプ ファイルがない場合に Get-Help を実行すると、
+    コマンドレットと関数について基本的なヘルプが表示されます。また、Get-Help を使用して、
+    コマンドレットと関数についてオンライン ヘルプを表示することもできます。
+
+    コマンドレットのヘルプを表示するには、次のように入力します。
+
+        Get-Help <コマンドレット名>
+    
+    オンライン ヘルプを表示するには、次のように入力します。
+   
+        Get-Help <コマンドレット名> -Online
+
+    概念説明のトピックのタイトルは "About_" で始まります。
+    概念または言語要素のヘルプを表示するには、次のように入力します。
+
+        Get-Help About_<トピック名>
+
+    すべてのヘルプ ファイルで単語や語句を検索するには、次のように入力します。
+
+        Get-Help <検索用語>
+
+    Get-Help コマンドレットの詳細を確認するには、次のように入力します。
+
+        Get-Help Get-Help -Online
+
+    または、http://go.microsoft.com/fwlink/?LinkID=113316 を参照してください。
+
+
+  例:
+      Save-Help              : インターネットからヘルプ ファイルをダウンロードして、
+                               ファイル共有に保存します。
+      Update-Help            : インターネットまたはファイル共有からヘルプ ファイルを
+                               ダウンロードしてインストールします。
+      Get-Help Get-Process   : Get-Process コマンドレットに関するヘルプを表示します。
+      Get-Help Get-Process -Online
+                             : Get-Process コマンドレットのオンライン ヘルプを開きます。
+      Help Get-Process       : Get-Process に関するヘルプを 1 ページずつ表示します。
+      Get-Process -?         : Get-Process コマンドレットに関するヘルプを表示します。
+      Get-Help About_Modules : Windows PowerShell モジュールに関するヘルプを表示します。
+      Get-Help remoting      : ヘルプ トピックで "リモート処理" という単語を検索します。
+
+  関連項目:
+      about_Updatable_Help
+      Get-Help
+      Save-Help
+      Update-Help
