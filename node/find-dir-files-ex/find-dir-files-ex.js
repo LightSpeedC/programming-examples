@@ -18,10 +18,13 @@ void function () {
 			if (stat.isDirectory()) {
 				const r = findDirFiles(subDir, pattern);
 				if (r || name.includes(pattern))
-					result[name + path.sep] = r || {};
+					result[name + path.sep] = r ||
+						console.log(subDir + path.sep) || {};
 			}
-			else if (name.includes(pattern))
+			else if (name.includes(pattern)) {
 				result[name] = null;
+				console.log(subDir);
+			}
 		});
 		return (Object.keys(result).length || null) && result;
 	}
