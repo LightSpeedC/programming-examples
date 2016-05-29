@@ -1,0 +1,2 @@
+electron ..\quick-start.asar
+
