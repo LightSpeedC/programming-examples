@@ -26,14 +26,14 @@ void function () {
 			private2.set(this, {private2: 'private2:' + name});
 
 			var private1 = 'private1:' + name;
-			this.getPrivate1 = () => private1;
-			Object.defineProperty(this, 'private1',
-				{get: function () { return private1; }});
-
 			var private2 = {private2: 'private2:' + name};
-			this.getPrivate2 = () => private2;
-			Object.defineProperty(this, 'private2',
-				{get: function () { return private2; }});
+
+			this.privates({
+				getPrivate1: () => private1,
+				getPrivate2: () => private2,
+				get private1() { return private1; },
+				get private2() { return private2; }
+			});
 		}
 	});
 

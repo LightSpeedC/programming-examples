@@ -1,6 +1,8 @@
 void function () {
 	'use strict';
 
+	var getProto = Object.getPrototypeOf ||
+			function getProto(obj) { return obj.__proto__; };
 	var setProto = Object.setPrototypeOf ||
 			function setProto(obj, proto) { obj.__proto__ = proto; };
 
@@ -20,7 +22,7 @@ void function () {
 		function $super() { this.constructor = ctor; }
 		if (super_) $super.prototype = super_.prototype;
 		function $ctor() {}
-		$ctor.prototype = ctor.prototype = merge(new $super(), proto);
+		$ctor.prototype = ctor.prototype = merge(new $super(), proto, {privates: privates});
 		delete ctor.prototype.statics;
 
 		if (super_) setProto(ctor, super_);
@@ -43,6 +45,12 @@ void function () {
 				if (src.hasOwnProperty(p) && !dst.hasOwnProperty(p) &&
 						dst[p] !== src[p]) dst[p] = src[p];
 		return dst;
+	}
+
+	// privates
+	function privates(proto) {
+		setProto(proto, getProto(this));
+		setProto(this, proto);
 	}
 
 	if (typeof module === 'object' && module && module.exports)
