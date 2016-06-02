@@ -9,7 +9,7 @@ void function () {
 	// extend-light
 	function extend(name, proto, statics) {
 		'use strict';
-		if (typeof name !== 'string') statics = proto, proto = name;
+		if (typeof name !== 'string') statics = proto, proto = name, name = undefined;
 		proto = proto || {};
 		var super_ = typeof this === 'function' ? this : undefined;
 
@@ -26,7 +26,8 @@ void function () {
 		delete ctor.prototype.statics;
 
 		if (super_) setProto(ctor, super_);
-		if (typeof name === 'string') try { ctor.name = name; } catch (e) {} // for old IE
+		if (typeof name === 'string' && ctor.name !== name)
+			try { ctor.name = name; } catch (e) {} // for old IE
 		return merge(ctor, proto.statics, statics,
 			super_ ? {super_: super_} : undefined, super_, {extend: extend, create: create});
 	}
