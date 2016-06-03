@@ -1,0 +1,21 @@
+{
+  "name": "xml2js-ex",
+  "version": "0.0.0",
+  "description": "xml2js example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "xml2js"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "xml2js": "^0.4.16"
+  }
+}
