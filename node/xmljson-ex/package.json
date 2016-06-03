@@ -1,0 +1,21 @@
+{
+  "name": "xmljson-ex",
+  "version": "0.0.0",
+  "description": "xmljson example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "xml2js"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "xmljson": "^0.2.0"
+  }
+}
