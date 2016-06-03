@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello World!</title>
+  </head>
+  <body>
+    <h1>Hello World!</h1>
+    We are using node.js <script>document.write(process.version)</script>.<br/>
+    process id is <script>document.write(process.pid)</script>.<br/>
+    <font color="blue"><u><span onclick="global.hey()">link</span></u></font><br/>
+<script>
+if (!global.count) global.count = 0;
+if (Function('return this')() === window) document.writeln('window<br/>');
+</script>
+    Window count: <script>document.write(++global.count)</script>.<br/>
+  </body>
+</html>

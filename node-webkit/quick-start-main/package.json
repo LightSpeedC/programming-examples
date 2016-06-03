@@ -1,0 +1,28 @@
+{
+  "name": "quick-start",
+  "version": "0.0.0",
+  "description": "quick start node-webkit",
+  "main": "index.js",
+  "!node-main": "pre.js",
+  "!js-flags": "",
+  "window": {
+    "resizable": true,
+    "fullscreen": false,
+    "width": 1000,
+    "height": 800,
+    "position": "mouse",
+    "transparent": false
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "node-webkit"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
