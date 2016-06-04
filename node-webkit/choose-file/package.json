@@ -1,0 +1,24 @@
+{
+  "name": "choose-file",
+  "version": "0.0.0",
+  "description": "choose-file node-webkit",
+  "main": "index.html",
+  "private": true,
+  "window": {
+    "width": 1000,
+    "height": 800
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nw ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedC/programming-examples"
+  },
+  "keywords": [
+    "node-webkit"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}

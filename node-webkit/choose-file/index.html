@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Hello World! こんにちは、世界!</title>
+		<meta charset="UTF-8">
+		<style> body{ font-family: "メイリオ", Meiryo,
+					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+				font-size: 20px; line-height: 1.5; } </style>
+	</head>
+	<body>
+		<h1>Hello World! こんにちは、世界!</h1>
+		Node.js バージョン <script>document.write(process.version)</script> を使用しています。<br/>
+		NWjs/node-webkit バージョン <script>document.write(process.versions.nw)</script> を使用しています。<br/>
+		プロセスIDは <script>document.write(process.pid)</script> です。<br/>
+
+		10秒で閉じます。<br/><script>setTimeout(close, 10e3);</script>
+
+		<br/>
+
+		<!-- 表示されない input 要素を作成 -->
+		<input id="$chooser" type="file" style="display:none"
+			onchange="openBrowsedFile(event)" />
+
+		ファイルを選択: <button onclick="ChooseFile()">ファイルを選択</button><br/>
+
+		<br/>
+
+		<button onclick="window.close()">閉じる</button><br/>
+
+		<script>
+		// ファイルを選択
+		function ChooseFile() {
+			var chooser = $chooser; // document.getElementById('$chooser');
+			var click = new CustomEvent('click'); // clickイベント
+
+			// clickイベントを発生させる
+			chooser.dispatchEvent(click);
+		}
+
+		// イベントに選んだファイル名が入っている
+		function openBrowsedFile(event) {
+			var filename = event.target.value;
+			alert(filename);
+		}
+		</script>
+
+	</body>
+</html>
