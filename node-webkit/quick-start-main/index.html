@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using node.js <script>document.write(process.version)</script>.<br/>
-    process id is <script>document.write(process.pid)</script>.<br/>
-    <font color="blue"><u><span onclick="global.hey()">link</span></u></font><br/>
-<script>
-if (!global.count) global.count = 0;
-if (Function('return this')() === window) document.writeln('window<br/>');
-</script>
-    Window count: <script>document.write(++global.count)</script>.<br/>
-  </body>
+	<head>
+		<title>Hello World! こんにちは、世界!</title>
+		<meta charset="UTF-8">
+		<style> body{ font-family: "メイリオ", Meiryo,
+					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+				font-size: 20px; line-height: 1.5; } </style>
+	</head>
+	<body>
+		<h1>Hello World! こんにちは、世界!</h1>
+		Node.js バージョン <script>document.write(process.version)</script> を使用しています。<br/>
+		NWjs/node-webkit バージョン <script>document.write(process.versions.nw)</script> を使用しています。<br/>
+		プロセスIDは <script>document.write(process.pid)</script> です。<br/>
+
+		10秒で閉じます。<br/><script>setTimeout(close, 10e3);</script>
+
+		新規ウィンドウ: <button onclick="global.openMyWindow()">新規ウィンドウ</button><br/>
+
+		Window count: <script>document.write(global.myCount)</script>.<br/>
+	</body>
 </html>

@@ -3,22 +3,18 @@
   "version": "0.0.0",
   "description": "quick start node-webkit",
   "main": "index.js",
-  "!node-main": "pre.js",
-  "!js-flags": "",
+  "private": true,
   "window": {
-    "resizable": true,
-    "fullscreen": false,
     "width": 1000,
-    "height": 800,
-    "position": "mouse",
-    "transparent": false
+    "height": 800
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nw ."
   },
   "repository": {
     "type": "git",
-    "url": "repo"
+    "url": "LightSpeedC/programming-examples"
   },
   "keywords": [
     "node-webkit"
