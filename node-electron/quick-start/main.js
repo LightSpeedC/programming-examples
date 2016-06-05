@@ -1,7 +1,7 @@
 const electron = require('electron');
-// Module to control application life.
+// app: Module to control application life.
+// BrowserWindow: Module to create native browser window.
 const {app, BrowserWindow} = electron;
-// Module to create native browser window.
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -54,3 +54,7 @@ app.on('activate', () => {
 console.log('main:');
 console.log(process.versions);
 console.log('process id: ' + process.pid);
+require('fs').writeFileSync('process.log',
+	['process.pid = ' + process.pid,
+	'process.argv = ' + process.argv.join(' '),
+	''].join('\n'));
