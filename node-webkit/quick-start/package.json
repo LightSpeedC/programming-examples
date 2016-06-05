@@ -1,7 +1,7 @@
 {
-  "name": "quick-start",
+  "name": "quick-start-html-node-webkit",
   "version": "0.0.0",
-  "description": "quick start node-webkit",
+  "description": "quick start html node-webkit",
   "main": "index.html",
   "private": true,
   "window": {
@@ -9,16 +9,6 @@
     "height": 800
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nw ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "LightSpeedC/programming-examples"
-  },
-  "keywords": [
-    "node-webkit"
-  ],
-  "author": "LightSpeedC",
-  "license": "MIT"
+  }
 }
