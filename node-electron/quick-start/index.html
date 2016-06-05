@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    We are using node <script>document.write(process.versions.node)</script>,<br/>
-    Chrome <script>document.write(process.versions.chrome)</script>,<br/>
-    and Electron <script>document.write(process.versions.electron)</script>.<br/>
-    <script>
-    document.write("<pre>" + JSON.stringify(process.versions,null,"\t") + "</pre>");
+	<head>
+		<meta charset="UTF-8">
+		<title>Hello World! こんにちは、世界!</title>
+		<style> body{ font-family: "メイリオ", Meiryo,
+					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+				font-size: 20px; line-height: 1.5; } </style>
+	</head>
+	<body>
+		<h1>Hello World! こんにちは、世界!</h1>
+		Node.js バージョン <script>document.write(process.version)</script> を使用しています。<br/>
+		Electron バージョンは <script>document.write(process.versions.electron)</script><br/>
+		Chrome バージョンは <script>document.write(process.versions.chrome)</script><br/>
+		プロセスIDは <script>document.write(process.pid)</script> です。<br/>
 
-    const {BrowserWindow} = require('electron').remote;
-    let win = new BrowserWindow({width: 800, height: 600});
-    win.loadURL('https://github.com');
-    </script>
-  </body>
+		10秒で閉じます。<br/><script>setTimeout(close, 10e3);</script>
+
+		<pre><script>
+		document.write(JSON.stringify(process.versions, null, '\t'));
+		</script></pre>
+	</body>
 </html>
