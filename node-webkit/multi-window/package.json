@@ -2,7 +2,7 @@
   "name": "quick-start",
   "version": "0.0.0",
   "description": "quick start node-webkit",
-  "main": "index.js",
+  "main": "main.js",
   "private": true,
   "window": {
     "width": 1000,
