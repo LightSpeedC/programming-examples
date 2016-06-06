@@ -1,0 +1,14 @@
+{
+  "name": "nw-mithril-node-webkit",
+  "version": "0.0.0",
+  "description": "mithril js node-webkit",
+  "main": "main.js",
+  "private": true,
+  "window": {
+    "width": 1000,
+    "height": 800
+  },
+  "scripts": {
+    "start": "nw ."
+  }
+}

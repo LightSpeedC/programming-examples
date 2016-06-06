@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Search 検索</title>
+		<style> body{ font-family: "メイリオ", Meiryo,
+					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+				font-size: 16px; line-height: 1.5; } </style>
+	</head>
+	<body>
+		<h3>Search 検索</h3>
+
+		<script src="mithril.min.js" ></script>
+		<div id="$div" />
+		<script>
+		void function () {
+			'use strict';
+
+			// text
+			const text = m.prop('');
+			const logs = [];
+
+			// 検索
+			function search() {
+				// alert('search:' + text());
+				m.redraw(true);
+				return false;
+			}
+
+			// view
+			function view() {
+				return [m('form', {onsubmit: search},
+						m('input', m_on('change', 'value', text,
+							{autofocus: true, placeholder: '入力', size: 100})),
+						m('button[type=submit]', {onclick: search}, '検索')),
+					m('hr'),
+					myViewResult()];
+			}
+
+			// 結果
+			function myViewResult() {
+				return m('pre',
+					logs.concat(
+						JSON.stringify(process.versions, null, '\t'),
+						JSON.stringify(process.env, null, '\t'))
+					.join('\n'));
+			}
+
+			// HTML要素のイベントと値にプロパティを接続するユーティリティ
+			function m_on(eventName, propName, propFunc, attrs) {
+				attrs = attrs || {};
+				attrs['on' + eventName] = m.withAttr(propName, propFunc);
+				attrs[propName] = propFunc();
+				return attrs;
+			}
+
+			m.mount($div, {view});
+		}();
+		</script>
+
+	</body>
+</html>
