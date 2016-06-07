@@ -6,6 +6,7 @@
 		<style> body{ font-family: "メイリオ", Meiryo,
 					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 				font-size: 16px; line-height: 1.5; } </style>
+		<script>if (window.module) delete module;</script>
 	</head>
 	<body>
 		<h3>Search 検索</h3>
@@ -39,11 +40,7 @@
 
 			// 結果
 			function myViewResult() {
-				return m('pre',
-					logs.concat(
-						JSON.stringify(process.versions, null, '\t'),
-						JSON.stringify(process.env, null, '\t'))
-					.join('\n'));
+				return m('pre', logs.join('\n'));
 			}
 
 			// HTML要素のイベントと値にプロパティを接続するユーティリティ
@@ -57,6 +54,12 @@
 			m.mount($div, {view});
 		}();
 		</script>
+
+		<pre><script>
+		if (window.process)
+			document.writeln('process.versions: ' + JSON.stringify(process.versions, null, '\t')),
+			document.writeln('process.env: ' + JSON.stringify(process.env, null, '\t'));
+		</script></pre>
 
 	</body>
 </html>
