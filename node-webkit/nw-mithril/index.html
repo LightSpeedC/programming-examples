@@ -6,7 +6,9 @@
 		<style> body{ font-family: "メイリオ", Meiryo,
 					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 				font-size: 16px; line-height: 1.5; } </style>
-		<script>if (window.module) delete module;</script>
+		<script>
+		if (window.module) delete module;
+		</script>
 	</head>
 	<body>
 		<h3>Search 検索</h3>
@@ -19,14 +21,8 @@
 
 			// text
 			const text = m.prop('');
-			const logs = [];
-
-			// 検索
-			function search() {
-				// alert('search:' + text());
-				m.redraw(true);
-				return false;
-			}
+			let logs = [];
+			let wholeObject = {};
 
 			// view
 			function view() {
@@ -52,14 +48,51 @@
 			}
 
 			m.mount($div, {view});
+
+			function progressCallback(file, object) {
+				//console.log(file);
+				logs.push(file);
+				logs = logs.sort();
+				wholeObject = object;
+				//m.redraw(true);
+			}
+
+			const aa = require('aa');
+			const findDirFiles = require('./find-dir-files');
+
+			let timer;
+
+			// 検索
+			function search() {
+				console.log('search ' + (timer != null));
+				if (timer) return;
+				console.log('search start!');
+				logs = [];
+				timer = setInterval(() => m.redraw(true), 20);
+				aa(function *() {
+					console.log('aa1');
+					yield findDirFiles('..', text(), progressCallback);
+					console.log('aa2');
+					m.redraw(true);
+					clearInterval(timer);
+					timer = null; 
+					console.log('search end');
+				}).then(
+					val => console.log('then val: ', val),
+					err => console.log('then err: ', err)
+				);
+				return false;
+			}
 		}();
 		</script>
 
+<!--
 		<pre><script>
 		if (window.process)
 			document.writeln('process.versions: ' + JSON.stringify(process.versions, null, '\t')),
 			document.writeln('process.env: ' + JSON.stringify(process.env, null, '\t'));
 		</script></pre>
+-->
 
 	</body>
 </html>

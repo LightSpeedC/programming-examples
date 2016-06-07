@@ -10,5 +10,8 @@
   },
   "scripts": {
     "start": "nw ."
+  },
+  "dependencies": {
+    "aa": "^0.1.35"
   }
 }
