@@ -5,7 +5,7 @@
 		<title>Search 検索</title>
 		<style> body{ font-family: "メイリオ", Meiryo,
 					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
-				font-size: 16px; line-height: 1.5; } </style>
+				font-size: 12px; line-height: 1.2; } </style>
 		<script>
 		if (window.module) delete module;
 		</script>
@@ -26,17 +26,20 @@
 
 			// view
 			function view() {
+				logs = logs.sort();
 				return [m('form', {onsubmit: search},
 						m('input', m_on('change', 'value', text,
 							{autofocus: true, placeholder: '入力', size: 100})),
 						m('button[type=submit]', {onclick: search}, '検索')),
 					m('hr'),
-					myViewResult()];
+					myViewResult(),
+					m('hr')];
 			}
 
 			// 結果
 			function myViewResult() {
-				return m('pre', logs.join('\n'));
+				return logs.map(x => m('div', x));
+				//return m('pre', logs.join('\n'));
 			}
 
 			// HTML要素のイベントと値にプロパティを接続するユーティリティ
@@ -52,7 +55,6 @@
 			function progressCallback(file, object) {
 				//console.log(file);
 				logs.push(file);
-				logs = logs.sort();
 				wholeObject = object;
 				//m.redraw(true);
 			}
@@ -64,19 +66,19 @@
 
 			// 検索
 			function search() {
-				console.log('search ' + (timer != null));
+				//console.log('search ' + (timer != null));
 				if (timer) return;
-				console.log('search start!');
+				//console.log('search start!');
 				logs = [];
-				timer = setInterval(() => m.redraw(true), 20);
+				timer = setInterval(() => m.redraw(true), 300);
 				aa(function *() {
-					console.log('aa1');
-					yield findDirFiles('..', text(), progressCallback);
-					console.log('aa2');
+					//console.log('aa1');
+					yield findDirFiles(process.env.AAA_TARGET_DIR.replace('"', '') || '..', text(), progressCallback);
+					//console.log('aa2');
 					m.redraw(true);
 					clearInterval(timer);
 					timer = null; 
-					console.log('search end');
+					//console.log('search end');
 				}).then(
 					val => console.log('then val: ', val),
 					err => console.log('then err: ', err)
@@ -86,13 +88,11 @@
 		}();
 		</script>
 
-<!--
 		<pre><script>
 		if (window.process)
 			document.writeln('process.versions: ' + JSON.stringify(process.versions, null, '\t')),
 			document.writeln('process.env: ' + JSON.stringify(process.env, null, '\t'));
 		</script></pre>
--->
 
 	</body>
 </html>
