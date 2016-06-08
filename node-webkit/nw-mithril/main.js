@@ -20,7 +20,8 @@ void function () {
 	// package.jsonのwindowオプションの初期値を取り込む
 	const options = require('./package.json').window;
 
-	process.env.AAA_TARGET_DIR = process.env.AAA_TARGET_DIR || process.argv[2] || process.argv[1];
+	process.env.AAA_TARGET_DIR = (process.env.AAA_TARGET_DIR
+		|| process.argv[2] || process.argv[1] || '..').replace('"', '');
 
 	// NWjs/node-webkit
 	if (global.nw) {

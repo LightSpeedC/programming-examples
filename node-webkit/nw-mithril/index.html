@@ -6,28 +6,33 @@
 		<style> body{ font-family: "メイリオ", Meiryo,
 					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 				font-size: 12px; line-height: 1.2; } </style>
-		<script>
-		if (window.module) delete module;
-		</script>
+		<script>if (window.module) delete module;</script>
+		<script src="mithril.min.js" ></script>
 	</head>
 	<body>
-		<h3>Search 検索</h3>
-
-		<script src="mithril.min.js" ></script>
 		<div id="$div" />
 		<script>
 		void function () {
 			'use strict';
 
-			// text
+			focus();
+
+			const path = require('path');
+			const aa = require('aa');
+			const findDirFiles = require('./find-dir-files');
+
+			const targetDir = process.env.AAA_TARGET_DIR;
 			const text = m.prop('');
-			let logs = [];
+			let files = [];
+			let filesIsDirty = false;
 			let wholeObject = {};
+			let timer;
 
 			// view
 			function view() {
-				logs = logs.sort();
-				return [m('form', {onsubmit: search},
+				return [m('h3', 'Search 検索 - ',
+							m('font[color=green]', targetDir)),
+						m('form', {onsubmit: search},
 						m('input', m_on('change', 'value', text,
 							{autofocus: true, placeholder: '入力', size: 100})),
 						m('button[type=submit]', {onclick: search}, '検索')),
@@ -38,8 +43,9 @@
 
 			// 結果
 			function myViewResult() {
-				return logs.map(x => m('div', x));
-				//return m('pre', logs.join('\n'));
+				if (filesIsDirty) files = files.sort();
+				else filesIsDirty = false;
+				return files.filter(x => x.includes(text())).map(x => m('div', x));
 			}
 
 			// HTML要素のイベントと値にプロパティを接続するユーティリティ
@@ -53,32 +59,21 @@
 			m.mount($div, {view});
 
 			function progressCallback(file, object) {
-				//console.log(file);
-				logs.push(file);
+				files.push(file);
+				filesIsDirty = true;
 				wholeObject = object;
-				//m.redraw(true);
 			}
-
-			const aa = require('aa');
-			const findDirFiles = require('./find-dir-files');
-
-			let timer;
 
 			// 検索
 			function search() {
-				//console.log('search ' + (timer != null));
 				if (timer) return;
-				//console.log('search start!');
-				logs = [];
-				timer = setInterval(() => m.redraw(true), 300);
 				aa(function *() {
-					//console.log('aa1');
-					yield findDirFiles(process.env.AAA_TARGET_DIR.replace('"', '') || '..', text(), progressCallback);
-					//console.log('aa2');
+					files = [];
+					timer = setInterval(() => m.redraw(true), 500);
+					yield findDirFiles(targetDir, text(), progressCallback);
 					m.redraw(true);
 					clearInterval(timer);
 					timer = null; 
-					//console.log('search end');
 				}).then(
 					val => console.log('then val: ', val),
 					err => console.log('then err: ', err)
@@ -88,11 +83,13 @@
 		}();
 		</script>
 
-		<pre><script>
+		<pre><font color="brown"><script>
 		if (window.process)
+			document.writeln('process.cwd(): ' + process.cwd()),
+			document.writeln('process.pid: ' + process.pid),
 			document.writeln('process.versions: ' + JSON.stringify(process.versions, null, '\t')),
 			document.writeln('process.env: ' + JSON.stringify(process.env, null, '\t'));
-		</script></pre>
+		</script></font></pre>
 
 	</body>
 </html>
