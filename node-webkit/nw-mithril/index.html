@@ -17,10 +17,14 @@
 
 			focus();
 
+			const electron = require('electron');
 			const path = require('path');
 			const aa = require('aa');
 			const findDirFiles = require('./find-dir-files');
+
 			const debugFlag = m.prop(false);
+			const includes = m.prop('');
+			const excludes = m.prop('');
 
 			const targetDir = process.env.AAA_TARGET_DIR;
 			const text = m.prop('');
@@ -34,16 +38,29 @@
 				return [m('h3', 'Search 検索 - ',
 							m('font[color=green]', targetDir),
 							(timer ? m('font[color=red]', ' - 検索中') : '')),
-						(timer ? m('b', m('font[color=red]', text())) :
+						(timer ?
+							[m('div', m('b', m('font[color=red]', text()))),
+							 m('div', includes()),
+							 m('div', excludes())] :
 							m('form', {onsubmit: search},
-							m('input', m_on('change', 'value', text,
-								{autofocus: true, placeholder: '入力', size: 100})),
-							m('button[type=submit]', {onclick: search}, '検索'))
+								m('div',
+									m('input', m_on('change', 'value', text,
+										{autofocus: true, placeholder: '入力', size: 100})),
+									m('button[type=submit]', {onclick: search}, '検索')),
+								m('div',
+									m('input', m_on('change', 'value', includes,
+										{placeholder: '含む', size: 100})),
+									'を含む'),
+								m('div',
+									m('input', m_on('change', 'value', excludes,
+										{placeholder: '含まない', size: 100})),
+									'を含まない')
+							)
 						),
 					m('hr'),
 					myViewResult(),
 					m('hr'),
-
+					m('div', 'version: 0.0.1 (2016/06/10)'),
 					m('input[type=checkbox]', m_on('click', 'checked', debugFlag)), 'debug',
 					(debugFlag() ? debugView() : '')
 					];
@@ -66,9 +83,24 @@
 			function myViewResult() {
 				if (filesIsDirty) files = files.sort();
 				filesIsDirty = false;
-				// .filter(x => x.includes(text()))
-				return files.map(x => x.substr(targetDir.length))
-					.map(x => m('div', x));
+				const incl = includes();
+				const excl = excludes();
+				return files
+					.filter(file => file.includes(incl))
+					.filter(file => excl === '' || !file.includes(excl))
+					.map(file => {
+					const dirs = file.split('\\');
+					dirs.pop();
+					const dir = dirs.join('\\');
+					return m('div',
+						m('span',
+							{style: {color: 'green'},
+							 onclick: () => electron.shell.openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
+						m('span',
+							{style: {color: 'blue'},
+							 onclick: () => electron.shell.openExternal(file)}, '[ﾌｧｲﾙ]'),
+							' ' + file.substr(targetDir.length))
+				});
 			}
 
 			// HTML要素のイベントと値にプロパティを接続するユーティリティ
