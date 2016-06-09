@@ -20,6 +20,7 @@
 			const path = require('path');
 			const aa = require('aa');
 			const findDirFiles = require('./find-dir-files');
+			const debugFlag = m.prop(false);
 
 			const targetDir = process.env.AAA_TARGET_DIR;
 			const text = m.prop('');
@@ -31,21 +32,43 @@
 			// view
 			function view() {
 				return [m('h3', 'Search 検索 - ',
-							m('font[color=green]', targetDir)),
-						m('form', {onsubmit: search},
-						m('input', m_on('change', 'value', text,
-							{autofocus: true, placeholder: '入力', size: 100})),
-						m('button[type=submit]', {onclick: search}, '検索')),
+							m('font[color=green]', targetDir),
+							(timer ? m('font[color=red]', ' - 検索中') : '')),
+						(timer ? m('b', m('font[color=red]', text())) :
+							m('form', {onsubmit: search},
+							m('input', m_on('change', 'value', text,
+								{autofocus: true, placeholder: '入力', size: 100})),
+							m('button[type=submit]', {onclick: search}, '検索'))
+						),
 					m('hr'),
 					myViewResult(),
-					m('hr')];
+					m('hr'),
+
+					m('input[type=checkbox]', m_on('click', 'checked', debugFlag)), 'debug',
+					(debugFlag() ? debugView() : '')
+					];
+			}
+
+			function debugView() {
+				//if (window.process)
+				//<pre><font color="brown">
+				return m('pre',
+					m('font[color=brown]',
+						('process.cwd(): ' + process.cwd()),
+						('\n\nprocess.pid: ' + process.pid),
+						('\n\nprocess.versions: ' + JSON.stringify(process.versions, null, '\t')),
+						('\n\nprocess.env: ' + JSON.stringify(process.env, null, '\t'))
+					));
+				//</font></pre>
 			}
 
 			// 結果
 			function myViewResult() {
 				if (filesIsDirty) files = files.sort();
 				else filesIsDirty = false;
-				return files.filter(x => x.includes(text())).map(x => m('div', x));
+				// .filter(x => x.includes(text()))
+				return files.map(x => x.substr(targetDir.length + 1))
+					.map(x => m('div', x));
 			}
 
 			// HTML要素のイベントと値にプロパティを接続するユーティリティ
@@ -68,12 +91,13 @@
 			function search() {
 				if (timer) return;
 				aa(function *() {
+					m.redraw(true);
 					files = [];
 					timer = setInterval(() => m.redraw(true), 500);
 					yield findDirFiles(targetDir, text(), progressCallback);
-					m.redraw(true);
 					clearInterval(timer);
 					timer = null; 
+					m.redraw(true);
 				}).then(
 					val => console.log('then val: ', val),
 					err => console.log('then err: ', err)
@@ -83,13 +107,6 @@
 		}();
 		</script>
 
-		<pre><font color="brown"><script>
-		if (window.process)
-			document.writeln('process.cwd(): ' + process.cwd()),
-			document.writeln('process.pid: ' + process.pid),
-			document.writeln('process.versions: ' + JSON.stringify(process.versions, null, '\t')),
-			document.writeln('process.env: ' + JSON.stringify(process.env, null, '\t'));
-		</script></font></pre>
 
 	</body>
 </html>
