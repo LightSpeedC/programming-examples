@@ -65,9 +65,9 @@
 			// 結果
 			function myViewResult() {
 				if (filesIsDirty) files = files.sort();
-				else filesIsDirty = false;
+				filesIsDirty = false;
 				// .filter(x => x.includes(text()))
-				return files.map(x => x.substr(targetDir.length + 1))
+				return files.map(x => x.substr(targetDir.length))
 					.map(x => m('div', x));
 			}
 
