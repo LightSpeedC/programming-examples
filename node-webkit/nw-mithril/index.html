@@ -19,6 +19,7 @@
 
 			const electron = require('electron');
 			const path = require('path');
+			const spawn = require('child_process').spawn;
 			const aa = require('aa');
 			const findDirFiles = require('./find-dir-files');
 
@@ -95,10 +96,10 @@
 					return m('div',
 						m('span',
 							{style: {color: 'green'},
-							 onclick: () => electron.shell.openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
+							 onclick: () => openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
 						m('span',
 							{style: {color: 'blue'},
-							 onclick: () => electron.shell.openExternal(file)}, '[ﾌｧｲﾙ]'),
+							 onclick: () => openExternal(file)}, '[ﾌｧｲﾙ]'),
 							' ' + file.substr(targetDir.length))
 				});
 			}
@@ -135,6 +136,14 @@
 					err => console.log('then err: ', err)
 				);
 				return false;
+			}
+
+			function openExternal(file) {
+				if (!file.startsWith('\\'))
+					return electron.shell.openExternal(file);
+
+				spawn('explorer', [file]);
+				return;
 			}
 		}();
 		</script>
