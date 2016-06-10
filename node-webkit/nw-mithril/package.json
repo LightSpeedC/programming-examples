@@ -8,10 +8,10 @@
     "width": 1200,
     "height": 800
   },
-  "scripts": {
-    "start": "nw ."
-  },
   "dependencies": {
     "aa": "^0.1.36"
+  },
+  "scripts": {
+    "start": "electron ."
   }
 }
