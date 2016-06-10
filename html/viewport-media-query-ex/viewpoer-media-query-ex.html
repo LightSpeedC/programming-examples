@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+
+<!-- http://qiita.com/ryounagaoka/items/045b2808a5ed43f96607 -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+var pc_width = 1080;
+var device = screen.width < 600 ? 'sp' : 'pc';
+var view_mode = device == 'pc' || document.cookie.indexOf('view_mode=pc') != -1 ? 'pc' : 'sp';
+if (device == 'sp' && view_mode == 'pc') {
+    document.getElementById('viewport').setAttribute('content', 'width=' + pc_width + ',initial-scale=1');
+}
+
+$(function () {
+    if (device == 'sp') {
+        if (view_mode == 'pc') {
+            $('.sp-mode').on('click', function () {
+                var date = new Date();
+                date.setTime(0);
+                document.cookie = 'view_mode=;expires='+date.toGMTString();
+                location.reload(false);
+            }).show();
+        } else {
+            $('.pc-mode').on('click', function () {
+                document.cookie = 'view_mode=pc';
+                location.reload(false);
+            }).show();
+        }
+    }
+});
+</script>
+</head>
+<body>
+
+(中略)
+
+<button class="sp-mode" style="display:none;">スマートフォン用で表示</button>
+<button class="pc-mode" style="display:none;">PC用で表示</button>
+
+</body>
+</html>
