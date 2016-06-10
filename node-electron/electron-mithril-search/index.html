@@ -17,7 +17,7 @@
 
 			focus();
 
-			const version = 'version: 0.0.2 (2016/06/10)';
+			const version = 'version: 0.0.3 (2016/06/11)';
 			const electron = require('electron');
 			const path = require('path');
 			const spawn = require('child_process').spawn;
@@ -115,10 +115,12 @@
 
 			m.mount($div, {view});
 
-			function progressCallback(file, object) {
+			// コールバック
+			function progressCallback(object) {
+				const file = object.file;
 				files.push(file);
 				filesIsDirty = true;
-				wholeObject = object;
+				wholeObject = object.wholeObject;
 			}
 
 			// 検索

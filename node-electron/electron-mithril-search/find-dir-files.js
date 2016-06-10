@@ -15,21 +15,27 @@ void function () {
 		throw new TypeError('eh!? readdirAsync');
 
 	function *findDirFiles(dir, pattern, progressCallback, wholeObject) {
-		const names = yield fs.readdirAsync(dir);
 		const result = {};
 		if (!wholeObject) wholeObject = result;
+		try {
+			var names = yield fs.readdirAsync(dir);
+		} catch (e) {
+			result['*'] = e;
+			return result;
+		}
 		yield names.map(name => function *() {
-			const subDir = path.resolve(dir, name);
-			const stat = yield fs.statAsync(subDir);
+			const file = path.resolve(dir, name);
+			const stat = yield fs.statAsync(file);
 			if (stat.isDirectory()) {
-				const r = yield findDirFiles(subDir, pattern, progressCallback, wholeObject);
-				if (r || name.includes(pattern))
-					result[name + path.sep] = r ||
-						(progressCallback(subDir + path.sep, wholeObject), null) || {};
+				const r = yield findDirFiles(file, pattern, progressCallback, wholeObject);
+				if (r || name.includes(pattern)) {
+					result[name] = r || {};
+					if (!r) progressCallback({isDirectory:true, file, wholeObject, dir, name, stat});
+				}
 			}
 			else if (name.includes(pattern)) {
 				result[name] = null;
-				progressCallback(subDir, wholeObject);
+				progressCallback({isDirectory:false, file, wholeObject, dir, name, stat});
 			}
 		});
 		return (Object.keys(result).length || null) && result;
