@@ -17,6 +17,7 @@
 
 			focus();
 
+			const version = 'version: 0.0.2 (2016/06/10)';
 			const electron = require('electron');
 			const path = require('path');
 			const spawn = require('child_process').spawn;
@@ -61,7 +62,7 @@
 					m('hr'),
 					myViewResult(),
 					m('hr'),
-					m('div', 'version: 0.0.1 (2016/06/10)'),
+					m('div', version),
 					m('input[type=checkbox]', m_on('click', 'checked', debugFlag)), 'debug',
 					(debugFlag() ? debugView() : '')
 					];
@@ -139,8 +140,8 @@
 			}
 
 			function openExternal(file) {
-				if (!file.startsWith('\\'))
-					return electron.shell.openExternal(file);
+				//if (!file.startsWith('\\'))
+				//	return electron.shell.openExternal(file);
 
 				spawn('explorer', [file]);
 				return;
