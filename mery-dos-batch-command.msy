@@ -16,6 +16,7 @@
 
 #Word Color=0, WholeWord=True, RightSide=False, MatchCase=False, InsideTag=False, RegEx=False
 CALL
+COPY
 DO
 ENDLOCAL
 ERRORLEVEL
@@ -24,15 +25,19 @@ FOR
 GOTO
 IF
 IN
+MKDIR
 NOT
 OFF
 ON
 PAUSE
 POPD
 PUSHD
+ROBOCOPY
 SET
 SETLOCAL
 SHIFT
+START
+TYPE
 
 #Word Color=2, WholeWord=False, RightSide=False, MatchCase=False, InsideTag=False, RegEx=False
 %
