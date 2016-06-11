@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<title>Search 検索</title>
+		<title>ファイル検索(electron)</title>
 		<style> body{ font-family: "メイリオ", Meiryo,
 					"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
 				font-size: 12px; line-height: 1.2; } </style>
@@ -11,145 +11,7 @@
 	</head>
 	<body>
 		<div id="$div" />
-		<script>
-		void function () {
-			'use strict';
-
-			focus();
-
-			const version = 'version: 0.0.3 (2016/06/11)';
-			const electron = require('electron');
-			const path = require('path');
-			const spawn = require('child_process').spawn;
-			const aa = require('aa');
-			const findDirFiles = require('./find-dir-files');
-
-			const debugFlag = m.prop(false);
-			const includes = m.prop('');
-			const excludes = m.prop('');
-
-			const targetDir = process.env.AAA_TARGET_DIR;
-			const text = m.prop('');
-			let files = [];
-			let filesIsDirty = false;
-			let wholeObject = {};
-			let timer;
-
-			// view
-			function view() {
-				return [m('h3', 'Search 検索 - ',
-							m('font[color=green]', targetDir),
-							(timer ? m('font[color=red]', ' - 検索中') : '')),
-						(timer ?
-							[m('div', m('b', m('font[color=red]', text()))),
-							 m('div', includes()),
-							 m('div', excludes())] :
-							m('form', {onsubmit: search},
-								m('div',
-									m('input', m_on('change', 'value', text,
-										{autofocus: true, placeholder: '入力', size: 100})),
-									m('button[type=submit]', {onclick: search}, '検索')),
-								m('div',
-									m('input', m_on('change', 'value', includes,
-										{placeholder: '含む', size: 100})),
-									'を含む'),
-								m('div',
-									m('input', m_on('change', 'value', excludes,
-										{placeholder: '含まない', size: 100})),
-									'を含まない')
-							)
-						),
-					m('hr'),
-					myViewResult(),
-					m('hr'),
-					m('div', version),
-					m('input[type=checkbox]', m_on('click', 'checked', debugFlag)), 'debug',
-					(debugFlag() ? debugView() : '')
-					];
-			}
-
-			function debugView() {
-				//if (window.process)
-				//<pre><font color="brown">
-				return m('pre',
-					m('font[color=brown]',
-						('process.cwd(): ' + process.cwd()),
-						('\n\nprocess.pid: ' + process.pid),
-						('\n\nprocess.versions: ' + JSON.stringify(process.versions, null, '\t')),
-						('\n\nprocess.env: ' + JSON.stringify(process.env, null, '\t'))
-					));
-				//</font></pre>
-			}
-
-			// 結果
-			function myViewResult() {
-				if (filesIsDirty) files = files.sort();
-				filesIsDirty = false;
-				const incl = includes();
-				const excl = excludes();
-				return files
-					.filter(file => file.includes(incl))
-					.filter(file => excl === '' || !file.includes(excl))
-					.map(file => {
-					const dirs = file.split('\\');
-					dirs.pop();
-					const dir = dirs.join('\\');
-					return m('div',
-						m('span',
-							{style: {color: 'green'},
-							 onclick: () => openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
-						m('span',
-							{style: {color: 'blue'},
-							 onclick: () => openExternal(file)}, '[ﾌｧｲﾙ]'),
-							' ' + file.substr(targetDir.length))
-				});
-			}
-
-			// HTML要素のイベントと値にプロパティを接続するユーティリティ
-			function m_on(eventName, propName, propFunc, attrs) {
-				attrs = attrs || {};
-				attrs['on' + eventName] = m.withAttr(propName, propFunc);
-				attrs[propName] = propFunc();
-				return attrs;
-			}
-
-			m.mount($div, {view});
-
-			// コールバック
-			function progressCallback(object) {
-				const file = object.file;
-				files.push(file);
-				filesIsDirty = true;
-				wholeObject = object.wholeObject;
-			}
-
-			// 検索
-			function search() {
-				if (timer) return;
-				aa(function *() {
-					m.redraw(true);
-					files = [];
-					timer = setInterval(() => m.redraw(true), 500);
-					yield findDirFiles(targetDir, text(), progressCallback);
-					clearInterval(timer);
-					timer = null; 
-					m.redraw(true);
-				}).then(
-					val => console.log('then val: ', val),
-					err => console.log('then err: ', err)
-				);
-				return false;
-			}
-
-			function openExternal(file) {
-				//if (!file.startsWith('\\'))
-				//	return electron.shell.openExternal(file);
-
-				spawn('explorer', [file]);
-				return;
-			}
-		}();
-		</script>
+		<script src="main-script.js"></script>
 
 
 	</body>

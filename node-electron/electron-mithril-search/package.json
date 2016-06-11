@@ -1,5 +1,5 @@
 {
-  "name": "nw-mithril-node-webkit",
+  "name": "ファイル検索(electron)",
   "version": "0.0.0",
   "description": "mithril js node-webkit",
   "main": "main.js",
