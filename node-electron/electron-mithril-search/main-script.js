@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.4 (2016/06/11)';
+	const version = 'version: 0.0.5 (2016/06/12)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const aa = require('aa');
@@ -17,10 +17,12 @@ void function () {
 
 	const targetDir = process.env.AAA_TARGET_DIR;
 	const text = m.prop('');
+	const newLayout = m.prop(true); // 新レイアウト
 	let files = [];
 	let filesIsDirty = false;
 	let wholeObject = {};
 	let timer;
+	const maxIndent = 20;
 
 	m.mount($div, {view});
 
@@ -56,8 +58,15 @@ void function () {
 			m('hr', {key: 'hr1'}),
 			m('div', {key: 'message'}, message()), // メッセージ
 			m('hr', {key: 'hr2'}),
-			m('div', {key: 'result'}, myViewResult()), // 検索結果
+			//m('div', {key: 'result'}, myViewResult()), // 検索結果
+			//m('div', {key: 'result2'}, myViewResult2()), // 検索結果2
+			m('div', {key: 'layout'},
+				m('input[type=checkbox]',
+					m_on('click', 'checked', newLayout)),
+				'新レイアウト (作りたて注意)',
 			m('hr', {key: 'hr3'}),
+			(newLayout() ? myViewResult2() : myViewResult())), // 検索結果
+			m('hr', {key: 'hr4'}),
 			m('div', {key:'version'}, version), // バージョン
 			// デバッグ表示
 			m('div', {key: 'debug'},
@@ -97,6 +106,68 @@ void function () {
 		);
 	}
 
+	// range 0～n-1までの数字の配列
+	function range(n) {
+		var a = [];
+		for (let i = 0; i < n; ++i) a.push(i);
+		return a;
+	}
+
+	function viewNode(nodePath, node, i, n, txt, incl, excl) {
+		if (typeof node === 'object' && node !== null) {
+			let keys = Object.getOwnPropertyNames(node);
+			return [
+				keys.filter(key => key !== ' hide').map(key => {
+					if (key === '*')
+						return m('tr', {},
+							range(i + 1).map(x => m('td', {align: 'center', width: 40}, ' ')),
+							m('td', {colspan: n - i, style: {color: 'red'}}, node[key] + ''));
+					const fullPath = nodePath.join('\\') + '\\' + key;
+					const child = node[key];
+					return [
+						m('tr', {key: fullPath},
+							(node[key] || key.includes(txt) &&
+								(!incl || key.includes(incl)) &&
+								(!excl || !key.includes(excl))) ? [
+								range(i).map(x => m('td', {align: 'center', width: 40}, ' ')),
+								m('td', {align: 'center', width: 40},
+									child ? m('input[type=checkbox]',
+										m_on('click', 'checked',
+											function (v) {
+												if (arguments.length === 0) return child[' hide'] !== true;
+												child[' hide'] = !v;
+											}
+										)
+									) : ' '
+								),
+								m('td', {
+									colspan: n - i,
+									title: fullPath.substring(targetDir.length),
+									onclick: () => openExternal(fullPath),
+									style: {color: node[key] ? 'green' : 'blue'}
+								}, key)
+							] : []
+						),
+						(!child || child[' hide']) ? [] :
+						viewNode(nodePath.concat(key), child, i + 1, n, txt, incl, excl)
+					];
+				})
+			];
+		}
+		else
+			return [];
+	}
+
+	// 結果2
+	function myViewResult2() {
+		const txt = text();
+		const incl = includes();
+		const excl = excludes();
+		return m('table', {width: '100%', cellPadding: 0, border: 0, borderColor: 'lightgray', cellSpacing: 0},
+			viewNode([], {[targetDir]: wholeObject}, 0, maxIndent, txt, incl, excl)
+		);
+	}
+
 	// 検索コールバック
 	function progressCallback(object) {
 		const file = object.file;
@@ -118,7 +189,7 @@ void function () {
 			try {
 				yield findDirFiles(targetDir, text(),
 					progressCallback,
-					wholeObject,
+					null,
 					findController);
 				if (!findController.isCancel)
 					message('完了しました');

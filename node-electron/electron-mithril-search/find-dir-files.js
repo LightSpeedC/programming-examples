@@ -48,19 +48,20 @@ void function () {
 						}
 						if (r || name.includes(pattern)) {
 							result[name] = r || {};
-							if (name.includes(pattern))
-								progressCallback({isDirectory:true, file: file + path.sep, wholeObject, dir, name, stat});
+							progressCallback({isDirectory:true, file: file + path.sep, wholeObject, dir, name, stat});
 						}
+						else delete result[name];
 					}
 					else if (name.includes(pattern)) {
 						result[name] = null;
 						progressCallback({isDirectory:false, file, wholeObject, dir, name, stat});
 					}
+					else delete result[name];
 				} catch (e) {
 					result[name] = {'*': e};
 				}
 			});
-			return (Object.keys(result).length || null) && result;
+			return (Object.keys(result).length || undefined) && result;
 		} catch (e) {
 			result['*'] = e;
 			return result;
