@@ -1,0 +1,57 @@
+body {
+	font-family: "メイリオ", Meiryo,
+		"ＭＳ Ｐゴシック", "MS PGothic", sans-serif;
+	font-size: 12px;
+	line-height: 1.2;
+}
+
+/* http://weboook.blog22.fc2.com/blog-entry-265.html */
+tr:nth-child(odd) {
+	background: #eff;
+}
+tr:hover {
+	background-color: #eef;
+}
+td:hover {
+	background-color: #ccf;
+}
+/*
+tr:nth-child(n)   　･･･　n番目のtrに適用
+tr:nth-child(odd) 　･･･　奇数番目のtrに適用
+tr:nth-child(2n+1)　･･･　奇数番目のtrに適用
+tr:nth-child(even)　･･･　偶数番目のtrに適用
+tr:nth-child(2n)  　･･･　偶数番目のtrに適用
+tr:nth-child(3n)  　･･･　3,6,9,12…番目のtrに適用
+tr:nth-child(3n+1)　･･･　1,4,7,10…番目のtrに適用
+*/
+
+/* http://www.nxworld.net/tips/css-only-button-design-and-hover-effects.html */
+.button {
+	display: inline-block;
+	/* width: 200px; height: 54px; 
+	line-height: 54px; */
+	text-align: center;
+	text-decoration: none;
+	outline: none;
+	border: 0;
+}
+.button::before,
+.button::after {
+	position: absolute;
+	z-index: -1;
+	display: block;
+	content: '';
+}
+.button,
+.button::before,
+.button::after {
+	box-sizing: border-box;
+	transition: all .3s;
+}
+.button {
+	background-color: #383;
+	color: #fff;
+}
+.button:hover {
+	background-color: #6bc;
+}

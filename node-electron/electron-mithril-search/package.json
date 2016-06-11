@@ -1,7 +1,7 @@
 {
-  "name": "ファイル検索(electron)",
+  "name": "file-search-electron-mithril",
   "version": "0.0.0",
-  "description": "mithril js node-webkit",
+  "description": "file search electron mithril",
   "main": "main.js",
   "private": true,
   "window": {

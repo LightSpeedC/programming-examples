@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.3 (2016/06/11)';
+	const version = 'version: 0.0.4 (2016/06/11)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const aa = require('aa');
@@ -33,7 +33,7 @@ void function () {
 			m('div', {key: 'condition'},
 				timer ? [
 					m('div',
-						m('button', {onclick: cancel}, 'ｷｬﾝｾﾙ'),
+						m('button.button', {onclick: cancel}, 'ｷｬﾝｾﾙ'),
 						m('b', m('font[color=red]', text()))),
 					m('div', includes()),
 					m('div', excludes())
@@ -42,7 +42,7 @@ void function () {
 						m('div',
 							m('input', m_on('change', 'value', text,
 								{autofocus: true, placeholder: '検索したい文字列', size: 100})),
-							m('button[type=submit]', {onclick: search}, '検索'))),
+							m('button.button[type=submit]', {onclick: search}, '検索'))),
 					m('div',
 						m('input', m_on('change', 'value', includes,
 							{placeholder: '含む', size: 100})),
@@ -73,24 +73,28 @@ void function () {
 		filesIsDirty = false;
 		const incl = includes();
 		const excl = excludes();
-		return files
+		return m('table', {width: '100%', cellPadding: 0, border: 0, cellSpacing: 0},
+			files
 			.filter(file => file.includes(incl))
 			.filter(file => !excl || !file.includes(excl))
 			.map(file => {
-			const dirs = file.split('\\');
-			dirs.pop();
-			const dir = dirs.join('\\');
-			return m('div', {key: file},
-				m('span',
-					{style: {color: 'green'},
-					 onclick: () => openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
-				m('span',
-					{style: {color: 'blue'},
-					 onclick: () => openExternal(file)}, '[ﾌｧｲﾙ]'),
-				m('span',
-					' ' + file.substr(targetDir.length))
-			);
-		});
+				const dirs = file.split('\\');
+				dirs.pop();
+				const dir = dirs.join('\\');
+				return m('tr', {key: file},
+					m('td',
+						{align: 'center', width: 50, style: {color: 'green'},
+						 title: dir.substr(targetDir.length),
+						 onclick: () => openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
+					m('td',
+						{align: 'center', width: 44, style: {color: 'blue'},
+						 title: file.substr(targetDir.length),
+						 onclick: () => openExternal(file)}, '[ﾌｧｲﾙ]'),
+					m('td',
+						file.substr(targetDir.length))
+				);
+			})
+		);
 	}
 
 	// 検索コールバック
