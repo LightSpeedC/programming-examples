@@ -8,37 +8,44 @@ void function () {
 	const path = require('path');
 	const fs = require('fs');
 	const aa = require('aa');
+	const Executors = require('executors');
+
 	aa.thunkifyAll(fs);
 	if (typeof fs.statAsync !== 'function')
 		throw new TypeError('eh!? statAsync');
 	if (typeof fs.readdirAsync !== 'function')
 		throw new TypeError('eh!? readdirAsync');
 
+	const exec1 = Executors(5);
+	const exec2 = Executors(5);
+
 	function *findDirFiles(dir, pattern, progressCallback, wholeObject, controller) {
 		const result = {};
 		if (!wholeObject) wholeObject = result;
 		if (!controller) controller = {};
-		if (controller.isCancel) {
-			const e = new Error('Cancel');
-			result['*'] = e;
-			return result;
-		}
+		if (controller.isCancel) return {'*': new Error('Cancel')};
 		try {
-			const names = yield fs.readdirAsync(dir);
-			names.forEach(name => result[name] = undefined);
-			for (let name of names) {
-			//yield names.map(name => function *() {
-				if (controller.isCancel) {
-					const e = new Error('Cancel');
-					result[name] = {'*': e};
-					return;
-				}
+			const names = yield exec1(fs.readdirAsync, dir);
+			if (controller.isCancel) {
+				result['*'] = new Error('Cancel');
+				return result;
+			}
+			//for (let name of names) {
+			yield names.map(name => function *() {
+				result[name] = undefined;
 				try {
 					var file = path.resolve(dir, name);
-					const stat = yield fs.statAsync(file);
-					if (controller.isCancel) return;
+					const stat = yield exec2(fs.statAsync, file);
+					if (controller.isCancel) {
+						result[name] = {'*': new Error('Cancel')};
+						return;
+					}
 					if (stat.isDirectory()) {
 						const r = yield findDirFiles(file, pattern, progressCallback, wholeObject, controller);
+						if (controller.isCancel) {
+							result[name] = {'*': new Error('Cancel')};
+							return;
+						}
 						if (r || name.includes(pattern)) {
 							result[name] = r || {};
 							if (name.includes(pattern))
@@ -52,8 +59,7 @@ void function () {
 				} catch (e) {
 					result[name] = {'*': e};
 				}
-			//});
-			}
+			});
 			return (Object.keys(result).length || null) && result;
 		} catch (e) {
 			result['*'] = e;

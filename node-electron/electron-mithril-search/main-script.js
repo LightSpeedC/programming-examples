@@ -120,7 +120,8 @@ void function () {
 					message('完了しました');
 			} catch (e) {
 				cancel();
-				console.log('search err: ', e);
+				console.error('search err:');
+				console.error(e);
 				alert(e.stack);
 			}
 			finish();
