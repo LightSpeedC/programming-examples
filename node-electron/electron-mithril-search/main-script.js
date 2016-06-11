@@ -23,6 +23,7 @@ void function () {
 	let wholeObject = {};
 	let timer;
 	const maxIndent = 20;
+	const indentSpace = ' ';
 
 	m.mount($div, {view});
 
@@ -117,20 +118,20 @@ void function () {
 		if (typeof node === 'object' && node !== null) {
 			let keys = Object.getOwnPropertyNames(node);
 			return [
-				keys.filter(key => key !== ' hide').map(key => {
-					if (key === '*')
+				keys.filter(prop => prop !== ' hide').map(prop => {
+					const child = node[prop];
+					if (prop === findDirFiles.ERROR_PROP)
 						return m('tr', {},
-							range(i + 1).map(x => m('td', {align: 'center', width: 40}, ' ')),
-							m('td', {colspan: n - i, style: {color: 'red'}}, node[key] + ''));
-					const fullPath = nodePath.join('\\') + '\\' + key;
-					const child = node[key];
+							range(i + 1).map(x => m('td.indent', indentSpace)),
+							m('td.error', {colspan: n - i}, child + ''));
+					const fullPath = nodePath.join('\\') + '\\' + prop;
 					return [
 						m('tr', {key: fullPath},
-							(node[key] || key.includes(txt) &&
-								(!incl || key.includes(incl)) &&
-								(!excl || !key.includes(excl))) ? [
-								range(i).map(x => m('td', {align: 'center', width: 40}, ' ')),
-								m('td', {align: 'center', width: 40},
+							(child || prop.includes(txt) &&
+								(!incl || prop.includes(incl)) &&
+								(!excl || !prop.includes(excl))) ? [
+								range(i).map(x => m('td.indent', indentSpace)),
+								m('td.indent', {},
 									child ? m('input[type=checkbox]',
 										m_on('click', 'checked',
 											function (v) {
@@ -138,18 +139,17 @@ void function () {
 												child[' hide'] = !v;
 											}
 										)
-									) : ' '
+									) : indentSpace
 								),
-								m('td', {
+								m(child ? 'td.folder' : 'td.file', {
 									colspan: n - i,
-									title: fullPath.substring(targetDir.length),
-									onclick: () => openExternal(fullPath),
-									style: {color: node[key] ? 'green' : 'blue'}
-								}, key)
+									title: fullPath.substring(targetDir.length + 1),
+									onclick: () => openExternal(fullPath)
+								}, prop)
 							] : []
 						),
 						(!child || child[' hide']) ? [] :
-						viewNode(nodePath.concat(key), child, i + 1, n, txt, incl, excl)
+						viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl)
 					];
 				})
 			];

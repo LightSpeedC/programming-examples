@@ -24,6 +24,13 @@ tr:nth-child(2n)  　･･･　偶数番目のtrに適用
 tr:nth-child(3n)  　･･･　3,6,9,12…番目のtrに適用
 tr:nth-child(3n+1)　･･･　1,4,7,10…番目のtrに適用
 */
+td.indent {
+	text-align: center;
+	width: 30px;
+}
+td.error  { color: red; }
+td.folder { color: green; }
+td.file   { color: blue; }
 
 /* http://www.nxworld.net/tips/css-only-button-design-and-hover-effects.html */
 .button {
