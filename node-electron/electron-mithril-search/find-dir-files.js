@@ -41,8 +41,13 @@ void function () {
 
 		// cancel
 		function *cancel() {
-			yield *xqtor1.cancel();
-			yield *xqtor2.cancel();
+			try {
+				yield *xqtor1.cancel();
+				yield *xqtor2.cancel();
+			} catch(e) {
+				yield *xqtor1.end();
+				yield *xqtor2.end();
+			}
 		}
 
 		// find
