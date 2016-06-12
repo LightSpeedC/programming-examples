@@ -8,7 +8,7 @@ void function () {
 	const spawn = require('child_process').spawn;
 	const aa = require('aa');
 	const findDirFiles = require('./find-dir-files');
-	const findController = {isCancel:false, cancel};
+	const findController = {isCancel:false, cancel, progress};
 
 	const debugFlag = m.prop(false);
 	const includes = m.prop('');
@@ -169,11 +169,12 @@ void function () {
 	}
 
 	// 検索コールバック
-	function progressCallback(object) {
+	function progress(object) {
 		const file = object.file;
+		wholeObject = object.wholeObject;
+		if (file === targetDir) return;
 		files.push(file);
 		filesIsDirty = true;
-		wholeObject = object.wholeObject;
 	}
 
 	// 検索
@@ -188,8 +189,6 @@ void function () {
 			findController.isCancel = false;
 			try {
 				yield findDirFiles(targetDir, text(),
-					progressCallback,
-					null,
 					findController);
 				if (!findController.isCancel)
 					message('完了しました');
