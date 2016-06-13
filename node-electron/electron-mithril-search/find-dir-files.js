@@ -32,12 +32,26 @@ void function () {
 	function *findDirFiles(dir, pattern, controller) {
 		if (!controller) controller = {};
 		if (controller.isCancel) return CANCEL_DATA;
+		const maxFiles = controller.maxFiles || 3000;
+		const maxTotalFiles = controller.maxTotalFiles || 30000;
 		const {progress} = controller;
 		let wholeObject;
+		let filesCount = 0;
 
 		const xqtor1 = Executors(5);
 		const xqtor2 = Executors(5);
-		return yield *find(dir);
+		const result = yield *find(dir);
+
+		if (filesCount > maxTotalFiles)
+			result[ERROR_PROP] = new RangeError(
+				'合計ファイル数の制限 (' +
+				maxTotalFiles + ') を超えました (' +
+				filesCount + ')');
+
+		if (result[ERROR_PROP] === undefined)
+			delete result[ERROR_PROP];
+
+		return result;
 
 		// cancel
 		function *cancel() {
@@ -55,6 +69,7 @@ void function () {
 			const result = new SpecialData();
 			if (!wholeObject) {
 				wholeObject = result;
+				wholeObject[ERROR_PROP] = undefined;
 				progress &&
 				progress({isDirectory:true, file: dir, wholeObject, dir, name: '', stat: null});
 			}
@@ -66,6 +81,17 @@ void function () {
 					yield *cancel();
 					return result;
 				}
+				if (names.length > maxFiles) {
+					result[ERROR_PROP] = new RangeError(
+						'ファイル数の制限 (' +
+						maxFiles + ') を超えました (' +
+						names.length + ')');
+					return result;
+				}
+				filesCount += names.length;
+				if (filesCount > maxTotalFiles)
+					return undefined;
+
 				//for (let name of names) {
 				yield names.map(name => function *() {
 					result[name] = undefined;
