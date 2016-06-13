@@ -3,15 +3,18 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.5 (2016/06/13)';
+	const version = 'version: 0.0.6 (2016/06/13)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
+	const electron = require('electron');
 	const aa = require('aa');
 	const findDirFiles = require('./find-dir-files');
 	const findController = {isCancel:false, cancel, progress};
 
 	const debugFlag = m.prop(false);
+	const usageFlag = m.prop(false);
 	const releaseNotesFlag = m.prop(false);
+	const wishListFlag = m.prop(false);
 	const includes = m.prop('');
 	const excludes = m.prop('');
 	const message = m.prop('検索できます');
@@ -22,14 +25,54 @@ void function () {
 	let files = [targetDir + '\まだ検索していません'];
 	let filesIsDirty = false;
 	let wholeObject = {[findDirFiles.ERROR_PROP]: 'まだ検索していません'};
-	let timer;
-	const maxIndent = 20;
+	let timer; // 検索中のインターバルタイマー
+	const maxIndent = 20; // 最大インデントの深さ
 	const indentSpace = ' ';
+	const INVISIBLE_PROP = ' ';
 	const HIDE_PROP = ' hide';
 
 	m.mount($div, {view});
 
-	// view
+	// 使い方表示
+	function usageView() {
+		const list = [
+			'ファイル名の一部として「検索したい文字列」を入れて「検索」します (Enterで検索)',
+			'ファイル名に「含む」文字列をフィルタします (Enterで更新)',
+			'ファイル名に「含まない」文字列を除外します (Enterで更新)',
+			'検索中に「キャンセル」できます',
+			'フォルダやファイルへリンクできます (ファイルの左の■でフォルダへリンク)',
+			'ツリー表示でき、チェックボックスで非表示にできます (再検索でリセット)',
+			'新旧のレイアウトを切替できます → 後で削除する予定',
+			'×ワイルドカード検索はまだできません',
+			'×あまりたくさんのファイルを検索するとハングする可能性があります',
+		];
+		return m('font[color=gray]', {}, m('ul', list.map(x => m('li', x))));
+	}
+
+	// リリース・ノート表示
+	function releaseNotesView() {
+		const list = [
+			'0.0.6 (2016/06/13): ルート・フォルダのリンク不具合修正、ほか',
+			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
+			'0.0.4 (2016/06/12): ツリー表示、新旧レイアウト切替',
+			'0.0.3 (2016/06/11): 検索中のキャンセル',
+			'0.0.2 (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)',
+			'0.0.1 (2016/06/09): 検索したファイルの一覧表示',
+		];
+		return m('font[color=darkblue]', {}, m('ul', list.map(x => m('li', x))));
+	}
+
+	// やりたいことリスト表示
+	function wishListView() {
+		const list = [
+			'AND/OR検索',
+			'ワイルドカード検索',
+			'ファイル数制限'
+		];
+		return m('font[color=purple]', {}, m('ul', list.map(x => m('li', x))));
+	}
+
+	// メインview
 	function view() {
 		return [
 			m('h3', {key: 'title'}, 'ファイル検索 - ',
@@ -59,10 +102,11 @@ void function () {
 				]
 			),
 			m('hr', {key: 'hr1'}),
-			m('div', {key: 'message'}, message()), // メッセージ
+
+			// メッセージ
+			m('div', {key: 'message'}, m('b', message())),
 			m('hr', {key: 'hr2'}),
-			//m('div', {key: 'result'}, myViewResult()), // 検索結果
-			//m('div', {key: 'result2'}, myViewResult2()), // 検索結果2
+
 			m('div', {key: 'layout'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', newLayout)),
@@ -70,17 +114,25 @@ void function () {
 			m('hr', {key: 'hr3'}),
 			(newLayout() ? myViewResult2() : myViewResult())), // 検索結果
 			m('hr', {key: 'hr4'}),
-			// デバッグ表示
+
+			// 使い方表示
+			m('div', {key: 'usage'},
+				m('input[type=checkbox]',
+					m_on('click', 'checked', usageFlag)),
+				'使い方', usageFlag() ? usageView() : ''),
+
+			// リリース・ノート表示
 			m('div', {key: 'release-notes'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', releaseNotesFlag)),
-				'リリースノート: ' + version, (releaseNotesFlag() ? m('pre', {}, m('font[color=purple]', [
-					'\t0.0.5 (2016/06/13): リリースノート表示、リファクタリング\n',
-					'\t0.0.4 (2016/06/12): ツリー表示、新旧レイアウト切替\n',
-					'\t0.0.3 (2016/06/11): 検索中のキャンセル\n',
-					'\t0.0.2 (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)\n',
-					'\t0.0.1 (2016/06/09): 検索したファイルの一覧表示\n',
-				])) : '')),
+				'リリース・ノート: ' + version, releaseNotesFlag() ? releaseNotesView() : ''),
+
+			// やりたいことリスト表示
+			m('div', {key: 'wish-list'},
+				m('input[type=checkbox]',
+					m_on('click', 'checked', wishListFlag)),
+				'やりたいことリスト', wishListFlag() ? wishListView() : ''),
+
 			// デバッグ表示
 			m('div', {key: 'debug'},
 				m('input[type=checkbox]',
@@ -107,11 +159,11 @@ void function () {
 					m('td',
 						{align: 'center', width: 50, style: {color: 'green'},
 						 title: dir.substr(targetDir.length),
-						 onclick: () => openExternal(dir)}, '[ﾌｫﾙﾀﾞ]'),
+						 onclick: () => openItem(dir)}, '[ﾌｫﾙﾀﾞ]'),
 					m('td',
 						{align: 'center', width: 44, style: {color: 'blue'},
 						 title: file.substr(targetDir.length),
-						 onclick: () => openExternal(file)}, '[ﾌｧｲﾙ]'),
+						 onclick: () => openItem(file)}, '[ﾌｧｲﾙ]'),
 					m('td',
 						file.substr(targetDir.length))
 				);
@@ -131,37 +183,35 @@ void function () {
 		if (typeof node === 'object' && node !== null) {
 			let keys = Object.getOwnPropertyNames(node);
 			return [
-				keys.filter(prop => prop !== HIDE_PROP).map(prop => {
+				keys.filter(prop => !prop.startsWith(INVISIBLE_PROP)).map(prop => {
 					const child = node[prop];
 					if (prop === findDirFiles.ERROR_PROP)
 						return m('tr', {},
 							range(i + 1).map(x => m('td.indent', indentSpace)),
 							m('td.error', {colspan: n - i}, child + ''));
-					const fullPath = nodePath.join('\\') + '\\' + prop;
+					const fullPath = (nodePath.join('\\') + '\\' + prop).substr(i === 0);
 					return [
-						m('tr', {key: fullPath},
-							(child || prop.includes(txt) &&
-								(!incl || prop.includes(incl)) &&
-								(!excl || !prop.includes(excl))) ? [
-								range(i).map(x => m('td.indent', indentSpace)),
-								m('td.indent', {},
-									child ? m('input[type=checkbox]',
-										m_on('click', 'checked',
-											function (v) {
-												if (arguments.length === 0) return child[HIDE_PROP] !== true;
-												child[HIDE_PROP] = !v;
-											}
-										)
-									) : indentSpace
-								),
-								m(child ? 'td.folder' : 'td.file', {
-									colspan: n - i,
-									title: fullPath.substring(targetDir.length + 1),
-									onclick: () => openExternal(fullPath)
-								}, prop)
-							] : []
-						),
-						(!child || child[HIDE_PROP]) ? [] :
+						(child || prop.includes(txt) &&
+							(!incl || prop.includes(incl)) &&
+							(!excl || !prop.includes(excl))) ?
+						m('tr', {key: fullPath}, [
+							range(i).map(x => m('td.indent', indentSpace)),
+							child ?
+							m('td.indent', {}, m('input[type=checkbox]',
+								m_on('click', 'checked', v =>
+									v === undefined ? !child[HIDE_PROP] :
+									(child[HIDE_PROP] = !v))
+							)) :
+							m('td.indent.folder',
+								{onclick: () => showItemInFolder(fullPath)},
+								'■'),
+							m(child ? 'td.folder' : 'td.file', {
+								colspan: n - i,
+								title: fullPath.substring(targetDir.length + 1),
+								onclick: () => openItem(fullPath)
+							}, prop)
+						]) : '',
+						!child || child[HIDE_PROP] ? [] :
 						viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl)
 					];
 				})
@@ -233,20 +283,29 @@ void function () {
 	}
 
 	// フォルダやファイルを開く
-	function openExternal(file) {
+	function openItem(file) {
 		spawn('explorer', [file]);
+		//electron.shell.openItem(file);
+		//alert('openItem ?\n' + file);
+		return;
+	}
+
+	// ファイルのあるフォルダを開く
+	function showItemInFolder(file) {
+		electron.shell.showItemInFolder(file);
+		//alert('showItemInFolder ?\n' + file);
 		return;
 	}
 
 	// デバッグ表示
 	function debugView() {
-		return m('pre',
-			m('font[color=brown]',
-				('カレント作業ディレクトリ process.cwd(): ' + process.cwd()),
-				('\n\nプロセスID process.pid: ' + process.pid),
-				('\n\nバージョン process.versions: ' + JSON.stringify(process.versions, null, '\t')),
-				('\n\n環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'))
-			));
+		const list = [
+			'カレント作業ディレクトリ process.cwd(): ' + process.cwd(),
+			'プロセスID process.pid: ' + process.pid,
+			'バージョン process.versions: ' + JSON.stringify(process.versions, null, '\t'),
+			'環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'),
+		];
+		return m('font[color=brown]',{}, m('ul', list.map(x => m('li', m('pre', x)))));
 	}
 
 	// HTML要素のイベントと値にプロパティを接続するユーティリティ

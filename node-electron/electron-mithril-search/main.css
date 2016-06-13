@@ -6,31 +6,13 @@ body {
 }
 
 /* http://weboook.blog22.fc2.com/blog-entry-265.html */
-tr:nth-child(odd) {
-	background: #eff;
-}
-tr:hover {
-	background-color: #eef;
-}
-td:hover {
-	background-color: #ccf;
-}
-/*
-tr:nth-child(n)   　･･･　n番目のtrに適用
-tr:nth-child(odd) 　･･･　奇数番目のtrに適用
-tr:nth-child(2n+1)　･･･　奇数番目のtrに適用
-tr:nth-child(even)　･･･　偶数番目のtrに適用
-tr:nth-child(2n)  　･･･　偶数番目のtrに適用
-tr:nth-child(3n)  　･･･　3,6,9,12…番目のtrに適用
-tr:nth-child(3n+1)　･･･　1,4,7,10…番目のtrに適用
-*/
-td.indent {
-	text-align: center;
-	width: 30px;
-}
+tr:nth-child(odd) { background: #eff; }
+td.indent { text-align: center; width: 30px; }
 td.error  { color: red; }
 td.folder { color: green; }
 td.file   { color: blue; }
+tr:hover  { background-color: #eef; }
+td:hover  { background-color: #ccf; }
 
 /* http://www.nxworld.net/tips/css-only-button-design-and-hover-effects.html */
 .button {
