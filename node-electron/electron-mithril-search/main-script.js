@@ -3,13 +3,15 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.6 (2016/06/13)';
+	const version = 'version: 0.0.6 (2016/06/14)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
 	const aa = require('aa');
 	const findDirFiles = require('./find-dir-files');
 	const findController = {isCancel:false, cancel, progress};
+	const CLEAN_PROP = findDirFiles.CLEAN_PROP;
+	const ERROR_PROP = findDirFiles.ERROR_PROP;
 
 	const debugFlag = m.prop(false);
 	const usageFlag = m.prop(false);
@@ -24,12 +26,13 @@ void function () {
 	const newLayout = m.prop(true); // 新レイアウト
 	let files = [targetDir + '\まだ検索していません'];
 	let filesIsDirty = false;
-	let wholeObject = {[findDirFiles.ERROR_PROP]: 'まだ検索していません'};
+	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
 	let timer; // 検索中のインターバルタイマー
 	const maxIndent = 20; // 最大インデントの深さ
 	const indentSpace = ' ';
 	const INVISIBLE_PROP = ' ';
 	const HIDE_PROP = ' hide';
+	const SUBTREE_RETAIN = {subtree: 'retain'};
 
 	m.mount($div, {view});
 
@@ -52,7 +55,7 @@ void function () {
 	// リリース・ノート表示
 	function releaseNotesView() {
 		const list = [
-			'0.0.6 (2016/06/13): ルート・フォルダのリンク不具合修正、ほか',
+			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、ほか',
 			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
 			'0.0.4 (2016/06/12): ツリー表示、新旧レイアウト切替',
 			'0.0.3 (2016/06/11): 検索中のキャンセル',
@@ -185,11 +188,45 @@ void function () {
 			return [
 				keys.filter(prop => !prop.startsWith(INVISIBLE_PROP)).map(prop => {
 					const child = node[prop];
-					if (prop === findDirFiles.ERROR_PROP)
-						return m('tr', {},
-							range(i + 1).map(x => m('td.indent', indentSpace)),
-							m('td.error', {colspan: n - i}, child + ''));
 					const fullPath = (nodePath.join('\\') + '\\' + prop).substr(i === 0);
+					if (prop === ERROR_PROP)
+						return child === undefined ? [] :
+							m('tr', {key: fullPath},
+								range(i + 1).map(x => m('td.indent', indentSpace)),
+								m('td.error', {colspan: n - i}, child + ''));
+					let vdom = [];
+					if (child || prop.includes(txt) &&
+							(!incl || prop.includes(incl)) &&
+							(!excl || !prop.includes(excl))) {
+						//if (!node[CLEAN_PROP]) {
+							vdom.push(m('tr', {key: fullPath}, [
+								range(i).map(x => m('td.indent', indentSpace)),
+								child ?
+								m('td.indent', {}, m('input[type=checkbox]',
+									m_on('click', 'checked', v =>
+										v === undefined ? !child[HIDE_PROP] :
+										(child[HIDE_PROP] = !v))
+								)) :
+								m('td.indent.folder',
+									{onclick: () => showItemInFolder(fullPath)},
+									'■'),
+								m(child ? 'td.folder' : 'td.file', {
+									colspan: n - i,
+									title: fullPath.substring(targetDir.length + 1),
+									onclick: () => openItem(fullPath)
+								}, prop)
+							]));
+						//	node[CLEAN_PROP] = true;
+						//}
+						//else {
+						//	vdom.push(m('tr', {key: fullPath},
+						//		range(n + 1).map(x => SUBTREE_RETAIN)));
+						//}
+					}
+					if (child && !child[HIDE_PROP])
+						vdom.push(viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl));
+					return vdom;
+/*
 					return [
 						(child || prop.includes(txt) &&
 							(!incl || prop.includes(incl)) &&
@@ -214,6 +251,7 @@ void function () {
 						!child || child[HIDE_PROP] ? [] :
 						viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl)
 					];
+*/
 				})
 			];
 		}

@@ -18,9 +18,10 @@ void function () {
 	if (typeof readdirAsync !== 'function')
 		throw new TypeError('eh!? readdirAsync');
 
+	const PARENT_PROP = ' parent';
+	const CLEAN_PROP = ' clean';
 	const ERROR_PROP = '*';
 	const CANCEL_ERROR = new Error('キャンセル');
-	const CANCEL_DATA = new SpecialData(ERROR_PROP, CANCEL_ERROR);
 
 	// 特殊なデータ・クラス
 	function SpecialData(prop, val) {
@@ -31,15 +32,16 @@ void function () {
 	// ディレクトリとファイルを検索
 	function *findDirFiles(dir, pattern, controller) {
 		if (!controller) controller = {};
-		if (controller.isCancel) return CANCEL_DATA;
+		if (controller.isCancel)
+			return new SpecialData(ERROR_PROP, CANCEL_ERROR);
 		const maxFiles = controller.maxFiles || 3000;
-		const maxTotalFiles = controller.maxTotalFiles || 30000;
+		const maxTotalFiles = controller.maxTotalFiles || 100000;
 		const {progress} = controller;
 		let wholeObject;
 		let filesCount = 0;
 
-		const xqtor1 = Executors(5);
-		const xqtor2 = Executors(5);
+		const xqtor1 = Executors(2);
+		const xqtor2 = Executors(2);
 		const result = yield *find(dir);
 
 		if (filesCount > maxTotalFiles)
@@ -70,6 +72,7 @@ void function () {
 			if (!wholeObject) {
 				wholeObject = result;
 				wholeObject[ERROR_PROP] = undefined;
+				setDirty(result);
 				progress &&
 				progress({isDirectory:true, file: dir, wholeObject, dir, name: '', stat: null});
 			}
@@ -78,6 +81,7 @@ void function () {
 				const names = yield xqtor1(readdirAsync, dir);
 				if (controller.isCancel) {
 					result[ERROR_PROP] = CANCEL_ERROR;
+					setDirty(result);
 					yield *cancel();
 					return result;
 				}
@@ -86,6 +90,7 @@ void function () {
 						'ファイル数の制限 (' +
 						maxFiles + ') を超えました (' +
 						names.length + ')');
+					setDirty(result);
 					return result;
 				}
 				filesCount += names.length;
@@ -95,21 +100,26 @@ void function () {
 				//for (let name of names) {
 				yield names.map(name => function *() {
 					result[name] = undefined;
+					setDirty(result);
 					try {
 						var file = path.resolve(dir, name);
 						const stat = yield xqtor2(statAsync, file);
 						if (controller.isCancel) {
-							result[name] = CANCEL_DATA;
+							result[name] = new SpecialData(ERROR_PROP, CANCEL_ERROR);
+							setDirty(result);
 							return yield *cancel();
 						}
 						if (stat.isDirectory()) {
 							const r = yield *find(file);
 							if (controller.isCancel) {
-								result[name] = CANCEL_DATA;
+								result[name] = new SpecialData(ERROR_PROP, CANCEL_ERROR);
+								setDirty(result);
 								return yield *cancel();
 							}
 							if (r || name.includes(pattern)) {
-								result[name] = r || {};
+								result[name] = r || new SpecialData();
+								if (r) r[PARENT_PROP] = result;
+								setDirty(result);
 								progress &&
 								progress({isDirectory:true, file: file + path.sep, wholeObject, dir, name, stat});
 							}
@@ -117,23 +127,37 @@ void function () {
 						}
 						else if (name.includes(pattern)) {
 							result[name] = null;
+							setDirty(result);
 							progress &&
 							progress({isDirectory:false, file, wholeObject, dir, name, stat});
 						}
 						else delete result[name];
 					} catch (e) {
 						result[name] = new SpecialData(ERROR_PROP, e);
+						setDirty(result);
 					}
 				});
-				return (Object.keys(result).length || undefined) && result;
+				return (validKeysCount(result) || undefined) && result;
 			} catch (e) {
 				result[ERROR_PROP] = e;
+				setDirty(result);
 				return result;
 			}
 
 		} // find
 
+		function setDirty(x) {
+			if (!x) return;
+			do { x[CLEAN_PROP] = false; }
+			while (x = x[PARENT_PROP]);
+		}
+
+		function validKeysCount(x) {
+			return Object.keys(x).filter(x => !x.startsWith(' ')).length;
+		}
+
 	} // findDirFiles
 	findDirFiles.ERROR_PROP = ERROR_PROP;
+	findDirFiles.CLEAN_PROP = CLEAN_PROP;
 
 }();
