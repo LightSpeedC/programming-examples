@@ -22,6 +22,7 @@ void function () {
 	const CLEAN_PROP = ' clean';
 	const ERROR_PROP = '*';
 	const CANCEL_ERROR = new Error('キャンセル');
+	const SEARCHING = '検索中です';
 
 	// 特殊なデータ・クラス
 	function SpecialData(prop, val) {
@@ -50,7 +51,8 @@ void function () {
 				maxTotalFiles + ') を超えました (' +
 				filesCount + ')');
 
-		if (result[ERROR_PROP] === undefined)
+		if (typeof result[ERROR_PROP] === 'string' &&
+				(result[ERROR_PROP] + '').startsWith(SEARCHING))
 			delete result[ERROR_PROP];
 
 		return result;
@@ -71,11 +73,15 @@ void function () {
 			const result = new SpecialData();
 			if (!wholeObject) {
 				wholeObject = result;
-				wholeObject[ERROR_PROP] = undefined;
+				wholeObject[ERROR_PROP] = SEARCHING;
 				setDirty(result);
 				progress &&
 				progress({isDirectory:true, file: dir, wholeObject, dir, name: '', stat: null});
 			}
+
+			if (typeof wholeObject[ERROR_PROP] === 'string' &&
+					(wholeObject[ERROR_PROP] + '').startsWith(SEARCHING))
+				wholeObject[ERROR_PROP] = SEARCHING + ' (' + filesCount + ')';
 
 			try {
 				const names = yield xqtor1(readdirAsync, dir);
