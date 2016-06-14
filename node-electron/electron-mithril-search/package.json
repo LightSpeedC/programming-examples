@@ -9,8 +9,8 @@
     "height": 800
   },
   "dependencies": {
-    "aa": "^0.1.36",
-    "executors": "0.0.3"
+    "aa": ">=0.1.37",
+    "executors": ">=0.0.5"
   },
   "scripts": {
     "start": "electron ."
