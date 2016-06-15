@@ -1,0 +1,14 @@
+{
+  "name": "search-files-ex",
+  "version": "0.0.0",
+  "description": "search files examples",
+  "main": "search-files-sync-ex.js",
+  "private": true,
+  "dependencies": {},
+  "keywords": ["search", "files", "async", "sync"],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
