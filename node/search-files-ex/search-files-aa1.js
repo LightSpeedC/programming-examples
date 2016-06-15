@@ -7,17 +7,31 @@ void function () {
 
 	const fs = require('fs');
 	const path = require('path');
+	const util = require('util');
 
 	const aa = require('aa');
 	const statAsync = aa.thunkify(fs, fs.stat);
 	const readdirAsync = aa.thunkify(fs, fs.readdir);
 
+	// メイン
+	if (require.main === module) {
+		aa(function *() {
+			const dir = process.argv[2] || '.';
+			const rex = process.argv[3] || '';
+
+			try {
+				const children = yield searchFiles(dir, rex);
+				console.log(util.inspect({[path.resolve(dir)]: children},
+					{depth:null, colors:true}));
+			} catch (err) { console.error(util.inspect(err, {depth:null, colors:true})); }
+		});
+	}
+
+	// searchFiles ファイルを検索
 	function *searchFiles(dir, rex) {
 		dir = path.resolve(dir);
 		if (typeof rex === 'string')
-			rex = RegExp(rex
-				.replace(/\./g, '\\.')
-				.replace(/\*/g, '.*'), 'i');
+			rex = RegExp(rex, 'i');
 
 		return search(dir);
 
@@ -27,33 +41,17 @@ void function () {
 				return null;
 
 			const names = yield readdirAsync(dir);
-			const result = {};
+			const children = {};
 			for (let name of names) {
 				const fullPath = path.resolve(dir, name);
-				const r = yield search(fullPath);
-				if (r || rex.test(name)) {
-					result[name] = r;
+				const child = yield search(fullPath);
+				if (child || rex.test(name)) {
+					children[name] = child;
 					console.log(fullPath);
 				}
 			}
-			return Object.keys(result).length ? result : null;
+			return Object.keys(children).length ? children : null;
 		} // search
 	} // searchFiles
-
-	// メイン (もしメインとして実行したら)
-	if (require.main === module) aa(function *() {
-		const dir = process.argv[2] || '.';
-		const rex = process.argv[3] || '';
-
-		const result = yield searchFiles(dir, rex);
-
-		console.log(path.resolve(dir) + ':');
-		console.log(JSON.stringify(result, null, '\t')
-			.replace(/\"/g, ''));
-
-		const inspect = require('util').inspect;
-		console.log(inspect(result, {depth:null, colors:true})
-			.replace(/\'/g, ''));
-	});
 
 }();
