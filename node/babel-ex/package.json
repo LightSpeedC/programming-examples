@@ -1,0 +1,31 @@
+{
+  "name": "babel-ex",
+  "version": "0.0.0",
+  "description": "babel example",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+    "babel-polyfill": "^6.9.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-plugin-transform-regenerator": "^6.9.0",
+    "babel-polyfill": "^6.9.1",
+    "regenerator-runtime": "^0.9.5"
+  },
+  "presets": [],
+  "scripts": {
+    "build": "echo require('babel-polyfill'); > generator-out.js & babel --plugins transform-regenerator generator-ex.js >> generator-out.js",
+    "build2": "echo require('regenerator-runtime/runtime'); > generator-out.js & babel --plugins transform-regenerator generator-ex.js >> generator-out.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "babel"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
