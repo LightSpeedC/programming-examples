@@ -7,7 +7,6 @@ void function () {
 
 	const fs = require('fs');
 	const path = require('path');
-	const util = require('util');
 
 	// メイン
 	if (require.main === module) {
@@ -16,16 +15,15 @@ void function () {
 
 		try {
 			const children = searchFiles(dir, rex);
-			console.log(util.inspect({[path.resolve(dir)]: children},
-				{depth:null, colors:true}));
-		} catch (err) { console.error(util.inspect(err, {depth:null, colors:true})); }
+			console.log(dir, inspect(children));
+		} catch (err) { console.error(inspect(err)); }
 	}
 
 	// searchFiles ファイルを検索
 	function searchFiles(dir, rex) {
 		dir = path.resolve(dir);
 		if (typeof rex === 'string')
-			rex = RegExp(rex, 'i');
+			rex = new RegExp(rex, 'i');
 
 		return search(dir);
 
@@ -48,5 +46,10 @@ void function () {
 			return Object.keys(children).length ? children : null;
 		} // search
 	} // searchFiles
+
+	// util.inspect
+	function inspect(x) {
+		return require('util').inspect(x, {depth:null, colors:true});
+	}
 
 }();

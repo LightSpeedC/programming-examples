@@ -7,7 +7,6 @@ void function () {
 
 	const fs = require('fs');
 	const path = require('path');
-	const util = require('util');
 
 	// メイン
 	if (require.main === module) {
@@ -15,9 +14,8 @@ void function () {
 		const rex = process.argv[3] || '';
 
 		searchFiles(dir, rex, function (err, children) {
-			if (err) return console.error(util.inspect(err, {depth:null, colors:true}));
-			console.log(util.inspect({[path.resolve(dir)]: children},
-				{depth:null, colors:true}));
+			if (err) return console.error(inspect(err));
+			console.log(dir, inspect(children));
 		});
 	}
 
@@ -25,37 +23,38 @@ void function () {
 	function searchFiles(dir, rex, cb) {
 		dir = path.resolve(dir);
 		if (typeof rex === 'string')
-			rex = RegExp(rex, 'i');
+			rex = new RegExp(rex, 'i');
 
-		let called;
+		let end = false;
 		return search(dir, function (err, value) {
-			if (called) return;
-			called = true;
+			if (end) return;
+			end = true;
 			cb(err, value);
 		});
 
 		function search(dir, cb) {
-			if (called) return;
+			if (end) return;
 
 			fs.stat(dir, function (err, stat) {
-				if (called || err) return called || cb(err);
+				if (end || err) return end || cb(new Error(err.stack));
 
 				if (!stat.isDirectory())
 					return cb(null, null);
 
 				return fs.readdir(dir, function (err, names) {
-					if (called || err) return called || cb(err);
+					if (end || err) return end || cb(new Error(err.stack));
 
 					const children = {};
 					if (names.length === 0)
 						return cb(null, null);
 
 					let n = names.length;
-					names.forEach(name => {
+					//names.forEach(name => { ... });
+					for (let name of names) {
 						children[name] = undefined;
 						const fullPath = path.resolve(dir, name);
 						search(fullPath, function (err, child) {
-							if (called || err) return called || cb(err);
+							if (end || err) return end || cb(err);
 
 							if (child || rex.test(name)) {
 								children[name] = child;
@@ -65,10 +64,15 @@ void function () {
 							if (--n === 0)
 								return cb(null, Object.keys(children).length ? children : null);
 						}); // search
-					}); // names.forEach()
+					} // for name of names
 				}); // fs.readdir
 			}); // fs.stat
 		} // search
 	} // searchFiles
+
+	// util.inspect
+	function inspect(x) {
+		return require('util').inspect(x, {depth:null, colors:true});
+	}
 
 }();
