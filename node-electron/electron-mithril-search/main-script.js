@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.6 (2016/06/14)';
+	const version = 'version: 0.0.7 (2016/06/16)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
@@ -20,6 +20,8 @@ void function () {
 	const includes = m.prop('');
 	const excludes = m.prop('');
 	const message = m.prop('検索できます');
+	const maxFiles = m.prop(3000);
+	const maxTotalFiles = m.prop(100000);
 
 	const targetDir = process.env.AAA_TARGET_DIR;
 	const text = m.prop('');
@@ -45,6 +47,8 @@ void function () {
 			'検索中に「キャンセル」できます',
 			'フォルダやファイルへリンクできます (ファイルの左の■でフォルダへリンク)',
 			'ツリー表示でき、チェックボックスで非表示にできます (再検索でリセット)',
+			'フォルダあたりの最大検索ファイル数を変更できます (超えたらスキップ)',
+			'トータルの最大検索ファイル数を変更できます (超えたら検索をキャンセル)',
 			'新旧のレイアウトを切替できます → 後で削除する予定',
 			'×ワイルドカード検索はまだできません',
 			'×あまりたくさんのファイルを検索するとハングする可能性があります',
@@ -55,7 +59,8 @@ void function () {
 	// リリース・ノート表示
 	function releaseNotesView() {
 		const list = [
-			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、ファイル数制限、ほか',
+			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
+			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
 			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
 			'0.0.4 (2016/06/12): ツリー表示、新旧レイアウト切替',
 			'0.0.3 (2016/06/11): 検索中のキャンセル',
@@ -70,7 +75,6 @@ void function () {
 		const list = [
 			'AND/OR検索したい',
 			'ワイルドカード検索したい',
-			'制限するファイル数を入力できる様に'
 		];
 		return m('font[color=purple]', {}, m('ul', list.map(x => m('li', x))));
 	}
@@ -86,8 +90,10 @@ void function () {
 					m('div',
 						m('button.button', {onclick: cancel}, 'ｷｬﾝｾﾙ'),
 						m('b', m('font[color=red]', text()))),
-					m('div', includes()),
-					m('div', excludes())
+					includes() ? m('div', '「', includes(), '」を含む') : '',
+					excludes() ? m('div', '「', excludes(), '」を含まない') : '',
+					m('div', '最大ファイル数/フォルダ:「', maxFiles(), '」'),
+					m('div', '最大ファイル数/トータル:「', maxTotalFiles(), '」')
 				] : [
 					m('form', {onsubmit: search},
 						m('div',
@@ -101,7 +107,15 @@ void function () {
 					m('div',
 						m('input', m_on('change', 'value', excludes,
 							{placeholder: '含まない', size: 100})),
-						'を含まない')
+						'を含まない'),
+					m('div',
+						'最大ファイル数/フォルダ:',
+							m('input', m_on('change', 'value', maxFiles,
+							{placeholder: '最大ファイル数/フォルダ', size: 10}))),
+					m('div',
+						'最大ファイル数/トータル:',
+							m('input', m_on('change', 'value', maxTotalFiles,
+							{placeholder: '最大ファイル数/トータル', size: 10})))
 				]
 			),
 			m('hr', {key: 'hr1'}),
@@ -288,6 +302,9 @@ void function () {
 			wholeObject = {};
 			timer = setInterval(() => m.redraw(true), 500);
 			findController.isCancel = false;
+			findController.maxFiles = maxFiles();
+			findController.maxTotalFiles = maxTotalFiles();
+
 			try {
 				yield findDirFiles(targetDir, text(),
 					findController);
