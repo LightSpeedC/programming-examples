@@ -16,6 +16,7 @@
   "author": "LightSpeedC",
   "license": "MIT",
   "dependencies": {
-    "co": ">=4.5.1"
+    "aa": "^0.1.37",
+    "co": "^4.6.0"
   }
 }
