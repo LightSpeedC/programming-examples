@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-    var aa = require('aa');
+    var aa = require(process.argv[2] || 'aa');
 
     function sleep(ms) {
       return function (cb) {
