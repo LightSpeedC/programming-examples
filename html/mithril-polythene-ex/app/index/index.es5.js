@@ -1,6 +1,8 @@
 var m = require('mithril');
 var button = require('polythene/button/button');
 var dialog = require('polythene/dialog/dialog');
+var card = require('polythene/card/card');
+//var list = require('polythene/list/list');
 require('polythene/theme/theme'); // optional
 
 var app = {
@@ -18,6 +20,25 @@ var app = {
 					}
 				}
 			}),
+			m(card, {content: [
+				{primary: {
+					title: 'Primary title',
+					subtitle: 'Subtitle'
+				}},
+				{text: {content: 'text2...'}},
+				{primary: {
+					title: 'Primary title',
+					subtitle: 'Subtitle'
+				}},
+				{text: {content: 'text2...'}},
+			]}),
+			m(card, {content: [
+				{primary: {
+					title: 'Primary title',
+					subtitle: 'Subtitle'
+				}},
+				{text: {content: 'text2...'}},
+			]}),
 			m(dialog)
 		]);
 	}
