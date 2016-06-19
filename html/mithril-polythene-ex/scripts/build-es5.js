@@ -19,4 +19,4 @@ function bundle(entries, outfile) {
 
 bundle([
 	'app/index/index.es5.js'
-], 'app-es5.js');
+], 'release/app-es5.js');

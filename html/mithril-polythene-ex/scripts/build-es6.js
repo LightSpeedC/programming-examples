@@ -21,4 +21,4 @@ function bundle(entries, outfile) {
 
 bundle([
 	'app/index/index.es6.js'
-], 'app-es6.js');
+], 'release/app-es6.js');
