@@ -1,5 +1,9 @@
 # Polythene for Mithril - setup example
 
+[Polythene - GitHub](https://github.com/ArthurClemens/Polythene#readme)
+
+[Polythene setup](https://github.com/ArthurClemens/Polythene-setup#readme)
+
 Minimal setup example how to create a Polythene app.
 
 Variations:
