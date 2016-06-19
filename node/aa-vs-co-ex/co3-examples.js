@@ -1,33 +1,31 @@
 var co = require(process.argv[2] || 'co');
+var next = require('./next');
 
-co(function *(){
-  // yield any promise 
-  var result = yield Promise.resolve(true);
-  console.log(result);
-}).catch(onerror);
+next(co(function *() {
 
-co(function *(){
-  // resolve multiple promises in parallel 
-  var a = Promise.resolve(1);
-  var b = Promise.resolve(2);
-  var c = Promise.resolve(3);
-  var res = yield [a, b, c];
-  console.log(res);
-  // => [1, 2, 3] 
-}).catch(onerror);
+	yield co(function *() {
+		// yield any promise 
+		var result = yield Promise.resolve(true);
+		console.log(result);
+	});
 
-// errors can be try/catched 
-co(function *(){
-  try {
-    yield Promise.reject(new Error('boom'));
-  } catch (err) {
-    console.error(err.message); // "boom" 
- }
-}).catch(onerror);
+	yield co(function *(){
+		// resolve multiple promises in parallel 
+		var a = Promise.resolve(1);
+		var b = Promise.resolve(2);
+		var c = Promise.resolve(3);
+		var res = yield [a, b, c];
+		console.log(res);
+		// => [1, 2, 3] 
+	});
 
-function onerror(err) {
-  // log any uncaught errors 
-  // co will not throw any errors you do not handle!!! 
-  // HANDLE ALL YOUR ERRORS!!! 
-  console.error(err.stack);
-}
+	// errors can be try/catched 
+	yield co(function *(){
+		try {
+			yield Promise.reject(new Error('boom'));
+		} catch (err) {
+			console.error(err.message); // "boom" 
+		}
+	});
+
+}));

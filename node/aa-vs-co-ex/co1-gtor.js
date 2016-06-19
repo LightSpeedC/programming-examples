@@ -1,10 +1,7 @@
 var co = require(process.argv[2] || 'co');
+var next = require('./next');
 
-co(function* () {
-  var result = yield Promise.resolve(true);
-  return result;
-}).then(function (value) {
-  console.log(value);
-}, function (err) {
-  console.error(err.stack);
-});
+next(co(function* () {
+	var result = yield Promise.resolve(true);
+	return result;
+}));
