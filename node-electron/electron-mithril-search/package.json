@@ -1,6 +1,6 @@
 {
   "name": "file-search-electron-mithril",
-  "version": "0.0.0",
+  "version": "0.0.7",
   "description": "file search electron mithril",
   "main": "main.js",
   "private": true,
@@ -9,7 +9,7 @@
     "height": 800
   },
   "dependencies": {
-    "aa": ">=0.1.37",
+    "aa": ">=0.1.38",
     "executors": ">=0.0.5"
   },
   "scripts": {
