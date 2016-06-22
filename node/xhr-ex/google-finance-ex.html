@@ -1,0 +1,86 @@
+<!doctype html>
+<meta charset="UTF-8">
+
+<h1>ホームページの前半</h1>
+
+<!-- ここから -->
+
+<style type="text/css">
+table#mitsuba_stocks tr:nth-child(odd) { background: #eff; }
+table#mitsuba_stocks tr td { font-size:14px; }
+table#mitsuba_stocks { width:100%; border:1px solid #999; }
+table#mitsuba_stocks .ar { text-align:right; }
+table#mitsuba_stocks .ac { text-align:center; }
+table#mitsuba_stocks .colorDown { color:green; }
+table#mitsuba_stocks .colorUp { color:red; }
+</style>
+
+<table id="mitsuba_stocks">
+<tr><td><a href="http://www.nikkei.com/markets/" target="_blank">
+日経平均</a></td>
+<td class="ar" id="$NI225a"></td><td class="ar" id="$NI225b"></td>
+<td class="ac" width="120px" id="$NI225c"></td></tr>
+
+<tr><td><a href="http://www.nikkei.com/markets/company/index.aspx?scode=9691" target="_blank">
+両毛システムズ</a></td>
+<td class="ar" id="$9691a"></td><td class="ar" id="$9691b"></td>
+<td class="ac" width="120px" id="$9691c"></td></tr>
+
+<tr><td><a href="http://www.nikkei.com/markets/company/index.aspx?scode=7280" target="_blank">
+ミツバ</a></td>
+<td class="ar" id="$7280a"></td><td class="ar" id="$7280b"></td>
+<td class="ac" width="120px" id="$7280c"></td></tr>
+
+<tr><td><a href="http://www.nikkei.com/markets/company/index.aspx?scode=7268" target="_blank">
+タツミ</a></td>
+<td class="ar" id="$7268a"></td><td class="ar" id="$7268b"></td>
+<td class="ac" width="120px" id="$7268c"></td></tr>
+
+</table>
+
+<script>
+get('http://finance.google.com/finance/info?client=ig&q=9691,7280,7268,NI225')
+(function (err, val) {
+	if (err) return console.error(err);
+	var x = {9691:[$9691a, $9691b, $9691c], 7280:[$7280a, $7280b, $7280c],
+			7268:[$7268a, $7268b, $7268c], NI225:[$NI225a, $NI225b, $NI225c]};
+	var arr = JSON.parse(val.substr(4));
+	for (var i in arr) {
+		var elem = arr[i], data = x[elem.t];
+		var minus = Number(elem.c_fix) < 0;
+		var plus = !minus ? '+' : '';
+		data[0].innerHTML = elem.l_cur.replace('$', '\xa5');
+		data[1].innerHTML = elem.c + ' (' + plus + elem.cp_fix + '%)';
+		data[0].className = data[1].className = minus ? 'ar colorDown' : 'ar colorUp';
+		data[2].innerHTML = elem.lt_dts.substr(0, 10) + ' ' + elem.lt_dts.substr(11, 5);
+	}
+});
+
+function get(url) {
+	return function(callback) {
+		var xhr; // = new XMLHttpRequest();
+		if (typeof XDomainRequest != 'undefined') {
+			xhr = new XDomainRequest();
+			xhr.open('GET', url);
+		}
+		else {
+			xhr = window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+			if ('withCredentials' in xhr) {
+				xhr.withCredentials = true;
+				xhr.open('GET', url, true);
+			}
+			else xhr.open('GET', url, true);
+		}
+		xhr.onload = function() {
+			if (xhr.status == 200) callback(null, xhr.response);
+			else callback(new Error(xhr.statusText));
+		};
+		xhr.onerror = function() { callback(new Error("Network Error")); };
+		xhr.send();
+	};
+}
+</script>
+
+<!-- ここまで -->
+
+<h1>ホームページの後半</h1>
