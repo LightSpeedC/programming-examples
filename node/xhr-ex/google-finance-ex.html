@@ -58,19 +58,10 @@ get('http://finance.google.com/finance/info?client=ig&q=9691,7280,7268,NI225')
 
 function get(url) {
 	return function(callback) {
-		var xhr; // = new XMLHttpRequest();
-		if (typeof XDomainRequest != 'undefined') {
-			xhr = new XDomainRequest();
-			xhr.open('GET', url);
-		}
-		else {
-			xhr = window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
-			if ('withCredentials' in xhr) {
-				xhr.withCredentials = true;
-				xhr.open('GET', url, true);
-			}
-			else xhr.open('GET', url, true);
-		}
+		var xhr = window.XDomainRequest ? new XDomainRequest() :
+			window.ActiveXObject ? new ActiveXObject("Microsoft.XMLHTTP") : new XMLHttpRequest();
+		if ('withCredentials' in xhr) xhr.withCredentials = true;
+		xhr.open('GET', url, true);
 		xhr.onload = function() {
 			if (xhr.status == 200) callback(null, xhr.response);
 			else callback(new Error(xhr.statusText));

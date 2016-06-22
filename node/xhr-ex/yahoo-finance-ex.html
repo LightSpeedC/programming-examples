@@ -1,0 +1,87 @@
+<!-- http://mix-juice001.hatenablog.com/entry/2014/06/16/192519 -->
+<html>
+<style>
+.ta1 {
+  width: 560px;
+  margin-top:20px;
+  margin-left:50px;
+  margin-bottom:10px;
+  color:#555555;
+}
+.ta1 .status {
+  text-align:center;
+}
+num {
+  text-align:right;
+}
+td {
+  padding:7px 22px;
+}
+th {
+  padding:7px 22px;
+}
+tr {
+  background-color:#c9eFFF;
+}
+tr.even {
+  background-color:#edF9FF;
+}
+th {
+  color:#333333;
+  background-color:#5caadb;
+  border-bottom:solid 1px #FFFFFF;
+}
+</style>
+<head>
+<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function () {
+  $.getJSON("http://query.yahooapis.com/v1/public/yql?callback=?", {
+    q: "select * from yahoo.finance.quotes where symbol in ('IVV', 'VTI', 'VT', 'VWO')",
+    env: "store://datatables.org/alltableswithkeys",
+    format: "json"
+  }, function (data) {
+    console.log(data);
+    var s = "<table class='ta1' cellspacing='0'><tr><th>symbol</th><th>Ask</th><th>Bid</th><th>Change</th></tr>";
+    for(var i in data.query.results.quote){
+      s += "<tr>"
+      + "<td>"+ data.query.results.quote[i].symbol + "</td>"
+      + "<td class='num'>" + data.query.results.quote[i].Ask + "</td>"
+      + "<td>" + data.query.results.quote[i].Bid + "</td>"
+      + "<td>" + data.query.results.quote[i].Change + "</td>"
+      + "</tr>";
+    }
+    $("#article").append(s + "</table>");
+  });
+});
+function add() {
+  $.ajax({
+    url: "http://query.yahooapis.com/v1/public/yql",
+    data: {
+      format: "json",
+      env: "store://datatables.org/alltableswithkeys",
+      q: "select * from yahoo.finance.quotes where symbol in ('" + $("#symbol").val() + "')"
+    }
+  })
+  .then(function(data) {
+    console.log(data);
+    $("#article").append("<tr>"
+    + "<td>"+ data.query.results.quote.symbol + "</td>"
+    + "<td class='num'>" + data.query.results.quote.Ask + "</td>"
+    + "<td>" + data.query.results.quote.Bid + "</td>"
+    + "<td>" + data.query.results.quote.Change + "</td>"
+    + "</tr>");
+  });
+}
+</script>
+</head>
+<body>
+  <div id="container">
+  <h1>Viva Index</h1>
+  <div id="article"></div>
+</div>
+  symbol
+  <input id="symbol" type="text" value="GOOG" />
+  <input type="button" value="add" onClick="add()" />
+</body>
+</html>
