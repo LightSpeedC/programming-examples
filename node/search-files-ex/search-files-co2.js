@@ -37,7 +37,7 @@ void function () {
 			rex = new RegExp(rex, 'i');
 
 		let end = false;
-		return search(dir);
+		return yield search(dir);
 
 		function *search(dir) {
 			if (end) return;

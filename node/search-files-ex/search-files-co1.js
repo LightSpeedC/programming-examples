@@ -34,7 +34,7 @@ void function () {
 		if (typeof rex === 'string')
 			rex = new RegExp(rex, 'i');
 
-		return search(dir);
+		return yield search(dir);
 
 		function *search(dir) {
 			const stat = yield statAsync(dir);
