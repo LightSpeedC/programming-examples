@@ -95,6 +95,7 @@ void function () {
 				var ret = {}, n = 0;
 				arr.forEach(function (i) {
 					var val = obj[i];
+					ret[i] = undefined;
 					++n;
 					function cb(e, v) {
 						if (n <= 0) return;

@@ -94,6 +94,7 @@ void function () {
 				var ret = {}, n = 0;
 				arr.forEach(function (i) {
 					var val = obj[i];
+					ret[i] = undefined;
 					++n;
 					function cb(e, v) {
 						if (n <= 0) return;
@@ -104,14 +105,14 @@ void function () {
 					switch (typeof val) {
 						case 'function':
 							if (isGeneratorFunction(val))
-								return spawn(val())(cb);
+								return spawn(val()).then(function (v) { cb(null, v); }, cb);
 							else return val(cb);
 						case 'object':
 							if (val) {
 								if (typeof val.then === 'function')
 									return val.then(function (v) { cb(null, v); }, cb);
 								else if (typeof val.next === 'function')
-									return spawn(val)(cb);
+									return spawn(val).then(function (v) { cb(null, v); }, cb);
 								else if (val.constructor === Array && val.length > 0)
 									return arrcb(val, cb);
 								else if (val.constructor === Object)

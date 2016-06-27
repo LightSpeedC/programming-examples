@@ -27,12 +27,24 @@ void function () {
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 4, s);
 
-		s = '5: Array ' + JSON.stringify(yield [Promise.resolve(5)]);
+		s = '5: Array ' + JSON.stringify(yield [
+			function (cb) { setTimeout(cb, 200, null, 5); },
+			Promise.resolve(5),
+			function *() { yield Promise.resolve(55); return 5; } (),
+			function *() { yield Promise.resolve(55); return 5; },
+			[], {}
+		]);
 		try { s += eh + JSON.stringify(yield [Promise.reject(new Error('5'))]); }
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 5, s);
 
-		s = '6: Object ' + JSON.stringify(yield {p:Promise.resolve(6)});
+		s = '6: Object ' + JSON.stringify(yield {
+			f:function (cb) { setTimeout(cb, 200, null, 6); },
+			p:Promise.resolve(6),
+			g:function *() { yield Promise.resolve(66); return 6; } (),
+			h:function *() { yield Promise.resolve(66); return 6; },
+			a:[], o:{}
+		});
 		try { s += eh + JSON.stringify(yield {p:Promise.reject(new Error('6'))}); }
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 6, s);
