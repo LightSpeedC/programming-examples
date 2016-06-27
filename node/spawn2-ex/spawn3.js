@@ -9,7 +9,9 @@ void function () {
 			if (gfn && typeof gfn.then === 'function')
 				return gfn.then(function (v) { callback(null, v); }, callback);
 			var gen, gtors = [gfn];
+
 			next(null);
+
 			function next(err, val) {
 				for (;;) {
 					if (gtors.length === 0)
@@ -61,7 +63,7 @@ void function () {
 					++n;
 					function cb(e, v) {
 						if (n <= 0) return;
-						if (e) { n = 0; return next(e); }
+						if (e) return n = 0, next(e);
 						ret[i] = v;
 						if (--n === 0) next(null, ret);
 					}
@@ -86,6 +88,7 @@ void function () {
 					} // switch
 				}); // forEach
 			} // arrcb
+
 			function objcb(obj, next) {
 				var arr = Object.keys(obj);
 				if (arr.length === 0) return next(null, {});
@@ -95,7 +98,7 @@ void function () {
 					++n;
 					function cb(e, v) {
 						if (n <= 0) return;
-						if (e) { n = 0; return next(e); }
+						if (e) return n = 0, next(e);
 						ret[i] = v;
 						if (--n === 0) next(null, ret);
 					}
@@ -120,6 +123,7 @@ void function () {
 					} // switch
 				}); // forEach
 			} // objcb
+
 		}; // thunk
 	} // spawn
 
