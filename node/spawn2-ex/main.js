@@ -8,7 +8,8 @@ void function () {
 		if (r && r.then) r.then(
 			function (v) { console.log('v:', v); },
 			function (e) { console.log('e:', e + ''); });
-		else if (typeof r === 'function') r(function (e, v) { console.log('e:', e + ',', 'v:', v); });
+		else if (typeof r === 'function')
+			r(function (e, v) { console.log('e:', e + ',', 'v:', v); });
 	}
 
 } ();
