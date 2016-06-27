@@ -24,19 +24,26 @@ void function () {
 							var done = val.done;
 							val = val.value;
 							if (done) { gtors.pop(); break; }
-							if (val == null ||
-								typeof val === 'string' ||
-								typeof val === 'number' ||
-								typeof val === 'boolean') continue;
-							else if (typeof val === 'function') {
-								if (isGeneratorFunction(val))
-									{ gtors.push(gen = val()); val = null; }
-								else return val(next);
-							}
-							else if (typeof val.then === 'function')
-								return val.then(function (v) { next(null, v); }, next);
-							else if (typeof val.next === 'function')
-								{ gtors.push(gen = val); val = null; }
+							switch (typeof val) {
+								case 'function':
+									if (isGeneratorFunction(val)) {
+										gtors.push(gen = val());
+										val = null;
+									}
+									else return val(next);
+									continue;
+								case 'object':
+									if (val) {
+										if (typeof val.then === 'function')
+											return val.then(function (v) { next(null, v); }, next);
+										if (typeof val.next === 'function') {
+											gtors.push(gen = val);
+											val = null;
+										}
+									}
+								default:
+									continue;
+							} // switch
 						} catch (e) { gtors.pop(); err = e; break; }
 					}
 				} // for
