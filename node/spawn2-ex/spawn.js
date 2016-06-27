@@ -1,12 +1,9 @@
 void function () {
 	'use strict';
 
-	module.exports = spawn;
-
-	var spawn = require('co');
-
 	if (require.main === module) {
 		var main = require('./' + (process.argv[2] || 'main'));
+		var spawn = require('./' + (process.argv[3] || 'main'));
 		var r = spawn(main);
 		if (r && r.then) r.then(
 			function (v) { console.log('v', v); },
