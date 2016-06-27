@@ -2,6 +2,6 @@
 @set HERE=%~dp0
 @set HERE=%HERE:~0,-1%
 subst P: %HERE%
-@explorer P:
+@rem explorer P:
 @:end
-@pause
+@rem pause
