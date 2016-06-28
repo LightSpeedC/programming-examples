@@ -1,4 +1,0 @@
-JavaScript 入門
-====
-
-
