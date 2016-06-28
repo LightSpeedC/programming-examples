@@ -5,9 +5,18 @@ void function () {
 
 	function spawn(gfn) {
 		if (isGeneratorFunction(gfn)) gfn = gfn();
+
 		return function thunk(callback) {
+
+			if (gfn === null || gfn === undefined ||
+				typeof gfn === 'string' ||
+				typeof gfn === 'number' ||
+				typeof gfn === 'boolean')
+				return callback(null, gfn);
+
 			if (gfn && typeof gfn.then === 'function')
 				return gfn.then(function (v) { callback(null, v); }, callback);
+
 			var gen, gtors = [gfn];
 
 			next(null);

@@ -6,7 +6,15 @@ void function () {
 	function spawn(gfn) {
 		if (gfn && typeof gfn.then === 'function') return gfn;
 		if (isGeneratorFunction(gfn)) gfn = gfn();
+
 		return new Promise(function (resolve, reject) {
+
+			if (gfn === null || gfn === undefined ||
+				typeof gfn === 'string' ||
+				typeof gfn === 'number' ||
+				typeof gfn === 'boolean')
+				return resolve(gfn);
+
 			var gen, gtors = [gfn];
 
 			next(null);
