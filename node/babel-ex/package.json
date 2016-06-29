@@ -16,7 +16,7 @@
   "presets": [],
   "scripts": {
     "build": "echo require('babel-polyfill'); > generator-out.js & babel --plugins transform-regenerator generator-ex.js >> generator-out.js",
-    "build2": "echo require('regenerator-runtime/runtime'); > generator-out.js & babel --plugins transform-regenerator generator-ex.js >> generator-out.js",
+    "build2": "echo require('regenerator-runtime/runtime'); > generator-out2.js & babel --plugins transform-regenerator generator-ex.js >> generator-out2.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
