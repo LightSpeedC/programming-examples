@@ -1,4 +1,4 @@
-"require('babel-polyfill');"  
+require('babel-polyfill');  
 var _marked = [gfn].map(regeneratorRuntime.mark);
 
 //require("babel-polyfill");
