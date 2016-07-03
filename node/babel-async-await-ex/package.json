@@ -1,0 +1,28 @@
+{
+  "name": "babel-async-await-ex",
+  "version": "0.0.0",
+  "description": "babel example",
+  "main": "index.js",
+  "private": true,
+  "dependencies": {
+  },
+  "devDependencies": {
+    "babel-cli": "^6.10.1",
+    "babel-preset-stage-2": "^6.11.0"
+  },
+  "presets": [],
+  "scripts": {
+    "build": "babel async-await-ex.js > async-await-out.js",
+    "build2": "babel async-await-ex.js > async-await-out2.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "babel"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
