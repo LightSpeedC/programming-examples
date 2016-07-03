@@ -13,7 +13,6 @@
   "presets": [],
   "scripts": {
     "build": "babel async-await-ex.js > async-await-out.js",
-    "build2": "babel async-await-ex.js > async-await-out2.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

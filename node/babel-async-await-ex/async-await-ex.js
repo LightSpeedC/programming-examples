@@ -1,5 +1,4 @@
-//require("babel-polyfill");
-//require("regenerator-runtime/runtime");
+// http://qiita.com/notsunohito/items/15c528509de8dc5927bf
 
 function sleep(ms) {
   return new Promise((resolve)=> {
@@ -27,3 +26,13 @@ class Human {
   await (await new Human().sayHello()).sayBye();
 })();
 // => helloしか出力されない
+
+Promise.all([
+  (async () => {
+    await sleep(3000);
+    console.log('x1');
+    await sleep(1000);
+    console.log('x2');
+  })(),
+  (async () => {})()
+]);

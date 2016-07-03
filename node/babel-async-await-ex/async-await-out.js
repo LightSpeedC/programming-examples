@@ -1,7 +1,6 @@
 function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { return step("next", value); }, function (err) { return step("throw", err); }); } } return step("next"); }); }; }
 
-//require("babel-polyfill");
-//require("regenerator-runtime/runtime");
+// http://qiita.com/notsunohito/items/15c528509de8dc5927bf
 
 function sleep(ms) {
   return new Promise(resolve => {
@@ -36,4 +35,11 @@ _asyncToGenerator(function* () {
   yield (yield new Human().sayHello()).sayBye();
 })();
 // => helloしか出力されない
+
+Promise.all([_asyncToGenerator(function* () {
+  yield sleep(3000);
+  console.log('x1');
+  yield sleep(1000);
+  console.log('x2');
+})(), _asyncToGenerator(function* () {})()]);
 
