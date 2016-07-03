@@ -7,22 +7,22 @@ void function () {
 		var s = '';
 		var eh = ' eh!? ';
 
-		s = '1: Callback function ' + (yield spawn(function (cb) { setTimeout(cb, 200, null, '1'); }));
+		s = '1: Callback function   '  + (yield spawn(function (cb) { setTimeout(cb, 200, null, '1'); }));
 		try { s += eh + (yield spawn(function (cb) { setTimeout(cb, 200, new Error('1')); })); }
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 1, s);
 
-		s = '2: Promise resolve ' + (yield spawn(Promise.resolve(2)));
+		s = '2: Promise resolve     ' + (yield spawn(Promise.resolve(2)));
 		try { s += eh + (yield spawn(Promise.reject(new Error('2')))); }
-		catch (e) { s += ', reject ' + e; }
+		catch (e) { s += ', error ' + e; }
 		console.log('*', 2, s);
 
-		s = '3: Generator ' + (yield spawn(function *() { yield Promise.resolve(33); return 3; } ()));
+		s = '3: Generator           ' + (yield spawn(function *() { yield Promise.resolve(33); return 3; } ()));
 		try { s += eh + (yield spawn(function *() { throw new Error('3'); } ())); }
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 3, s);
 
-		s = '4: Generator function ' + (yield spawn(function *() { yield Promise.resolve(44); return 4; }));
+		s = '4: Generator function  ' + (yield spawn(function *() { yield Promise.resolve(44); return 4; }));
 		try { s += eh + (yield spawn(function *() { throw new Error('4'); })); }
 		catch (e) { s += ', error ' + e; }
 		console.log('*', 4, s);
