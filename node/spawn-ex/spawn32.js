@@ -5,12 +5,12 @@ void function () {
 
 	var spawn3 = require('./spawn3');
 
-	function spawn(gfn) {
+	function spawn(val) {
 		var resolve, reject;
 		var p = new Promise(function (res, rej) {
 			resolve = res; reject = rej;
 		});
-		var thunk = spawn3(gfn);
+		var thunk = spawn3(val);
 		thunk.then = function (res, rej) {
 			thunk(function (err, val) {
 				err ? reject(err) : resolve(val);

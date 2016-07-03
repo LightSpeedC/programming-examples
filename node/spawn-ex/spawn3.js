@@ -3,32 +3,47 @@ void function () {
 
 	module.exports = spawn;
 
-	function spawn(gfn) {
-		if (isGeneratorFunction(gfn)) gfn = gfn();
+	function spawn(val) {
 
 		return function thunk(callback) {
 
-			if (gfn === null || gfn === undefined ||
-				typeof gfn === 'string' ||
-				typeof gfn === 'number' ||
-				typeof gfn === 'boolean')
-				return callback(null, gfn);
+			if (isGeneratorFunction(val)) val = val();
 
-			if (gfn && typeof gfn.then === 'function')
-				return gfn.then(function (v) { callback(null, v); }, callback);
+			var gtors = [];
 
-			var gen, gtors = [gfn];
+			if (val === undefined || val === null ||
+				typeof val === 'string' ||
+				typeof val === 'number' ||
+				typeof val === 'boolean')
+				return callback && callback(null, val);
+
+			if (typeof val === 'function')
+				return val(next);
+
+			if (typeof val.then === 'function')
+				return val.then(nextval, next);
+
+			if (typeof val.next !== 'function')
+				return callback && callback(null, val);
+
+			gtors = [val];
 
 			next(null);
 
+			function nextval(val) { next(null, val); }
+
 			function next(err, val) {
+
 				for (;;) {
 					if (gtors.length === 0)
 						return callback && callback(err, val);
-					gen = gtors[gtors.length - 1];
+
+					var gen = gtors[gtors.length - 1];
+
 					if (typeof gen.next !== 'function' ||
 						typeof gen['throw'] !== 'function')
-						return reject(new Error('is not generator'));
+						return callback && callback(new Error('is not generator'));
+
 					for (;;) {
 						try {
 							val = err ? gen['throw'](err) : gen.next(val);
@@ -36,32 +51,26 @@ void function () {
 							var done = val.done;
 							val = val.value;
 							if (done) { gtors.pop(); break; }
-							switch (typeof val) {
-								case 'function':
-									if (isGeneratorFunction(val)) {
-										gtors.push(gen = val());
-										val = null;
-									}
-									else return val(next);
-									continue;
-								case 'object':
-									if (val) {
-										if (typeof val.then === 'function')
-											return val.then(function (v) { next(null, v); }, next);
-										else if (typeof val.next === 'function') {
-											gtors.push(gen = val);
-											val = null;
-										}
-										else if (val.constructor === Array && val.length > 0)
-											return arrcb(val, next);
-										else if (val.constructor === Object)
-											return objcb(val, next);
-									}
-								default:
-									continue;
-							} // switch
+
+							if (val === undefined || val === null) continue;
+
+							if (typeof val === 'function') {
+								if (!isGeneratorFunction(val)) return val(next);
+								gtors.push(gen = val()), val = null;
+							}
+							else if (typeof val === 'object') {
+								if (typeof val.then === 'function')
+									return val.then(nextval, next);
+								else if (typeof val.next === 'function')
+									gtors.push(gen = val), val = null;
+								else if (val.constructor === Array && val.length > 0)
+									return arrcb(val, next);
+								else if (val.constructor === Object)
+									return objcb(val, next);
+							}
+
 						} catch (e) { gtors.pop(); err = e; val = undefined; break; }
-					}
+					} // for
 				} // for
 			} // next
 
@@ -137,9 +146,9 @@ void function () {
 		}; // thunk
 	} // spawn
 
-	function isGeneratorFunction(gtor) {
-		if (!gtor) return false;
-		return (gtor.constructor.displayName || gtor.constructor.name) === 'GeneratorFunction';
+	function isGeneratorFunction(gfn) {
+		if (typeof gfn !== 'function') return false;
+		return (gfn.constructor.displayName || gfn.constructor.name) === 'GeneratorFunction';
 	}
 
 } ();
