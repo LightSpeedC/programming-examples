@@ -1,0 +1,80 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script src="../js/mithril.min.js"></script>
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<body>
+<h3>やることリスト管理</h3>
+<div id="$todoApp"></div>
+</body>
+<script>
+void function () {
+	var key = 0; // unique key
+
+	// component: task
+	var taskCompo = {
+		controller: function (task) {
+			task.done = !!task.done;
+			this.task = task;
+			this.editMode = false; },
+		view: function (ctrl) {
+			var task = ctrl.task;
+			function inConfig(elem, isInit) {
+				if (!isInit) elem.onkeypress = inKey; }
+			function inKey(e) {
+				if (e.keyCode === 13) { inChange(e); m.redraw(); } }
+			function inChange(e) {
+				if (e.currentTarget.value) task.title = e.currentTarget.value;
+				ctrl.editMode = false; }
+
+			return m('div',
+				ctrl.editMode ? [
+					m('input', {size: 50, value: task.title, config: inConfig, onblur: inChange})
+				] : [
+					m('input[type=checkbox]',
+						{checked: task.done,
+						onclick: function () {task.done = !task.done;}}),
+					m('span',
+						{style:
+							{color: task.done ? 'green' : 'black',
+							textDecoration: task.done ? 'line-through' : 'none'},
+						ondblclick: function () { ctrl.editMode = true; }},
+						task.title)
+				]);
+		}
+	};
+
+	function newTaskCompo(x) {
+		return {task:x, compo:m('div', {key:++key}, m(taskCompo, x))}; }
+
+	var todoApp = {
+		controller: function (tasks) {
+			this.input = '';
+			this.tasks = !tasks ? [] : tasks.map(newTaskCompo); },
+		view: function (ctrl) {
+			function addClick() {
+				if (!ctrl.input) return;
+				ctrl.tasks.unshift(newTaskCompo({title:ctrl.input, done:false}));
+				ctrl.input = ''; }
+			function inConfig(elem, isInit) {
+				if (!isInit) elem.onkeypress = inKey; }
+			function inKey(e) {
+				if (e.keyCode === 13) { inChange(e); addClick(); m.redraw(); } }
+			function inChange(e) { ctrl.input = e.currentTarget.value; }
+			function removeClick() {
+				ctrl.tasks = ctrl.tasks.filter(function (x) { return !x.task.done; }); }
+
+			return [
+				m('input', {size: 60, autofocus: true, value: ctrl.input,
+					config: inConfig, onchange: inChange,
+					placeholder: 'タスクを入力してください'}),
+				m('button', {onclick: addClick}, '追加'),
+				ctrl.tasks.map(function (x) { return x.compo; }),
+				m('span', 'チェックされているタスクを'),
+				m('button', {onclick: removeClick}, '削除')];
+		}
+	};
+
+	m.mount($todoApp, m(todoApp, [{title: 'abc'}, {title: 'xyz', done:true}]));
+
+} ();
+</script>

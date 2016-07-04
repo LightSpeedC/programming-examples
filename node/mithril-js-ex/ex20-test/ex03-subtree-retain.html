@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script src="../js/mithril.min.js"></script>
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<body></body>
+<script>
+void function () {
+	var counter = 0;
+
+	setInterval(function () {
+		counter++;
+		m.redraw(true);
+	}, 1000);
+
+	function x(i) {
+		return counter === 0 || Math.random() > 0.9 ?
+			m('div', {key: i}, 'counter' + i + ': ' + counter) : {subtree: 'retain'};
+	}
+
+	m.mount(document.body, {view: function () {
+		return [
+			x(0),
+			x(1),
+			x(2),
+			x(3),
+			x(4),
+			x(5),
+			x(6),
+			x(7),
+			x(8),
+			x(9),
+		];
+	}});
+} ();
+</script>
