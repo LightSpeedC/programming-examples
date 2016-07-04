@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+</head>
+<body>
+ 
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+ 
+    <script>
+        var width = 960;
+        var height = 700;
+ 
+        var svg = d3.select("body").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+var nestedData = [{"科目": "国語", "点数": 30, "過去の点数":[20,50,10]},
+                                {"科目": "数学", "点数": 70, "過去の点数":[96,88,73]},
+                                {"科目": "社会", "点数": 60, "過去の点数":[76,88,66]}];
+ 
+var boxes = svg.selectAll("g")
+                         .data(nestedData)
+                         .enter()
+                          .append("g");
+ 
+    boxes.append("circle")
+            .attr("r",10)
+            .attr("fill","blue")
+            .attr("cy",function(d,i){ return (i+1)*50; })
+            .attr("cx", function(d){ return d["点数"]*2; });
+ 
+    boxes.selectAll("rect")
+            .data(function(d){ return d["過去の点数"]; }) // "過去の点数"を新たなデータとして使う。
+          .enter()
+             .append("rect")
+             .attr("y",200)
+             .attr("width",10)
+             .attr("height",10)
+             .attr("fill","orange")
+             .attr("stroke","black")
+             .attr("x", function(d){ return d*2; });
+
+          </script>
+ 
+</body>
+</html>
