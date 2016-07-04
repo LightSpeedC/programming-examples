@@ -1,0 +1,97 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script src="../js/mithril.min.js"></script>
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<style>.todo-done { color: gray; text-decoration: line-through; }</style>
+<body>
+<h3>やることリスト管理</h3>
+<div id="$todoApp"></div>
+</body>
+<script>
+void function () {
+	var key = 0; // unique key
+
+	var inputCompo = {
+		controller: function (attrs) {
+				this.attrs = attrs;
+			},
+		view: function (ctrl) {
+			var attrs = ctrl.attrs;
+			function inConfig(elem, isInit) {
+				if (!isInit) elem.onkeypress = inKey;
+			}
+			function inKey(e) {
+				if (e.keyCode === 13) {
+					inChange(e); attrs.onchange && attrs.onchange(attrs.value); m.redraw();
+				}
+			}
+			function inBlur(e) {
+				inChange(e); attrs.onblur && attrs.onblur(attrs.value);
+			}
+			function inChange(e) {
+				attrs.value = e.currentTarget.value;
+			}
+			return m('input', {size: 60, value: attrs.value, config: inConfig, onblur: inBlur, onchange: inChange,
+				autofocus: attrs.autofocus, placeholder: attrs.placeholder});
+		}
+	};
+
+	// component: task
+	var taskCompo = {
+		controller: function (task) {
+			task.done = !!task.done;
+			this.task = task;
+			this.editMode = false;
+		},
+		view: function (ctrl) {
+			var task = ctrl.task;
+			var inAttrs = {value: task.title, onchange: inChange, onblur: inChange};
+			function inChange(value) {
+				if (value) task.title = value;
+				ctrl.editMode = false;
+				inAttrs.value = task.title;
+			}
+			return m('div', {}, ctrl.editMode ? m(inputCompo, inAttrs) :
+				[	m('input[type=checkbox]', {checked: task.done,
+						onclick: function () {task.done = !task.done;}}),
+					m(task.done ? 'span.todo-done' : 'span',
+						{ondblclick: function () { ctrl.editMode = true; }},
+						task.title) ]);
+		}
+	};
+
+	function newTaskCompo(x) {
+		return {task:x, compo:m('div', {key:++key}, m(taskCompo, x))};
+	}
+
+	var todoApp = {
+		controller: function (taskList) {
+			this.input = '';
+			this.taskList = !taskList ? [] : taskList.map(newTaskCompo);
+		},
+		view: function (ctrl) {
+			var inAttrs = {autofocus: true, value: ctrl.input, onchange: inChange,
+						placeholder: 'タスクを入力してください'};
+			function addClick() {
+				if (!ctrl.input) return;
+				ctrl.taskList.unshift(newTaskCompo({title:ctrl.input, done:false}));
+				inAttrs.value = ctrl.input = '';
+			}
+			function inChange(value) {
+				ctrl.input = value; addClick();
+			}
+			function removeClick() {
+				ctrl.taskList = ctrl.taskList.filter(function (x) { return !x.task.done; });
+			}
+			return [
+				m('div', {key:'input'}, m(inputCompo, inAttrs),
+					m('button', {onclick: addClick}, '追加')),
+				ctrl.taskList.map(function (x) { return x.compo; }),
+				m('div', {key:'remove'}, 'チェックされているタスクを',
+					m('button', {onclick: removeClick}, '削除'))];
+		}
+	};
+
+	m.mount($todoApp, m(todoApp, [{title: 'abc'}, {title: 'xyz', done:true}]));
+} ();
+</script>
