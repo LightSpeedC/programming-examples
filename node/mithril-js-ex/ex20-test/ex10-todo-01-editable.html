@@ -2,7 +2,6 @@
 <meta charset="UTF-8">
 <script src="../js/mithril.min.js"></script>
 <!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
-<!--[if IE]><script src="../js/misc-ie8-polyfill.js"></script><![endif]-->
 <style>.todo-done { color: gray; text-decoration: line-through; }</style>
 <body>
 <h3>やることリスト管理 (Mithril)</h3>
@@ -17,24 +16,31 @@ void function () {
 	// component: task
 	var taskCompo = {
 		controller: function (task) {
-			task.done = !!task.done;
+			var ctrl = this;
+			var $input;
 			this.task = task;
-			this.editMode = false; },
-		view: function (ctrl) {
-			var $input, task = ctrl.task;
+			this.editMode = false;
+			this.inChange = inChange;
+			this.inConfig = inConfig;
 			function inConfig(elem, isInit) {
-				$input = elem;
-				if (!isInit) elem.onkeypress = inKey; }
+				($input = elem).onkeypress = inKey;
+			}
 			function inKey(e) {
-				if ((e || event).keyCode === 13) { inChange(); m.redraw(); } }
+				if ((e || event).keyCode === 13) {
+					inChange(); m.redraw(true); return false;
+				}
+			}
 			function inChange() {
 				if ($input.value) task.title = $input.value;
-				ctrl.editMode = false; }
-
-			return m('div',
-				ctrl.editMode ?
-					m('input', {size: 50, value: task.title, config: inConfig, onblur: inChange})
-				: m(task.done ? 'span.todo-done' : 'span',
+				ctrl.editMode = false;
+			}
+		},
+		view: function (ctrl) {
+			var task = ctrl.task;
+			return m('div', ctrl.editMode ?
+					m('input', {size: 50, value: task.title,
+						config: ctrl.inConfig, onblur: ctrl.inChange}) :
+					m('span' + (task.done ? '.todo-done' : ''),
 						{ondblclick: function () { ctrl.editMode = true; }},
 						m('input[type=checkbox]', {checked: task.done,
 							onclick: function () {task.done = !task.done;}}),
@@ -47,36 +53,52 @@ void function () {
 		return {task:x, compo:m('div', {key:++key}, m(taskCompo, x))}; }
 
 	var todoApp = {
-		controller: function (tasks) {
-			this.input = '';
-			this.tasks = !tasks ? [] : tasks.map(newTaskCompo); },
-		view: function (ctrl) {
+		controller: function (taskList) {
+			var ctrl = this;
 			var $input;
+			this.input = '';
+			this.taskList = !taskList ? [] : taskList.map(newTaskCompo);
+			this.inConfig = inConfig;
+			this.inChange = inChange;
+			this.addClick = addClick;
+			this.removeClick = removeClick;
 			function addClick() {
 				if (!ctrl.input) return;
-				ctrl.tasks.unshift(newTaskCompo({title:ctrl.input, done:false}));
-				ctrl.input = ''; }
+				ctrl.taskList.unshift(newTaskCompo({title:ctrl.input, done:false}));
+				ctrl.input = '';
+			}
 			function inConfig(elem, isInit) {
 				$input = elem;
-				if (!isInit) elem.onkeypress = inKey; }
+				if (!isInit) elem.onkeypress = inKey;
+			}
 			function inKey(e) {
-				if ((e || event).keyCode === 13) { inChange(); addClick(); m.redraw(); } }
-			function inChange() { ctrl.input = $input.value; }
+				if ((e || event).keyCode === 13) {
+					inChange();
+					addClick();
+					m.redraw(true);
+					return false;
+				}
+			}
+			function inChange() {
+				ctrl.input = $input.value;
+			}
 			function removeClick() {
-				ctrl.tasks = ctrl.tasks.filter(function (x) { return !x.task.done; }); }
-
+				ctrl.taskList = ctrl.taskList.filter(function (x) { return !x.task.done; });
+			}
+		},
+		view: function (ctrl) {
 			return [
 				m('input', {size: 60, autofocus: true, value: ctrl.input,
-					config: inConfig, onchange: inChange,
+					config: ctrl.inConfig, onchange: ctrl.inChange,
 					placeholder: 'タスクを入力してください'}),
-				m('button', {onclick: addClick}, '追加'),
-				ctrl.tasks.map(function (x) { return x.compo; }),
+				m('button', {onclick: ctrl.addClick}, '追加'),
+				ctrl.taskList.map(function (x) { return x.compo; }),
 				m('div', 'チェックされているタスクを',
-					m('button', {onclick: removeClick}, '削除'))];
+					m('button', {onclick: ctrl.removeClick}, '削除'))];
 		}
 	};
 
-	m.mount($todoApp, m(todoApp, [{title: 'abc'}, {title: 'xyz', done:true}]));
+	m.mount($todoApp, m(todoApp, [{title: 'abc', done:false}, {title: 'xyz', done:true}]));
 
 } ();
 </script>

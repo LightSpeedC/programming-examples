@@ -12,7 +12,7 @@ window.onload = function () {
 	var taskCompo = { // component: task
 		controller: function (task) { return task; },
 		view: function (task) {
-			return m(task.done ? 'span.todo-done' : 'span', {},
+			return m('span' + (task.done ? '.todo-done' : ''), {},
 				m('input[type=checkbox]', {checked: task.done,
 					onclick: function () {task.done = !task.done;}}),
 				task.title);
@@ -43,8 +43,7 @@ window.onload = function () {
 		input = '';
 	}
 	function inConfig(elem, isInit) {
-		$input = elem;
-		if (!isInit) elem.onkeypress = inKey;
+		($input = elem).onkeypress = inKey;
 	}
 	function inKey(e) {
 		if ((e || event).keyCode === 13) { inChange(); addClick(); m.redraw(); }

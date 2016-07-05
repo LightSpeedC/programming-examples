@@ -12,29 +12,38 @@ void function () {
 	'use strict';
 
 	var key = 0; // unique key
+	function dummy() {}
 
 	var inputCompo = {
 		controller: function (attrs) {
-				this.attrs = attrs;
-			},
-		view: function (ctrl) {
-			var $input, attrs = ctrl.attrs;
+			var $input;
+			this.attrs = attrs;
+			this.inConfig = inConfig;
+			this.inChange = inChange;
+			this.inBlur = inBlur;
+			var onchange = attrs.onchange || dummy;
+			var onenter = attrs.onenter || dummy;
+			var onblur = attrs.onblur || dummy;
 			function inConfig(elem, isInit) {
-				$input = elem;
-				if (!isInit) elem.onkeypress = inKey;
+				($input = elem).onkeypress = inKey;
 			}
 			function inKey(e) {
 				if ((e || event).keyCode === 13) {
-					inChange(); attrs.onchange && attrs.onchange(attrs.value); m.redraw();
+					onenter(e, attrs.value = $input.value);
+					m.redraw(true); return false;
 				}
 			}
-			function inBlur() {
-				inChange(); attrs.onblur && attrs.onblur(attrs.value);
+			function inBlur(e) {
+				onblur(e, attrs.value = $input.value);
 			}
-			function inChange() {
-				attrs.value = $input.value;
+			function inChange(e) {
+				onchange(e, attrs.value = $input.value);
 			}
-			return m('input', {size: 60, value: attrs.value, config: inConfig, onblur: inBlur, onchange: inChange,
+		},
+		view: function (ctrl) {
+			var attrs = ctrl.attrs;
+			return m('input', {size: 60, value: attrs.value, config: ctrl.inConfig,
+				onchange: ctrl.inChange, onblur: ctrl.inBlur,
 				autofocus: attrs.autofocus, placeholder: attrs.placeholder});
 		}
 	};
@@ -42,19 +51,24 @@ void function () {
 	// component: task
 	var taskCompo = {
 		controller: function (task) {
-			task.done = !!task.done;
-			this.task = task;
-			this.editMode = false;
-		},
-		view: function (ctrl) {
-			var task = ctrl.task;
-			var inAttrs = {value: task.title, onchange: inChange, onblur: inChange};
-			function inChange(value) {
+			var ctrl, inCtrl, inAttrs = {value: task.title,
+				onchange: inChange, onblur: inChange, onenter: inChange};
+			function inChange(e, value) {
 				if (value) task.title = value;
 				ctrl.editMode = false;
 				inAttrs.value = task.title;
 			}
-			return m('div', {}, ctrl.editMode ? m(inputCompo, inAttrs) :
+			function inCompo() {
+				if (!inCtrl) inCtrl = new (inputCompo.controller)(inAttrs);
+				return (inputCompo.view)(inCtrl);
+				//if (!inCtrl) inCtrl = m(inputCompo, inAttrs);
+				//return inCtrl;
+			}
+			return ctrl = {task: task, editMode: false, inCompo: inCompo};
+		},
+		view: function (ctrl) {
+			var task = ctrl.task;
+			return m('div', {}, ctrl.editMode ? ctrl.inCompo() :
 				m(task.done ? 'span.todo-done' : 'span',
 					{ondblclick: function () { ctrl.editMode = true; }},
 					m('input[type=checkbox]', {checked: task.done,
@@ -69,32 +83,34 @@ void function () {
 
 	var todoApp = {
 		controller: function (taskList) {
-			this.input = '';
-			this.taskList = !taskList ? [] : taskList.map(newTaskCompo);
-		},
-		view: function (ctrl) {
-			var inAttrs = {autofocus: true, value: ctrl.input, onchange: inChange,
-						placeholder: 'タスクを入力してください'};
-			function addClick() {
-				if (!ctrl.input) return;
-				ctrl.taskList.unshift(newTaskCompo({title:ctrl.input, done:false}));
-				inAttrs.value = ctrl.input = '';
+			var ctrl, inAttrs = {autofocus: true, value: '',
+					onchange: inChange, onblur: inChange, onenter: addClick,
+					placeholder: 'タスクを入力してください'};
+			function addClick(e, value) {
+				if (typeof value === 'string') inAttrs.value = value;
+				if (!inAttrs.value) return;
+				ctrl.taskList.unshift(newTaskCompo({title:inAttrs.value, done:false}));
+				inAttrs.value = '';
 			}
-			function inChange(value) {
-				ctrl.input = value; addClick();
+			function inChange(e, value) {
+				if (typeof value === 'string') inAttrs.value = value;
 			}
 			function removeClick() {
 				ctrl.taskList = ctrl.taskList.filter(function (x) { return !x.task.done; });
 			}
+			return ctrl = {taskList: !taskList ? [] : taskList.map(newTaskCompo),
+				inAttrs: inAttrs, addClick: addClick, removeClick: removeClick};
+		},
+		view: function (ctrl) {
 			return [
-				m('div', {key:'input'}, m(inputCompo, inAttrs),
-					m('button', {onclick: addClick}, '追加')),
+				m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
+					m('button', {onclick: ctrl.addClick}, '追加')),
 				ctrl.taskList.map(function (x) { return x.compo; }),
 				m('div', {key:'remove'}, 'チェックされているタスクを',
-					m('button', {onclick: removeClick}, '削除'))];
+					m('button', {onclick: ctrl.removeClick}, '削除'))];
 		}
 	};
 
-	m.mount($todoApp, m(todoApp, [{title: 'abc'}, {title: 'xyz', done:true}]));
+	m.mount($todoApp, m(todoApp, [{title: 'abc', done:false}, {title: 'xyz', done:true}]));
 } ();
 </script>
