@@ -18,20 +18,21 @@ void function () {
 				this.attrs = attrs;
 			},
 		view: function (ctrl) {
-			var attrs = ctrl.attrs;
+			var $input, attrs = ctrl.attrs;
 			function inConfig(elem, isInit) {
+				$input = elem;
 				if (!isInit) elem.onkeypress = inKey;
 			}
 			function inKey(e) {
-				if (e.keyCode === 13) {
-					inChange(e); attrs.onchange && attrs.onchange(attrs.value); m.redraw();
+				if ((e || event).keyCode === 13) {
+					inChange(); attrs.onchange && attrs.onchange(attrs.value); m.redraw();
 				}
 			}
-			function inBlur(e) {
-				inChange(e); attrs.onblur && attrs.onblur(attrs.value);
+			function inBlur() {
+				inChange(); attrs.onblur && attrs.onblur(attrs.value);
 			}
-			function inChange(e) {
-				attrs.value = e.currentTarget.value;
+			function inChange() {
+				attrs.value = $input.value;
 			}
 			return m('input', {size: 60, value: attrs.value, config: inConfig, onblur: inBlur, onchange: inChange,
 				autofocus: attrs.autofocus, placeholder: attrs.placeholder});
@@ -54,11 +55,11 @@ void function () {
 				inAttrs.value = task.title;
 			}
 			return m('div', {}, ctrl.editMode ? m(inputCompo, inAttrs) :
-				[	m('input[type=checkbox]', {checked: task.done,
+				m(task.done ? 'span.todo-done' : 'span',
+					{ondblclick: function () { ctrl.editMode = true; }},
+					m('input[type=checkbox]', {checked: task.done,
 						onclick: function () {task.done = !task.done;}}),
-					m(task.done ? 'span.todo-done' : 'span',
-						{ondblclick: function () { ctrl.editMode = true; }},
-						task.title) ]);
+						task.title));
 		}
 	};
 

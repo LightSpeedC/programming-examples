@@ -2,6 +2,8 @@
 <meta charset="UTF-8">
 <script src="../js/mithril.min.js"></script>
 <!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<!--[if IE]><script src="../js/misc-ie8-polyfill.js"></script><![endif]-->
+<style>.todo-done { color: gray; text-decoration: line-through; }</style>
 <body>
 <h3>やることリスト管理 (Mithril)</h3>
 <div id="$todoApp"></div>
@@ -19,29 +21,25 @@ void function () {
 			this.task = task;
 			this.editMode = false; },
 		view: function (ctrl) {
-			var task = ctrl.task;
+			var $input, task = ctrl.task;
 			function inConfig(elem, isInit) {
+				$input = elem;
 				if (!isInit) elem.onkeypress = inKey; }
 			function inKey(e) {
-				if (e.keyCode === 13) { inChange(e); m.redraw(); } }
-			function inChange(e) {
-				if (e.currentTarget.value) task.title = e.currentTarget.value;
+				if ((e || event).keyCode === 13) { inChange(); m.redraw(); } }
+			function inChange() {
+				if ($input.value) task.title = $input.value;
 				ctrl.editMode = false; }
 
 			return m('div',
-				ctrl.editMode ? [
+				ctrl.editMode ?
 					m('input', {size: 50, value: task.title, config: inConfig, onblur: inChange})
-				] : [
-					m('input[type=checkbox]',
-						{checked: task.done,
-						onclick: function () {task.done = !task.done;}}),
-					m('span',
-						{style:
-							{color: task.done ? 'green' : 'black',
-							textDecoration: task.done ? 'line-through' : 'none'},
-						ondblclick: function () { ctrl.editMode = true; }},
+				: m(task.done ? 'span.todo-done' : 'span',
+						{ondblclick: function () { ctrl.editMode = true; }},
+						m('input[type=checkbox]', {checked: task.done,
+							onclick: function () {task.done = !task.done;}}),
 						task.title)
-				]);
+				);
 		}
 	};
 
@@ -53,15 +51,17 @@ void function () {
 			this.input = '';
 			this.tasks = !tasks ? [] : tasks.map(newTaskCompo); },
 		view: function (ctrl) {
+			var $input;
 			function addClick() {
 				if (!ctrl.input) return;
 				ctrl.tasks.unshift(newTaskCompo({title:ctrl.input, done:false}));
 				ctrl.input = ''; }
 			function inConfig(elem, isInit) {
+				$input = elem;
 				if (!isInit) elem.onkeypress = inKey; }
 			function inKey(e) {
-				if (e.keyCode === 13) { inChange(e); addClick(); m.redraw(); } }
-			function inChange(e) { ctrl.input = e.currentTarget.value; }
+				if ((e || event).keyCode === 13) { inChange(); addClick(); m.redraw(); } }
+			function inChange() { ctrl.input = $input.value; }
 			function removeClick() {
 				ctrl.tasks = ctrl.tasks.filter(function (x) { return !x.task.done; }); }
 
