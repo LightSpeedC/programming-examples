@@ -71,8 +71,8 @@ void function () {
 					placeholder: 'タスクを入力してください'}),
 				m('button', {onclick: addClick}, '追加'),
 				ctrl.tasks.map(function (x) { return x.compo; }),
-				m('span', 'チェックされているタスクを'),
-				m('button', {onclick: removeClick}, '削除')];
+				m('div', 'チェックされているタスクを',
+					m('button', {onclick: removeClick}, '削除'))];
 		}
 	};
 
