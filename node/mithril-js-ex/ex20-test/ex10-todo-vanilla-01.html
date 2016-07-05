@@ -1,0 +1,63 @@
+<!doctype html>
+<meta charset="UTF-8">
+<style>.todo-done { color: gray; text-decoration: line-through; }</style>
+<body>
+<h3>やることリスト管理 (Vanilla)</h3>
+<input id="$input" size="60" autofocus placeholder="タスクを入力してください">
+<button id="$add">追加</button>
+<div id="$taskList"></div>
+<span>チェックされているタスクを</span>
+<button id="$remove">削除</button>
+</body>
+<script>
+window.onload = function () {
+	'use strict';
+
+	$add.onclick = addClick;
+	$remove.onclick = removeClick;
+	var input = '';
+	var taskList = [];
+
+	$input.onkeypress = inKey;
+	$input.onchange = inChange;
+	function inKey(e) {
+		if (e.keyCode === 13) inChange(e);
+	}
+	function inChange(e) {
+		input = e.currentTarget.value;
+		addClick();
+	}
+	function addClick() {
+		if (!input) return;
+		addTaskToList({title:input, done:false});
+		$input.value = input = '';
+	}
+	function removeClick() {
+		taskList = taskList.filter(function (task) {
+			if (task.done) task.elem.parentNode.removeChild(task.elem);
+			return !task.done;
+		});
+	}
+
+	function addTaskToList(task) {
+		taskList.unshift(task);
+		task.elem = document.createElement('div');
+		var $chk = document.createElement('input');
+		$chk.type = 'checkbox';
+		$chk.checked = task.done;
+		var $span = document.createElement('span');
+		$span.innerText = task.title;
+		$span.className = task.done ? 'todo-done' : '';
+		$chk.onclick = function () {
+			task.done = $chk.checked;
+			$span.className = task.done ? 'todo-done' : '';
+		};
+		task.elem.appendChild($chk);
+		task.elem.appendChild($span);
+		$taskList.insertBefore(task.elem, $taskList.firstChild);
+	}
+
+	addTaskToList({title: 'xyz', done: true});
+	addTaskToList({title: 'abc', done: false});
+};
+</script>
