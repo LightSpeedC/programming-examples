@@ -12,47 +12,37 @@ void function () {
 	'use strict';
 
 	var key = 0; // unique key
-	function dummy() {}
+	function fn() {} // dummy function
 
-	var inputCompo = {
-		controller: function (attrs) {
-			var $input;
-			this.attrs = attrs;
-			this.inConfig = inConfig;
-			this.inChange = inChange;
-			this.inBlur = inBlur;
-			var onchange = attrs.onchange || dummy;
-			var onenter = attrs.onenter || dummy;
-			var onblur = attrs.onblur || dummy;
+	var inputCompo = { // component: input
+		controller: function (args) {
+			var ctrl, $input;
 			function inConfig(elem, isInit) {
-				($input = elem).onkeypress = inKey;
+				($input = elem).onkeypress = function (ev) {
+					if ((ev || event).keyCode === 13) {
+						(args.onenter || fn)(ev, args.value = $input.value);
+						m.redraw(true); return false;
+					}
+				};
 			}
-			function inKey(e) {
-				if ((e || event).keyCode === 13) {
-					onenter(e, attrs.value = $input.value);
-					m.redraw(true); return false;
-				}
+			function on(cb) {
+				return function (ev) { cb(ev, args.value = $input.value); }
 			}
-			function inBlur(e) {
-				onblur(e, attrs.value = $input.value);
-			}
-			function inChange(e) {
-				onchange(e, attrs.value = $input.value);
-			}
+			return ctrl = {args:args, attrs:{size:60, config:inConfig,
+				onchange:on(args.onchange || fn),
+				onblur:on(args.onblur || fn),
+				autofocus:args.autofocus, placeholder:args.placeholder}};
 		},
 		view: function (ctrl) {
-			var attrs = ctrl.attrs;
-			return m('input', {size: 60, value: attrs.value, config: ctrl.inConfig,
-				onchange: ctrl.inChange, onblur: ctrl.inBlur,
-				autofocus: attrs.autofocus, placeholder: attrs.placeholder});
+			ctrl.attrs.value = ctrl.args.value;
+			return m('input', ctrl.attrs);
 		}
 	};
 
-	// component: task
-	var taskCompo = {
+	var taskCompo = { // component: task
 		controller: function (task) {
-			var ctrl, inCtrl, inAttrs = {value: task.title,
-				onchange: inChange, onblur: inChange, onenter: inChange};
+			var ctrl, inCtrl, inAttrs = {value:task.title,
+				onchange:inChange, onblur:inChange, onenter:inChange};
 			function inChange(e, value) {
 				if (value) task.title = value;
 				ctrl.editMode = false;
@@ -61,19 +51,19 @@ void function () {
 			function inCompo() {
 				if (!inCtrl) inCtrl = new (inputCompo.controller)(inAttrs);
 				return (inputCompo.view)(inCtrl);
-				//if (!inCtrl) inCtrl = m(inputCompo, inAttrs);
-				//return inCtrl;
 			}
-			return ctrl = {task: task, editMode: false, inCompo: inCompo};
+			function enterEdit() { ctrl.editMode = true; }
+			function checkClick() { task.done = !task.done; }
+			return ctrl = {task:task, editMode:false, inCompo:inCompo,
+				enterEdit:enterEdit, checkClick:checkClick};
 		},
 		view: function (ctrl) {
 			var task = ctrl.task;
 			return m('div', {}, ctrl.editMode ? ctrl.inCompo() :
-				m(task.done ? 'span.todo-done' : 'span',
-					{ondblclick: function () { ctrl.editMode = true; }},
-					m('input[type=checkbox]', {checked: task.done,
-						onclick: function () {task.done = !task.done;}}),
-						task.title));
+				m('span' + (task.done ? '.todo-done' : ''),
+					{ondblclick: ctrl.enterEdit},
+					m('input[type=checkbox]', {checked:task.done,
+						onclick: ctrl.checkClick}), task.title));
 		}
 	};
 
@@ -98,16 +88,15 @@ void function () {
 			function removeClick() {
 				ctrl.taskList = ctrl.taskList.filter(function (x) { return !x.task.done; });
 			}
-			return ctrl = {taskList: !taskList ? [] : taskList.map(newTaskCompo),
-				inAttrs: inAttrs, addClick: addClick, removeClick: removeClick};
+			return ctrl = {taskList:(taskList || []).map(newTaskCompo),
+				inAttrs:inAttrs, addClick:addClick, removeClick:removeClick};
 		},
 		view: function (ctrl) {
-			return [
-				m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
-					m('button', {onclick: ctrl.addClick}, '追加')),
-				ctrl.taskList.map(function (x) { return x.compo; }),
-				m('div', {key:'remove'}, 'チェックされているタスクを',
-					m('button', {onclick: ctrl.removeClick}, '削除'))];
+			return [m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
+						m('button', {onclick: ctrl.addClick}, '追加')),
+					ctrl.taskList.map(function (x) { return x.compo; }),
+					m('div', {key:'remove'}, 'チェックされているタスクを',
+						m('button', {onclick: ctrl.removeClick}, '削除'))];
 		}
 	};
 

@@ -7,21 +7,15 @@
 window.onload = function () {
 	'use strict';
 
-	var key = 0; // unique key
-
 	var taskCompo = { // component: task
 		controller: function (task) { return task; },
 		view: function (task) {
 			return m('span' + (task.done ? '.todo-done' : ''), {},
-				m('input[type=checkbox]', {checked: task.done,
+				m('input[type=checkbox]', {checked:task.done,
 					onclick: function () {task.done = !task.done;}}),
 				task.title);
 		}
 	};
-
-	function newTaskCompo(task) { // model:task and component
-		return {task:task, compo:m('div', {key:++key}, m(taskCompo, task))};
-	}
 
 	var $input, input = ''; // input task
 	var taskList = [{title: 'abc', done:false}, {title: 'xyz', done:true}].map(newTaskCompo);
@@ -35,6 +29,11 @@ window.onload = function () {
 			taskList.map(function (x) { return x.compo; }),
 			m('div', 'チェックされているタスクを',
 			m('button', {onclick: removeClick}, '削除'))];
+	}
+
+	var key = 0; // unique key
+	function newTaskCompo(task) { // model:task and component
+		return {task:task, compo:m('div', {key:++key}, m(taskCompo, task))};
 	}
 
 	function addClick() {
