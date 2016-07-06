@@ -9,7 +9,7 @@
     "height": 800
   },
   "dependencies": {
-    "aa": ">=0.1.38",
+    "aa": ">=0.1.39",
     "executors": ">=0.0.5"
   },
   "scripts": {
