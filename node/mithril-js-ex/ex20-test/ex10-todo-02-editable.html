@@ -61,9 +61,9 @@ void function () {
 			var task = ctrl.task;
 			return m('div', {}, ctrl.editMode ? ctrl.inCompo() :
 				m('span' + (task.done ? '.todo-done' : ''),
-					{ondblclick: ctrl.enterEdit},
+					{ondblclick:ctrl.enterEdit},
 					m('input[type=checkbox]', {checked:task.done,
-						onclick: ctrl.checkClick}), task.title));
+						onclick:ctrl.checkClick}), task.title));
 		}
 	};
 
@@ -73,9 +73,9 @@ void function () {
 
 	var todoApp = {
 		controller: function (taskList) {
-			var ctrl, inAttrs = {autofocus: true, value: '',
-					onchange: inChange, onblur: inChange, onenter: addClick,
-					placeholder: 'タスクを入力してください'};
+			var ctrl, inAttrs = {autofocus:true, value:'',
+					onchange:inChange, onblur:inChange, onenter:addClick,
+					placeholder:'タスクを入力してください'};
 			function addClick(e, value) {
 				if (typeof value === 'string') inAttrs.value = value;
 				if (!inAttrs.value) return;
@@ -93,13 +93,13 @@ void function () {
 		},
 		view: function (ctrl) {
 			return [m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
-						m('button', {onclick: ctrl.addClick}, '追加')),
+						m('button', {onclick:ctrl.addClick}, '追加')),
 					ctrl.taskList.map(function (x) { return x.compo; }),
 					m('div', {key:'remove'}, 'チェックされているタスクを',
-						m('button', {onclick: ctrl.removeClick}, '削除'))];
+						m('button', {onclick:ctrl.removeClick}, '削除'))];
 		}
 	};
 
-	m.mount($todoApp, m(todoApp, [{title: 'abc', done:false}, {title: 'xyz', done:true}]));
+	m.mount($todoApp, m(todoApp, [{title:'abc', done:false}, {title:'xyz', done:true}]));
 } ();
 </script>

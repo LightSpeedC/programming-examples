@@ -8,50 +8,53 @@ window.onload = function () {
 	'use strict';
 
 	var taskCompo = { // component: task
-		controller: function (task) { return task; },
-		view: function (task) {
+		controller: function (task) {
+			function checkClick() { task.done = !task.done; }
+			return {task:task, checkClick:checkClick};
+		},
+		view: function (ctrl) {
+			var task = ctrl.task;
 			return m('span' + (task.done ? '.todo-done' : ''), {},
 				m('input[type=checkbox]', {checked:task.done,
-					onclick: function () {task.done = !task.done;}}),
-				task.title);
+					onclick:ctrl.checkClick}), task.title);
 		}
 	};
 
+	var key = 0; // unique key
 	var $input, input = ''; // input task
-	var taskList = [{title: 'abc', done:false}, {title: 'xyz', done:true}].map(newTaskCompo);
+	var taskList = [newTaskCompo({title: 'abc', done:false})];
+	taskList.unshift(newTaskCompo({title: 'xyz', done:true}));
 
 	function todoAppView() { // todo application
 		return [m('h3', 'やることリスト管理 (Mithril)'),
-			m('input', {size: 60, autofocus: true, value: input,
-				config: inConfig, onchange: inChange,
-				placeholder: 'タスクを入力してください'}),
-			m('button', {onclick: addClick}, '追加'),
-			taskList.map(function (x) { return x.compo; }),
+			m('input', {size:60, autofocus:true, value:input,
+				config:inConfig, onchange:inChange,
+				placeholder:'タスクを入力してください'}),
+			m('button', {onclick:addClick}, '追加'),
+			//m('div', taskList.map(function (x) { return x.view(); })),
+			m('div', taskList.map(function (x) { return x.compo; })),
 			m('div', 'チェックされているタスクを',
-			m('button', {onclick: removeClick}, '削除'))];
+				m('button', {onclick:removeClick}, '削除'))];
 	}
 
-	var key = 0; // unique key
 	function newTaskCompo(task) { // model:task and component
+		//return {task:task, key:++key, ctrl:new (taskCompo.controller)(task),
+		//	view:function () { return m('div', {key:this.key}, (taskCompo.view)(this.ctrl)); }};
 		return {task:task, compo:m('div', {key:++key}, m(taskCompo, task))};
 	}
-
 	function addClick() {
-		if (!input) return;
-		taskList.unshift(newTaskCompo({title:input, done:false}));
+		if (input) taskList.unshift(newTaskCompo({title:input, done:false}));
 		input = '';
 	}
 	function inConfig(elem, isInit) {
-		($input = elem).onkeypress = inKey;
-	}
-	function inKey(e) {
-		if ((e || event).keyCode === 13) { inChange(); addClick(); m.redraw(); }
+		($input = elem).onkeypress = function (ev) {
+			if ((ev || event).keyCode === 13) { inChange(); addClick(); m.redraw(); }
+		};
 	}
 	function inChange() { input = $input.value; }
 	function removeClick() {
 		taskList = taskList.filter(function (x) { return !x.task.done; });
 	}
-
 	m.mount(document.body, {view:todoAppView});
 };
 </script>

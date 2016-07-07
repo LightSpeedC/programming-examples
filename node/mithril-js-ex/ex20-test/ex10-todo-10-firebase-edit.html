@@ -97,9 +97,9 @@ void function () {
 			var task = ctrl.task;
 			return m('div', {}, ctrl.editMode ? ctrl.inCompo() :
 				m('span' + (task.done ? '.todo-done' : ''),
-					{ondblclick: ctrl.enterEdit},
+					{ondblclick:ctrl.enterEdit},
 					m('input[type=checkbox]', {checked:task.done,
-						onclick: ctrl.checkClick}),
+						onclick:ctrl.checkClick}),
 						task.title,
 						m('font[size=1][color=lightgray]', ' ' + task.key)
 				)
@@ -114,9 +114,9 @@ void function () {
 	var todoApp = {
 		controller: function (attrs) {
 			var taskList = attrs.taskList = attrs.taskList || [];
-			var ctrl, inAttrs = {autofocus: true, value: '',
-					onchange: inChange, onblur: inChange, onenter: addClick,
-					placeholder: 'タスクを入力してください'};
+			var ctrl, inAttrs = {autofocus:true, value:'',
+					onchange:inChange, onblur:inChange, onenter:addClick,
+					placeholder:'タスクを入力してください'};
 			function addClick(e, value) {
 				if (typeof value === 'string') inAttrs.value = value;
 				if (!inAttrs.value) return;
@@ -136,12 +136,13 @@ void function () {
 		},
 		view: function (ctrl) {
 			return [m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
-						m('button', {onclick: ctrl.addClick}, '追加')),
+						m('button', {onclick:ctrl.addClick}, '追加')),
 					m('div', m('font[color=gray]', '※↓タスク名をダブルクリックすると編集できます')),
 					ctrl.attrs.taskList.map(function (x) { return x.compo; }),
 					m('div', {key:'remove'}, 'チェックされているタスクを',
-						m('button', {onclick: ctrl.removeClick}, '削除')),
-					m('div', m('font[color=gray]', '※DBはここです→ ', m('a', {href: FIREBASE_URL}, FIREBASE_URL)))];
+						m('button', {onclick:ctrl.removeClick}, '削除')),
+					m('div', m('font[color=gray]', '※DBはここです→ ',
+						m('a', {href:FIREBASE_URL}, FIREBASE_URL)))];
 		}
 	};
 

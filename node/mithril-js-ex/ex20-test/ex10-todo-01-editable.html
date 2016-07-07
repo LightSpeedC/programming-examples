@@ -74,10 +74,10 @@ void function () {
 				m('input', {size:60, autofocus:true, value:ctrl.input,
 					config:ctrl.inConfig, onchange:ctrl.inChange,
 					placeholder:'タスクを入力してください'}),
-				m('button', {onclick: ctrl.addClick}, '追加'),
+				m('button', {onclick:ctrl.addClick}, '追加'),
 				ctrl.taskList.map(function (x) { return x.compo; }),
 				m('div', 'チェックされているタスクを',
-					m('button', {onclick: ctrl.removeClick}, '削除'))];
+					m('button', {onclick:ctrl.removeClick}, '削除'))];
 		}
 	};
 
