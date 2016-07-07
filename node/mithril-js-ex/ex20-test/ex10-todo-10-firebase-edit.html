@@ -14,11 +14,8 @@
 void function () {
 	'use strict';
 
-	// [{title: 'abc', done:false}, {title: 'xyz', done:true}]
 	var todoAttrs = {taskListSrc:[], todoList:[]};
 
-	//var todoFirebaseRef = new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/');
-	//var todoFirebaseTasksRef = todoFirebaseRef.ref('tasks');
 	var todoFirebaseTasksRef = new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/tasks');
 	todoFirebaseTasksRef.on('child_added', function (snapshot) {
 		var task = snapshot.val();
@@ -29,29 +26,23 @@ void function () {
 	});
 	todoFirebaseTasksRef.on('child_changed', function (snapshot) {
 		var task = snapshot.val();
-		task.key = snapshot.key();
+		var key = snapshot.key();
 		todoAttrs.taskListSrc.forEach(function (task2) {
-			if (task.key === task2.key) {
+			if (key === task2.key) {
 				task2.title = task.title;
 				task2.done = task.done;
-			}
-		});
-		todoAttrs.taskList.forEach(function (x) {
-			if (task.key === x.task.key) {
-				x.task.title = task.title;
-				x.task.done = task.done;
 			}
 		});
 		m.redraw(true);
 	});
 	todoFirebaseTasksRef.on('child_removed', function (snapshot) {
 		var task = snapshot.val();
-		task.key = snapshot.key();
+		var key = snapshot.key();
 		todoAttrs.taskListSrc = todoAttrs.taskListSrc.filter(function (task2) {
-			return task.key !== task2.key;
+			return key !== task2.key;
 		});
 		todoAttrs.taskList = todoAttrs.taskList.filter(function (x) {
-			return task.key !== x.task.key;
+			return key !== x.task.key;
 		});
 		m.redraw(true);
 	});
@@ -98,6 +89,7 @@ void function () {
 				inAttrs.value = task.title;
 			}
 			function inCompo() {
+				inAttrs.value = task.title;
 				return m(inputCompo, inAttrs);
 				//if (!inCtrl) inCtrl = new (inputCompo.controller)(inAttrs);
 				//return (inputCompo.view)(inCtrl);
