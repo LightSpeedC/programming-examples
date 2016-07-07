@@ -8,39 +8,34 @@
 <body>
 <h3>やることリスト管理 (Mithril + Firebase)</h3>
 <div id="$todoApp"></div>
-<a href="https://lightspeedc-demo-todo.firebaseio-demo.com/">https://lightspeedc-demo-todo.firebaseio-demo.com/</a>
 </body>
 <script>
 void function () {
 	'use strict';
 
-	var todoAttrs = {taskListSrc:[], todoList:[]};
+	var todoAttrs = {todoList:[]};
+	var FIREBASE_URL = 'https://lightspeedc-demo-todo.firebaseio-demo.com/';
 
-	var todoFirebaseTasksRef = new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/tasks');
+	var todoFirebaseTasksRef = new Firebase(FIREBASE_URL + 'tasks');
 	todoFirebaseTasksRef.on('child_added', function (snapshot) {
 		var task = snapshot.val();
 		task.key = snapshot.key();
-		todoAttrs.taskListSrc.unshift(task);
 		todoAttrs.taskList.unshift(newTaskCompo(task));
 		m.redraw(true);
 	});
 	todoFirebaseTasksRef.on('child_changed', function (snapshot) {
 		var task = snapshot.val();
 		var key = snapshot.key();
-		todoAttrs.taskListSrc.forEach(function (task2) {
-			if (key === task2.key) {
-				task2.title = task.title;
-				task2.done = task.done;
+		todoAttrs.taskList.forEach(function (x) {
+			if (key === x.task.key) {
+				x.task.title = task.title;
+				x.task.done = task.done;
 			}
 		});
 		m.redraw(true);
 	});
 	todoFirebaseTasksRef.on('child_removed', function (snapshot) {
-		var task = snapshot.val();
 		var key = snapshot.key();
-		todoAttrs.taskListSrc = todoAttrs.taskListSrc.filter(function (task2) {
-			return key !== task2.key;
-		});
 		todoAttrs.taskList = todoAttrs.taskList.filter(function (x) {
 			return key !== x.task.key;
 		});
@@ -77,28 +72,23 @@ void function () {
 
 	var taskCompo = { // component: task
 		controller: function (task) {
-			var ctrl, inCtrl, inAttrs = {value:task.title,
-				onchange:inChange, onblur:inChange, onenter:inChange};
+			var ctrl, inCtrl, inAttrs = {onchange:inChange, onblur:inChange, onenter:inChange};
 			function inChange(e, value) {
 				if (value) {
 					task.title = value;
-					var ref = new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/tasks/' + task.key + '/title');
-					ref.set(task.title);
+					new Firebase(FIREBASE_URL + 'tasks/' + task.key + '/title').set(task.title);
 				}
 				ctrl.editMode = false;
-				inAttrs.value = task.title;
 			}
 			function inCompo() {
 				inAttrs.value = task.title;
-				return m(inputCompo, inAttrs);
-				//if (!inCtrl) inCtrl = new (inputCompo.controller)(inAttrs);
-				//return (inputCompo.view)(inCtrl);
+				if (!inCtrl) inCtrl = new (inputCompo.controller)(inAttrs);
+				return (inputCompo.view)(inCtrl); // m(inputCompo, inAttrs);
 			}
 			function enterEdit() { ctrl.editMode = true; }
 			function checkClick() {
 				task.done = !task.done;
-				var ref = new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/tasks/' + task.key + '/done');
-				ref.set(task.done);
+				new Firebase(FIREBASE_URL + 'tasks/' + task.key + '/done').set(task.done);
 			}
 			return ctrl = {task:task, editMode:false, inCompo:inCompo,
 				enterEdit:enterEdit, checkClick:checkClick};
@@ -123,17 +113,14 @@ void function () {
 
 	var todoApp = {
 		controller: function (attrs) {
-			if (!attrs.taskListSrc) attrs.taskListSrc = [];
-			var taskList = attrs.taskListSrc.map(newTaskCompo);
-			attrs.taskList = taskList;
+			var taskList = attrs.taskList = attrs.taskList || [];
 			var ctrl, inAttrs = {autofocus: true, value: '',
 					onchange: inChange, onblur: inChange, onenter: addClick,
 					placeholder: 'タスクを入力してください'};
 			function addClick(e, value) {
 				if (typeof value === 'string') inAttrs.value = value;
 				if (!inAttrs.value) return;
-				//ctrl.taskList.unshift(newTaskCompo({title:inAttrs.value, done:false}));
-				var taskRef = todoFirebaseTasksRef.push({title:inAttrs.value, done:false});
+				todoFirebaseTasksRef.push({title:inAttrs.value, done:false});
 				inAttrs.value = '';
 			}
 			function inChange(e, value) {
@@ -141,12 +128,8 @@ void function () {
 			}
 			function removeClick() {
 				attrs.taskList = attrs.taskList.filter(function (x) {
-					if (x.task.done)
-						new Firebase('https://lightspeedc-demo-todo.firebaseio-demo.com/tasks/' + x.task.key).remove();
+					if (x.task.done) new Firebase(FIREBASE_URL + 'tasks/' + x.task.key).remove();
 					return !x.task.done;
-				});
-				attrs.taskListSrc = attrs.taskListSrc.filter(function (task) {
-					return !task.done;
 				});
 			}
 			return ctrl = {attrs:attrs, inAttrs:inAttrs, addClick:addClick, removeClick:removeClick};
@@ -154,9 +137,11 @@ void function () {
 		view: function (ctrl) {
 			return [m('div', {key:'input'}, m(inputCompo, ctrl.inAttrs),
 						m('button', {onclick: ctrl.addClick}, '追加')),
+					m('div', m('font[color=gray]', '※↓タスク名をダブルクリックすると編集できます')),
 					ctrl.attrs.taskList.map(function (x) { return x.compo; }),
 					m('div', {key:'remove'}, 'チェックされているタスクを',
-						m('button', {onclick: ctrl.removeClick}, '削除'))];
+						m('button', {onclick: ctrl.removeClick}, '削除')),
+					m('div', m('font[color=gray]', '※DBはここです→ ', m('a', {href: FIREBASE_URL}, FIREBASE_URL)))];
 		}
 	};
 
