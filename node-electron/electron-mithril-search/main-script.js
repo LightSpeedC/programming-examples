@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.7 (2016/06/16)';
+	const version = 'version: 0.0.8 (2016/07/06)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
@@ -356,6 +356,8 @@ void function () {
 	function debugView() {
 		const list = [
 			'カレント作業ディレクトリ process.cwd(): ' + process.cwd(),
+			'ディレクトリ名 __dirname: ' + __dirname,
+			'ファイル名 __filename: ' + __filename,
 			'プロセスID process.pid: ' + process.pid,
 			'バージョン process.versions: ' + JSON.stringify(process.versions, null, '\t'),
 			'環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'),
