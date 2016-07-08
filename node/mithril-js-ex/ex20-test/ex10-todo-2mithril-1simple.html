@@ -2,7 +2,7 @@
 <meta charset="UTF-8">
 <!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
 <script src="../js/mithril.min.js"></script>
-<style>.todo-done { color: gray; text-decoration: line-through; }</style>
+<style>.todo-done { color: lightgray; text-decoration: line-through; }</style>
 <script>
 window.onload = function () {
 	'use strict';
@@ -22,8 +22,7 @@ window.onload = function () {
 
 	var key = 0; // unique key
 	var $input, input = ''; // input task
-	var taskList = [newTaskCompo({title: 'abc', done:false})];
-	taskList.unshift(newTaskCompo({title: 'xyz', done:true}));
+	var taskList = [{title: 'xyz', done:true}, {title: 'abc', done:false}].map(newTaskCompo);
 
 	function todoAppView() { // todo application
 		return [m('h3', 'やることリスト管理 (Mithril)'),
