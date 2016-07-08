@@ -12,8 +12,6 @@
 </body>
 <script>
 $(function () {
-	'use strict';
-
 	$('#add').click(addClick);
 	$('#remove').click(removeClick);
 	var $input = $('#input');
@@ -40,7 +38,6 @@ $(function () {
 			return !task.done;
 		});
 	}
-
 	function addTaskToList(task) {
 		taskList.unshift(task);
 		task.elem = $('<div>');
