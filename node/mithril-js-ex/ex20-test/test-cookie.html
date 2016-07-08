@@ -1,0 +1,19 @@
+<!doctype html>
+<meta charset="UTF-8">
+<script src="../js/mithril.min.js"></script>
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<body></body>
+<script>
+//document.cookie = 'NAME=値; expires=Tue, 1-Jan-2030 00:00:00 GMT; domain=値; path=値'
+//document.cookie = 'NAME=値; max-age=60; domain=値; path=値'
+//document.cookie = 'data1=value1; max-age=60';
+//document.cookie = 'data2='+new Date+'; max-age=60';
+//alert(document.cookie);
+void function () {
+	m.mount(document.body, {view: function () {
+		return [
+			m('ul', m('li', new Date), document.cookie.split('; ').map(x => m('li', x)))
+		];
+	}});
+} ();
+</script>
