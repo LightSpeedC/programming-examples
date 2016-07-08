@@ -4,46 +4,58 @@
 <style>.todo-done { color: lightgray; text-decoration: line-through; }</style>
 <body>
 <h3>やることリスト管理 (Vanilla)</h3>
-<input id="$input" size="60" autofocus placeholder="タスクを入力してください"
-	onkeypress="inKey()" onchange="addClick()">
-<button onclick="addClick()">追加</button>
+<input id="$input" size="60" autofocus placeholder="タスクを入力してください">
+<button id="$add">追加</button>
 <div id="$taskList"></div>
-<div>チェックされているタスクを<button onclick="removeClick()">削除</button></div>
+<div>チェックされているタスクを<button id="$remove">削除</button></div>
 </body>
 <script>
-var taskList = []; // Model: task list
-function inKey() {
-	if (event.keyCode === 13) addClick();
-}
-function addClick() {
-	if (!$input.value) return;
-	addTaskToList({title:$input.value, done:false});
-	$input.value = '';
-}
-function removeClick() {
-	taskList = taskList.filter(function (task) {
-		if (task.done) task.elem.parentNode.removeChild(task.elem);
-		return !task.done;
-	});
-}
-function addTaskToList(task) {
-	taskList.unshift(task);
-	task.elem = document.createElement('div');
-	var $checkbox = document.createElement('input');
-	$checkbox.type = 'checkbox';
-	$checkbox.checked = task.done;
-	var $span = document.createElement('span');
-	$span.innerText = task.title;
-	$span.className = task.done ? 'todo-done' : '';
-	$checkbox.onclick = function () {
-		task.done = $checkbox.checked;
-		$span.className = task.done ? 'todo-done' : '';
-	};
-	task.elem.appendChild($checkbox);
-	task.elem.appendChild($span);
-	$taskList.insertBefore(task.elem, $taskList.firstChild);
-}
 window.onload = function () {
+	'use strict';
+
+	$add.onclick = addClick;
+	$remove.onclick = removeClick;
+	var input = '';
+	var taskList = [];
+
+	$input.onkeypress = inKey;
+	$input.onchange = inChange;
+	function inKey(e) {
+		if ((e || event).keyCode === 13) inChange();
+	}
+	function inChange() {
+		input = $input.value;
+		addClick();
+	}
+	function addClick() {
+		if (!input) return;
+		addTaskToList({title:input, done:false});
+		$input.value = input = '';
+	}
+	function removeClick() {
+		taskList = taskList.filter(function (task) {
+			if (task.done) task.elem.parentNode.removeChild(task.elem);
+			return !task.done;
+		});
+	}
+
+	function addTaskToList(task) {
+		taskList.unshift(task);
+		task.elem = document.createElement('div');
+		var $chk = document.createElement('input');
+		$chk.type = 'checkbox';
+		$chk.checked = task.done;
+		var $span = document.createElement('span');
+		$span.innerText = task.title;
+		$span.className = task.done ? 'todo-done' : '';
+		$chk.onclick = function () {
+			task.done = $chk.checked;
+			$span.className = task.done ? 'todo-done' : '';
+		};
+		task.elem.appendChild($chk);
+		task.elem.appendChild($span);
+		$taskList.insertBefore(task.elem, $taskList.firstChild);
+	}
 	[{title: 'abc', done: false}, {title: 'xyz', done: true}].forEach(addTaskToList);
 };
 </script>

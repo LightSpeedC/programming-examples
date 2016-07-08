@@ -5,56 +5,45 @@
 <style>.todo-done { color: lightgray; text-decoration: line-through; }</style>
 <body>
 <h3>やることリスト管理 (jQuery)</h3>
-<input id="input" size="60" autofocus placeholder="タスクを入力してください">
-<button id="add">追加</button>
+<input id="input" size="60" autofocus placeholder="タスクを入力してください"
+	onkeypress="inKey()" onchange="addClick()">
+<button onclick="addClick()">追加</button>
 <div id="taskList"></div>
-<div>チェックされているタスクを<button id="remove">削除</button></div>
+<div>チェックされているタスクを<button onclick="removeClick()">削除</button></div>
 </body>
 <script>
-$(function () {
-	'use strict';
-
-	$('#add').click(addClick);
-	$('#remove').click(removeClick);
-	var $input = $('#input');
-	var input = '';
-	var $taskList = $('#taskList');
-	var taskList = [];
-
-	$input.keypress(inKey).change(inChange);
-	function inKey(e) {
-		if (e.keyCode === 13) inChange(e);
-	}
-	function inChange(e) {
-		input = e.currentTarget.value;
-		addClick();
-	}
-	function addClick() {
-		if (!input) return;
-		addTaskToList({title:input, done:false});
-		$input.val(input = '');
-	}
-	function removeClick() {
-		taskList = taskList.filter(function (task) {
-			if (task.done) task.elem.remove();
-			return !task.done;
-		});
-	}
-
-	function addTaskToList(task) {
-		taskList.unshift(task);
-		task.elem = $('<div>');
-		var $chk = $('<input type="checkbox">').prop('checked', task.done);
-		var $span = $('<span>').text(task.title);
+var $input, $taskList, taskList = []; // Model: task list
+function inKey() {
+	if (event.keyCode === 13) addClick();
+}
+function addClick() {
+	if (!$input.val()) return;
+	addTaskToList({title:$input.val(), done:false});
+	$input.val('');
+}
+function removeClick() {
+	taskList = taskList.filter(function (task) {
+		if (task.done) task.elem.remove();
+		return !task.done;
+	});
+}
+function addTaskToList(task) {
+	taskList.unshift(task);
+	task.elem = $('<div>');
+	var $checkbox = $('<input type="checkbox">').prop('checked', task.done);
+	var $span = $('<span>').text(task.title);
+	$span.attr('class', task.done ? 'todo-done' : '');
+	$checkbox.click(function () {
+		task.done = $checkbox.prop('checked');
+		//$span[task.done ? 'addClass' : 'removeClass']('todo-done');
 		$span.attr('class', task.done ? 'todo-done' : '');
-		$chk.click(function () {
-			task.done = $chk.prop('checked');
-			//$span[task.done ? 'addClass' : 'removeClass']('todo-done');
-			$span.attr('class', task.done ? 'todo-done' : '');
-		});
-		task.elem.append($chk).append($span);
-		$taskList.prepend(task.elem);
-	}
+	});
+	task.elem.append($checkbox).append($span);
+	$taskList.prepend(task.elem);
+}
+$(function () {
+	$input = $('#input');
+	$taskList = $('#taskList');
 	[{title: 'abc', done: false}, {title: 'xyz', done: true}].forEach(addTaskToList);
 });
 </script>
