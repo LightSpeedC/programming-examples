@@ -1,0 +1,50 @@
+<!doctype html>
+<meta charset="UTF-8">
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<script src="../js/jquery-1.12.4.min.js"></script>
+<style>.todo-done { color: gray; text-decoration: line-through; }</style>
+<body>
+<h3>やることリスト管理 (jQuery)</h3>
+<input id="input" size="60" autofocus placeholder="タスクを入力してください"
+	onkeypress="inKey()" onchange="addClick()">
+<button onclick="addClick()">追加</button>
+<div id="taskList"></div>
+<div>チェックされているタスクを<button onclick="removeClick()">削除</button></div>
+</body>
+<script>
+var $input, $taskList, taskList = []; // Model: task list
+function inKey() {
+	if (event.keyCode === 13) addClick();
+}
+function addClick() {
+	if (!$input.val()) return;
+	addTaskToList({title:$input.val(), done:false});
+	$input.val('');
+}
+function removeClick() {
+	taskList = taskList.filter(function (task) {
+		if (task.done) task.elem.remove();
+		return !task.done;
+	});
+}
+function addTaskToList(task) {
+	taskList.unshift(task);
+	task.elem = $('<div>');
+	var $checkbox = $('<input type="checkbox">').prop('checked', task.done);
+	var $span = $('<span>').text(task.title);
+	$span.attr('class', task.done ? 'todo-done' : '');
+	$checkbox.click(function () {
+		task.done = $checkbox.prop('checked');
+		//$span[task.done ? 'addClass' : 'removeClass']('todo-done');
+		$span.attr('class', task.done ? 'todo-done' : '');
+	});
+	task.elem.append($checkbox).append($span);
+	$taskList.prepend(task.elem);
+}
+$(function () {
+	$input = $('#input');
+	$taskList = $('#taskList');
+	addTaskToList({title: 'xyz', done: true});
+	addTaskToList({title: 'abc', done: false});
+});
+</script>
