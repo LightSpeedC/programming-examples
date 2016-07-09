@@ -1,0 +1,21 @@
+CMS: Content Management System
+
+	WordPress (MySQL+PHP)
+	Durapal
+	Joomla
+
+	Ghost [Blog] (Express)
+	KeystoneJS [Full] (Node.js Express MongoDB)
+	Pencil Blue [Full] (Bootstrap, Angular, jQuery, MongoDB Redis)
+	Apostrophe 2 [FE edit] (Node.js ImageMagick, MongoDB)
+	Buckets.io [UI Simple] (Express)
+	Calipso (Express MongoDB)
+	Reaction Commerce (Meteor Node MongoDB CoffeeScript Docker)
+	Cody (Express MySQL)
+	TiddlyWiki
+	Nodize (CoffeeScript)
+	TaracotJS (MongoDB)
+	Hatch.js
+	We.js
+
+	Hexo? Hugo?
