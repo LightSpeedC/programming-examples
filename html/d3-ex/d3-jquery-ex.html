@@ -6,17 +6,18 @@
 
 <body>
 
-<!--<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
-<script src="jquery-1.11.1.min.js"></script>
-<!--<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>-->
-<script src="d3.min.js"></script>
+<!--<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>-->
+<script src="../js/jquery-1.12.4.min.js"></script>
+<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
+<script src="../js/d3.v3.min.js"></script>
+<!--<script src="https://d3js.org/d3.v3.min.js"></script>-->
 <div id="d3graph" style="border:1px solid #ccc; margin-bottom:10px"></div>
 
 <script type="text/javascript">
 var stage;
 $(document).ready(function() {
-    stage = d3.select("#d3graph").append("svg:svg").attr("width", $("#d3graph").width()).attr("height", 300);
-    setInterval("update()",100);
+    stage = d3.select('#d3graph').append('svg:svg').attr('width', $('#d3graph').width()).attr('height', 300);
+    setInterval('update()',1000);
 });
 
 var colors = d3.scale.category10();
@@ -28,19 +29,19 @@ var points = new Array();
 
 function update() {
     points.push(Math.random() * 100 + 100);
-    if(points.length > $("#d3graph").width()/10) {
+    if(points.length > $('#d3graph').width()/10) {
         points.shift();
     }
 
     // 削除する
-    stage.selectAll("path").remove();
+    stage.selectAll('path').remove();
 
     // 描画する
-    stage.append("path")
-    .attr("d", d3Line(points))
-    .attr("stroke", colors(0))
-    .attr("fill", "none")
-    .attr("opacity", 1);
+    stage.append('path')
+    .attr('d', d3Line(points))
+    .attr('stroke', colors(0))
+    .attr('fill', 'none')
+    .attr('opacity', 1);
 
 }
 </script>
