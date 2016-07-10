@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<meta charset="UTF-8">
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<!-- http://code.jquery.com -->
+<script src="http://code.jquery.com/jquery-1.12.4.min.js"></script>
+<!--<script src="../js/jquery-1.12.4.min.js"></script>-->
+<style>
+#moving-item {
+	position: fixed;
+	background-color: #FF0000;
+	border: 1px solid #000000;
+	z-index: 99999;
+}
+div#floating-menu {
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	background-color: lightcyan;
+	border: 1px solid blue;
+	z-index: 9999;
+}
+</style>
+<body>
+<div id="floating-menu">固定: X: <span id="clientX"></span> Y: <span id="clientY"></span>
+</div>
+<span id="moving-item">+</span>
+<div>&nbsp;</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+<div>bbb</div>
+</body>
+<script>
+window.onload = function () {
+	var $x = $('#clientX');
+	var $y = $('#clientY');
+	var $zzz = $('#moving-item');
+	var h = $zzz.height();
+	var w = $zzz.width();
+	//$('html')
+	//$(window)
+	$(document)
+	.on('mousemove', function(e) {
+		$x.text(e.clientX);
+		$y.text(e.clientY);
+		$zzz.css({top: e.clientY - h - 1, left: e.clientX - w - 1});
+	});
+};
+</script>
+</html>
