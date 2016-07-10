@@ -2,25 +2,29 @@
 <head>
 	<meta charset="utf-8">
 	<title>D3.js</title>
-	<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
-	<script src="../js/d3.v3.min.js"></script>
+	<!--<script src="http://d3js.org/d3.v4.min.js"></script>-->
+	<script src="../js/d3.v4.min.js"></script>
 	<style>
 	#box {border:1px solid #ccc; margin-bottom:10px;}
 	</style>
 </head>
 <body>
 <div id="box"></div>
+<div id="tail">xx</div>
 </body>
 <script type="text/javascript">
 var stage;
+var interval = 6;
 window.onload = function() {
 	stage = d3.select(box).append('svg:svg')
 		.attr('width', box.offsetWidth)
 		.attr('height', 300);
-	setInterval('update()', 200);
+	setTimeout(update, interval);
 };
-var colors = d3.scale.category10();
-var lines = d3.svg.line()
+var colors = d3.version >= '4' ?
+	d3.schemeCategory10 :	// v4
+	[0].map(d3.scale.category10());	// v3
+var lines = (d3.line || d3.svg.line)()
 	.x(function (d, i) { return i * 10; })
 	.y(function (d, i) { return d; });
 
@@ -31,15 +35,15 @@ function update() {
 	if (points.length > box.offsetWidth / 10)
 		points.shift();
 
-	// 削除する
-	stage.selectAll('path').remove();
-
-	// 描画する
-	stage.append('path')
+	stage.selectAll('path').remove();	// 削除
+	stage.append('path')	// 描画
 		.attr('d', lines(points))
-		.attr('stroke', colors(0))
+		.attr('stroke', colors[0])
 		.attr('fill', 'none')
 		.attr('opacity', 1);
+
+	setTimeout(update, interval += 6);
+	tail.innerHTML = 'interval ' + (interval / 1000).toFixed(3) + ' sec';
 }
 </script>
 </html>
