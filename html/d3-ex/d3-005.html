@@ -1,46 +1,47 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
+	<meta charset="utf-8">
 </head>
 <body>
- 
-    <!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
-    <script src="d3.min.js"></script>
- 
-    <script>
-        var width = 960;
-        var height = 700;
- 
-        var svg = d3.select("body").append("svg")
-        .attr("width", width)
-        .attr("height", height);
 
-var dicData = [{"科目": "国語", "点数":30},
-                                {"科目": "数学", "点数":70},
-                                {"科目": "社会", "点数":60},];        
+	<!--<script src="http://d3js.org/d3.v3.min.js"></script>-->
+	<script src="../js/d3.v3.min.js"></script>
 
-var boxes = svg.selectAll("boxes")
-                       .data(dicData)
-                       .enter()
-                            .append("g");
+	<script>
+		var width = 960;
+		var height = 700;
 
-// g要素に円要素を加えている。
-boxes.append("circle")
-            .attr("cy",100)
-            .attr("r",10)
-            .attr("fill","blue")
-            .attr("cx", function(d){ return d["点数"]*2; });
+		var svg = d3.select('body').append('svg')
+			.attr('width', width)
+			.attr('height', height);
 
-// g要素にテキスト要素を加えている。
-boxes.append("text")
-            .text(function(d){ return d["科目"]; })
-            .attr("fill","gray")
-            .attr("y",80)
-            .attr("x", function(d){ return d["点数"]*2; })
-            .attr("font-size", 10);
+		var dicData = [
+			{'科目': '国語', '点数':30},
+			{'科目': '数学', '点数':70},
+			{'科目': '社会', '点数':60}];
 
-          </script>
- 
+		var boxes = svg.selectAll('boxes')
+			.data(dicData)
+			.enter()
+			.append('g');
+
+		// g要素に円要素を加えている。
+		boxes.append('circle')
+			.attr('cy',100)
+			.attr('r',10)
+			.attr('fill', 'blue')
+			.attr('cx', function(d){ return d['点数']*2; });
+
+		// g要素にテキスト要素を加えている。
+		boxes.append('text')
+			.text(function(d){ return d['科目']; })
+			.attr('fill', 'gray')
+			.attr('y', 80)
+			.attr('x', function(d){ return d['点数']*2; })
+			.attr('font-size', 10);
+
+	</script>
+
 </body>
 </html>
