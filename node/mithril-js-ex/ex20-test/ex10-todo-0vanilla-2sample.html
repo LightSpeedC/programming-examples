@@ -46,7 +46,7 @@ window.onload = function () {
 		var $span = document.createElement('span');
 		$span.innerText = task.title;
 		$span.ondblclick = function () {
-			var title = prompt('タスク名? (' + task.title + ')');
+			var title = prompt('タスク名?', task.title);
 			if (title) $span.innerText = task.title = title;
 		};
 		$span.className = task.done ? 'todo-done' : '';

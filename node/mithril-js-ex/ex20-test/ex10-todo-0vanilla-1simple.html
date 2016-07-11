@@ -36,7 +36,7 @@ function addTaskToList(task) {
 	$span.innerText = task.title;
 	$span.className = task.done ? 'todo-done' : '';
 	$span.ondblclick = function () {
-		var title = prompt('タスク名? (' + task.title + ')');
+		var title = prompt('タスク名?', task.title);
 		if (title) $span.innerText = task.title = title;
 	};
 	$checkbox.onclick = function () {

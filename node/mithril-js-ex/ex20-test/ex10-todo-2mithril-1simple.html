@@ -11,7 +11,7 @@ window.onload = function () {
 		controller: function (task) {
 			function checkClick() { task.done = !task.done; }
 			function editTitle() {
-				var title = prompt('タスク名? (' + task.title + ')');
+				var title = prompt('タスク名?', task.title);
 				if (title) task.title = title;
 			};
 			return {task:task, checkClick:checkClick, editTitle:editTitle};
