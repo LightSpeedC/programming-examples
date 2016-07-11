@@ -11,7 +11,9 @@
 <div>チェックされているタスクを<button onclick="removeClick()">削除</button></div>
 </body>
 <script>
-function inKey() { event.keyCode === 13 && addClick(); }
+function inKey() {
+	if (event.keyCode === 13) addClick();
+}
 function addClick() {
 	if (!$input.value) return;
 	addTaskToList({title:$input.value, done:false});
