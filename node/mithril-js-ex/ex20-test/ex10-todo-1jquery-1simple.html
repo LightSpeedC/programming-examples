@@ -33,6 +33,10 @@ function addTaskToList(task) {
 	var $checkbox = $('<input type="checkbox">').prop('checked', task.done);
 	var $span = $('<span>').text(task.title);
 	$span.attr('class', task.done ? 'todo-done' : '');
+	$span.dblclick(function () {
+		var title = prompt('タスク名? (' + task.title + ')');
+		if (title) $span.text(task.title = title);
+	});
 	$checkbox.click(function () {
 		task.done = $checkbox.prop('checked');
 		//$span[task.done ? 'addClass' : 'removeClass']('todo-done');

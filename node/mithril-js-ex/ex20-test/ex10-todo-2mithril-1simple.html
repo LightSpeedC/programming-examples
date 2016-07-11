@@ -10,11 +10,16 @@ window.onload = function () {
 	var taskCompo = { // component: task
 		controller: function (task) {
 			function checkClick() { task.done = !task.done; }
-			return {task:task, checkClick:checkClick};
+			function editTitle() {
+				var title = prompt('タスク名? (' + task.title + ')');
+				if (title) task.title = title;
+			};
+			return {task:task, checkClick:checkClick, editTitle:editTitle};
 		},
 		view: function (ctrl) {
 			var task = ctrl.task;
-			return m('span' + (task.done ? '.todo-done' : ''), {},
+			return m('span' + (task.done ? '.todo-done' : ''),
+					{ondblclick:ctrl.editTitle},
 				m('input[type=checkbox]', {checked:task.done,
 					onclick:ctrl.checkClick}), task.title);
 		}

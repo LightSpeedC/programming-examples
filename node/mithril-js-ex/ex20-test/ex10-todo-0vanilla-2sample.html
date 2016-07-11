@@ -45,6 +45,10 @@ window.onload = function () {
 		$chk.checked = task.done;
 		var $span = document.createElement('span');
 		$span.innerText = task.title;
+		$span.ondblclick = function () {
+			var title = prompt('タスク名? (' + task.title + ')');
+			if (title) $span.innerText = task.title = title;
+		};
 		$span.className = task.done ? 'todo-done' : '';
 		$chk.onclick = function () {
 			task.done = $chk.checked;

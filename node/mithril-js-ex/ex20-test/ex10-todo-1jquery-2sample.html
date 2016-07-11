@@ -44,6 +44,10 @@ $(function () {
 		var $chk = $('<input type="checkbox">').prop('checked', task.done);
 		var $span = $('<span>').text(task.title);
 		$span.attr('class', task.done ? 'todo-done' : '');
+		$span.dblclick(function () {
+			var title = prompt('タスク名? (' + task.title + ')');
+			if (title) $span.text(task.title = title);
+		});
 		$chk.click(function () {
 			task.done = $chk.prop('checked');
 			//$span[task.done ? 'addClass' : 'removeClass']('todo-done');
