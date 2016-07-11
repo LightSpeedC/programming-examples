@@ -1,0 +1,49 @@
+<!doctype html>
+<meta charset="UTF-8">
+<!--[if IE]><script src="../js/es5-shim.min.js"></script><![endif]-->
+<style>.todo-done { color: lightgray; text-decoration: line-through; }</style>
+<body>
+<h3>やることリスト管理 (Vanilla)</h3>
+<input id="$input" size="60" autofocus placeholder="タスクを入力してください"
+	onkeypress="inKey()" onchange="addClick()">
+<button onclick="addClick()">追加</button>
+<div id="$taskList"></div>
+<div>チェックされているタスクを<button onclick="removeClick()">削除</button></div>
+</body>
+<script>
+function inKey() { event.keyCode === 13 && addClick(); }
+function addClick() {
+	if (!$input.value) return;
+	addTaskToList({title:$input.value, done:false});
+	$input.value = '';
+}
+function removeClick() {
+	var list = document.querySelectorAll('input[type=checkbox]');
+	[].forEach.call(list, function ($checkbox) {
+		if ($checkbox.checked) $checkbox.parentNode.parentNode.removeChild($checkbox.parentNode);
+	});
+}
+function addTaskToList(task) {
+	var $div = document.createElement('div');
+	var $checkbox = document.createElement('input');
+	$checkbox.type = 'checkbox';
+	$checkbox.checked = task.done;
+	var $span = document.createElement('span');
+	$span.innerText = task.title;
+	$span.className = task.done ? 'todo-done' : '';
+	$span.ondblclick = function () {
+		var title = prompt('タスク名?', task.title);
+		if (title) $span.innerText = task.title = title;
+	};
+	$checkbox.onclick = function () {
+		task.done = $checkbox.checked;
+		$span.className = task.done ? 'todo-done' : '';
+	};
+	$div.appendChild($checkbox);
+	$div.appendChild($span);
+	$taskList.insertBefore($div, $taskList.firstChild);
+}
+window.onload = function () {
+	[{title: 'abc', done: false}, {title: 'xyz', done: true}].forEach(addTaskToList);
+};
+</script>
