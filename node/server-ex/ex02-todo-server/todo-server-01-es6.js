@@ -7,7 +7,7 @@ const port = 3000;
 const routes = {
 	GET: {
 		'/': (req, res) => resHtml(res, 200, '/ -> index.html'),
-		'/tasks.json': (req, res) => resSendFile(res, 200, {'Content-Type': 'application/json'}, 'tasks.json', '{}'),
+		'/tasks.json': (req, res) => resSendJsonFile(res, 200, 'tasks.json', '{}'),
 	},
 	POST: {
 		'/tasks.json': (req, res) => postFile(req, res, 'tasks.json'),
@@ -29,6 +29,11 @@ server.listen(port, hostname, () => {
 function resSend(res, statusCode, headers, text) {
 	res.writeHead(statusCode, headers);
 	res.end(text);
+}
+
+// response send json file
+function resSendJsonFile(res, statusCode, fileName, errResult) {
+	resSendFile(res, statusCode, {'Content-Type': 'application/json'}, fileName, errResult);
 }
 
 // response send file
