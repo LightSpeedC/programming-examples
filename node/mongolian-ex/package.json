@@ -1,0 +1,22 @@
+{
+  "name": "mongolian-ex",
+  "version": "0.0.0",
+  "description": "mongolian example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "mongolian",
+    "mongodb"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "mongolian": "^0.1.18"
+  }
+}
