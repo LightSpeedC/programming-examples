@@ -1,0 +1,22 @@
+{
+  "name": "mongoose-ex",
+  "version": "0.0.0",
+  "description": "mongoose example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "repo"
+  },
+  "keywords": [
+    "mongodb",
+    "mongoose"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^4.5.5"
+  }
+}
