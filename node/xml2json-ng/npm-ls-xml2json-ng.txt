@@ -1,0 +1,11 @@
+xml2json-ng@0.0.0 /LightSpeedC/programming-examples/node/xml2json-ng
+`-- xml2json@0.9.1
+  +-- hoek@2.16.3
+  +-- joi@6.10.1
+  | +-- isemail@1.2.0
+  | +-- moment@2.13.0
+  | `-- topo@1.1.0
+  `-- node-expat@2.3.13
+    +-- bindings@1.2.1
+    `-- nan@2.3.5
+

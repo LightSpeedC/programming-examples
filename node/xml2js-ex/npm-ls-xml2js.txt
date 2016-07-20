@@ -1,0 +1,6 @@
+xml2js-ex@0.0.0 /LightSpeedC/programming-examples/node/xml2js-ex
+`-- xml2js@0.4.16
+  +-- sax@1.2.1
+  `-- xmlbuilder@4.2.1
+    `-- lodash@4.13.1
+
