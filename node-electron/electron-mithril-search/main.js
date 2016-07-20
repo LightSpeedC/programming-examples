@@ -3,20 +3,6 @@ void function () {
 
 	const fs = require('fs');
 
-/*
-	const engine = global.nw ? 'node-webkit' : 'electron';
-	const zzz = 'zzz-' + engine;
-	try { fs.unlinkSync(zzz + '2.log'); } catch (e) {}
-	try { fs.renameSync(zzz + '1.log', zzz + '2.log'); } catch (e) {}
-	try { fs.renameSync(zzz + '.log',  zzz + '1.log'); } catch (e) {}
-	fs.writeFileSync(zzz + '.log', [
-		engine,
-		'process.pid: ' + process.pid,
-		'process.argv: ' + JSON.stringify(process.argv, null, '\t'),
-		'process.env: ' + JSON.stringify(process.env, null, '\t'),
-		''].join('\n\n'));
-*/
-
 	// package.jsonのwindowオプションの初期値を取り込む
 	const options = require('./package.json').window;
 

@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.8 (2016/07/06)';
+	const version = 'version: 0.0.8 (2016/07/20)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
@@ -25,7 +25,6 @@ void function () {
 
 	const targetDir = process.env.AAA_TARGET_DIR;
 	const text = m.prop('');
-	const newLayout = m.prop(true); // 新レイアウト
 	let files = [targetDir + '\まだ検索していません'];
 	let filesIsDirty = false;
 	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
@@ -59,6 +58,7 @@ void function () {
 	// リリース・ノート表示
 	function releaseNotesView() {
 		const list = [
+			'0.0.8 (2016/07/20): 旧レイアウト削除',
 			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
 			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
 			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
@@ -118,19 +118,15 @@ void function () {
 							{placeholder: '最大ファイル数/トータル', size: 10})))
 				]
 			),
-			m('hr', {key: 'hr1'}),
+			m('hr', {key: 'hr-search'}),
 
 			// メッセージ
 			m('div', {key: 'message'}, m('b', message())),
-			m('hr', {key: 'hr2'}),
+			m('hr', {key: 'hr-message'}),
 
-			m('div', {key: 'layout'},
-				m('input[type=checkbox]',
-					m_on('click', 'checked', newLayout)),
-				'新レイアウト (作りたて注意)',
-			m('hr', {key: 'hr3'}),
-			(newLayout() ? myViewResult2() : myViewResult())), // 検索結果
-			m('hr', {key: 'hr4'}),
+			// 検索結果
+			myViewResult(),
+			m('hr', {key: 'hr-result'}),
 
 			// 使い方表示
 			m('div', {key: 'usage'},
@@ -158,36 +154,6 @@ void function () {
 		];
 	}
 
-	// 結果表示 単純リスト形式
-	function myViewResult() {
-		if (filesIsDirty) files = files.sort();
-		filesIsDirty = false;
-		const incl = includes();
-		const excl = excludes();
-		return m('table', {width: '100%', cellPadding: 0, border: 0, cellSpacing: 0},
-			files
-			.filter(file => file.includes(incl))
-			.filter(file => !excl || !file.includes(excl))
-			.map(file => {
-				const dirs = file.split('\\');
-				dirs.pop();
-				const dir = dirs.join('\\');
-				return m('tr', {key: file},
-					m('td',
-						{align: 'center', width: 50, style: {color: 'green'},
-						 title: dir.substr(targetDir.length),
-						 onclick: () => openItem(dir)}, '[ﾌｫﾙﾀﾞ]'),
-					m('td',
-						{align: 'center', width: 44, style: {color: 'blue'},
-						 title: file.substr(targetDir.length),
-						 onclick: () => openItem(file)}, '[ﾌｧｲﾙ]'),
-					m('td',
-						file.substr(targetDir.length))
-				);
-			})
-		);
-	}
-
 	// range 0～n-1までの数字の配列
 	function range(n) {
 		var a = [];
@@ -212,7 +178,7 @@ void function () {
 					if (child || prop.includes(txt) &&
 							(!incl || prop.includes(incl)) &&
 							(!excl || !prop.includes(excl))) {
-						//if (!node[CLEAN_PROP]) {
+
 							vdom.push(m('tr', {key: fullPath}, [
 								range(i).map(x => m('td.indent', indentSpace)),
 								child ?
@@ -230,42 +196,10 @@ void function () {
 									onclick: () => openItem(fullPath)
 								}, prop)
 							]));
-						//	node[CLEAN_PROP] = true;
-						//}
-						//else {
-						//	vdom.push(m('tr', {key: fullPath},
-						//		range(n + 1).map(x => SUBTREE_RETAIN)));
-						//}
 					}
 					if (child && !child[HIDE_PROP])
 						vdom.push(viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl));
 					return vdom;
-/*
-					return [
-						(child || prop.includes(txt) &&
-							(!incl || prop.includes(incl)) &&
-							(!excl || !prop.includes(excl))) ?
-						m('tr', {key: fullPath}, [
-							range(i).map(x => m('td.indent', indentSpace)),
-							child ?
-							m('td.indent', {}, m('input[type=checkbox]',
-								m_on('click', 'checked', v =>
-									v === undefined ? !child[HIDE_PROP] :
-									(child[HIDE_PROP] = !v))
-							)) :
-							m('td.indent.folder',
-								{onclick: () => showItemInFolder(fullPath)},
-								'■'),
-							m(child ? 'td.folder' : 'td.file', {
-								colspan: n - i,
-								title: fullPath.substring(targetDir.length + 1),
-								onclick: () => openItem(fullPath)
-							}, prop)
-						]) : '',
-						!child || child[HIDE_PROP] ? [] :
-						viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl)
-					];
-*/
 				})
 			];
 		}
@@ -273,8 +207,8 @@ void function () {
 			return [];
 	}
 
-	// 結果表示2 ツリー形式
-	function myViewResult2() {
+	// 結果表示 ツリー形式
+	function myViewResult() {
 		const txt = text();
 		const incl = includes();
 		const excl = excludes();
@@ -341,14 +275,13 @@ void function () {
 	function openItem(file) {
 		spawn('explorer', [file]);
 		//electron.shell.openItem(file);
-		//alert('openItem ?\n' + file);
 		return;
 	}
 
 	// ファイルのあるフォルダを開く
 	function showItemInFolder(file) {
+		blur();
 		electron.shell.showItemInFolder(file);
-		//alert('showItemInFolder ?\n' + file);
 		return;
 	}
 
