@@ -11,6 +11,8 @@ void function () {
 	const getPathObjects = require('./get-path-objects');
 	try { var root1 = require('./root1'); } catch (err) { root1 = {}; }
 	try { var root2 = require('./root2'); } catch (err) { root2 = {}; }
+	log.info('node', process.version, process.arch, process.platform);
+	log.info('node exec path:', process.execPath);
 
 	var count1 = 0, count2 = 0;
 	var denyCount = 0, grantCount = 0;
