@@ -1,42 +1,36 @@
 (function () {
 	'use strict';
 
-	var pg = require('pg');
-	var aa = require('aa');
+	const pg = require('pg');
+	const aa = require('aa');
 
 	aa.thunkifyAll(pg.constructor.prototype, {suffix: 'A'});
 	aa.thunkifyAll(pg.Client.prototype, {suffix: 'A'});
 
 	// Client instance
 
-	var host = process.env.PGHOST     || 'localhost';
-	var port = process.env.PGPORT     || '5432';
-	var db   = process.env.PGDATABASE || 'postgres';
-	var user = process.env.PGUSER     || 'postgres';
-	var pw   = process.env.PGPASSWORD || 'password';
+	const host = process.env.PGHOST     || 'localhost';
+	const port = process.env.PGPORT     || '5432';
+	const db   = process.env.PGDATABASE || 'postgres';
+	const user = process.env.PGUSER     || 'postgres';
+	const pw   = process.env.PGPASSWORD || 'password';
 
-	var conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
+	const conString = 'postgres://' + user + ':' + pw + '@' + host + '/' + db;
 
 	aa(function *() {
 
-		var client = new pg.Client(conString);
+		let client = new pg.Client(conString);
 
 		try {
-			var msg = 'could not connect to postgres';
+			let msg = 'could not connect to postgres';
 			yield client.connectA();
-
 			console.log('connected!!!');
 
-			//client.queryA('SELECT $1::int AS numbor', ['1'])
 			msg = 'error running query';
-			var result = yield client.queryA('select * from s_tenant_r', []);
+			const result = yield client.queryA('select $1::int as number', ['1']);
+			console.log(result); // result.rows[0]
 
-			//console.log(result.rows[0]);
-			console.log(result);
-
-			console.log('client.end()++');
 			client.end();
-			console.log('client.end()--');
 		}
 		catch (err) {
 			return console.error(msg, err);
@@ -44,12 +38,11 @@
 
 		yield aa.wait(100);
 
-		var client = new pg.Client(conString);
+		client = new pg.Client(conString);
 
-		console.log('2nd connectA++');
 		yield client.connectA();
-		console.log('2nd connectA--');
-		var result = yield client.queryA('select * from s_tenant_r', []);
+		console.log('connected!!! 2nd.');
+		const result = yield client.queryA('select $1::int as number', ['1']);
 		console.log(result);
 		client.end();
 		yield aa.wait(100);
