@@ -10,7 +10,7 @@
   "dependencies": {
     "aa": "^0.1.39",
     "pg": "^4.5.6",
-    "promise-light": "^0.1.10"
+    "promise-light": "^0.1.11"
   },
   "repository": {
     "type": "git",
