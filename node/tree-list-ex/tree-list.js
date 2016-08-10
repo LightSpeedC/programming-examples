@@ -6,11 +6,11 @@ void function () {
 	const fs = require('fs');
 	const path = require('path');
 
-	const dir = path.resolve('.');
 	const outFile = process.argv[2] || 'tree-list.log';
-	//const pattern = process.argv[3] || '*';
-	//const regex = new RegExp(pattern.replace(new RegExp('\\*', 'g'), '.*'));
-	//console.log(regex);
+	const pattern = process.argv[3] || '*';
+	const dir = path.resolve(process.argv[4] || '.');
+	const regex = new RegExp(pattern.replace(new RegExp('\\*', 'g'), '.*'));
+	console.log(regex);
 	const w = fs.createWriteStream(outFile);
 
 	function println(str) {
@@ -19,7 +19,7 @@ void function () {
 	}
 
 
-	const tree = searchFiles(dir, 3);
+	const tree = searchFiles(dir, 3, regex);
 
 	function searchFiles(dir, maxDepth) {
 		return search(dir, ' ', 0, '');
