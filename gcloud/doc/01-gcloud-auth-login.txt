@@ -1,0 +1,17 @@
+> gcloud auth login
+Your browser has been opened to visit:
+
+    https://accounts.google.com/o/oauth2/auth?~~~
+
+
+Saved Application Default Credentials.
+WARNING: `gcloud auth login` will stop writing application default credentials
+in a future release. See:
+    https://developers.google.com/identity/protocols/application-default-credentials#toolcloudsdk
+for more information.
+
+You are now logged in as [???@gmail.com].
+Your current project is [???].  You can change this setting by running:
+  $ gcloud config set project PROJECT_ID
+
+>
