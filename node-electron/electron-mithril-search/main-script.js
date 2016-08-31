@@ -3,15 +3,17 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.8 (2016/07/20)';
+	const version = 'version: 0.0.8 (2016/08/31)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
 	const aa = require('aa');
 	const findDirFiles = require('./find-dir-files');
 	const findController = {isCancel:false, cancel, progress};
+	const INVISIBLE_PROP = findDirFiles.INVISIBLE_PROP;
 	const CLEAN_PROP = findDirFiles.CLEAN_PROP;
 	const ERROR_PROP = findDirFiles.ERROR_PROP;
+	const HIDE_PROP = findDirFiles.HIDE_PROP;
 
 	const debugFlag = m.prop(false);
 	const usageFlag = m.prop(false);
@@ -25,14 +27,10 @@ void function () {
 
 	const targetDir = process.env.AAA_TARGET_DIR;
 	const text = m.prop('');
-	let files = [targetDir + '\まだ検索していません'];
-	let filesIsDirty = false;
 	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
 	let timer; // 検索中のインターバルタイマー
 	const maxIndent = 20; // 最大インデントの深さ
 	const indentSpace = ' ';
-	const INVISIBLE_PROP = ' ';
-	const HIDE_PROP = ' hide';
 	const SUBTREE_RETAIN = {subtree: 'retain'};
 
 	m.mount($div, {view});
@@ -58,7 +56,7 @@ void function () {
 	// リリース・ノート表示
 	function releaseNotesView() {
 		const list = [
-			'0.0.8 (2016/07/20): 旧レイアウト削除',
+			'0.0.8 (2016/08/31): 旧レイアウト削除',
 			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
 			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
 			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
@@ -219,11 +217,7 @@ void function () {
 
 	// 検索コールバック
 	function progress(object) {
-		const file = object.file;
 		wholeObject = object.wholeObject;
-		if (file === targetDir) return;
-		files.push(file);
-		filesIsDirty = true;
 	}
 
 	// 検索
@@ -232,7 +226,6 @@ void function () {
 		if (timer) return;
 		aa(function *() {
 			m.redraw(true);
-			files = [];
 			wholeObject = {};
 			timer = setInterval(() => m.redraw(true), 500);
 			findController.isCancel = false;

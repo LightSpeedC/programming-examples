@@ -18,8 +18,10 @@ void function () {
 	if (typeof readdirAsync !== 'function')
 		throw new TypeError('eh!? readdirAsync');
 
+	const INVISIBLE_PROP = ' ';
 	const PARENT_PROP = ' parent';
 	const CLEAN_PROP = ' clean';
+	const HIDE_PROP = ' hide';
 	const ERROR_PROP = '*';
 	const CANCEL_ERROR = new Error('キャンセル');
 	const SEARCHING = '検索中です';
@@ -122,6 +124,7 @@ void function () {
 								setDirty(result);
 								return yield *cancel();
 							}
+							if (r && /^old$|backup|^旧$|^save$|^保存$|^node_modules/.test(name)) r[HIDE_PROP] = true;
 							if (r || name.includes(pattern)) {
 								result[name] = r || new SpecialData();
 								if (r) r[PARENT_PROP] = result;
@@ -163,7 +166,9 @@ void function () {
 		}
 
 	} // findDirFiles
+	findDirFiles.INVISIBLE_PROP = INVISIBLE_PROP;
 	findDirFiles.ERROR_PROP = ERROR_PROP;
 	findDirFiles.CLEAN_PROP = CLEAN_PROP;
+	findDirFiles.HIDE_PROP = HIDE_PROP;
 
 }();
