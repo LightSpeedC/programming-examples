@@ -1,5 +1,7 @@
 'use strict';
-const dir = process.argv[2] || '.';
+const dir = process.argv[2];
+if (!dir) return console.error('specify directory!');
+
 const fs = require('fs');
 const path = require('path');
 const files = fs.readdirSync(dir);
