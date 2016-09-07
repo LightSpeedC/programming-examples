@@ -1,0 +1,107 @@
+>gcloud app deploy
+You are about to deploy the following services:
+ - APPNAME/default/20160908t001234 (from [\nodejs-docs-samples\appengine\hello-world\app.yaml])
+     Deployed URL: [https://APPNAME.appspot.com]
+
+Do you want to continue (Y/n)?  y
+
+If this is your first deployment, this may take a while...done.
+
+Beginning deployment of service [default]...
+WARNING: Deployment of App Engine Flexible Environment apps is currently in Beta
+Building and pushing image for service [default]
+WARNING: No configuration information provided by runtime [nodejs].
+Started cloud build [12345678-5678-1234-abcd-12345678abcd].
+To see logs in the Cloud Console: https://console.developers.google.com/logs?project=APPNAME&service=cloudbuild.googleapis.com&key1=c05ccb6d-2f85-419c-9ccd-4
+20224fc2791
+--------------------------------------------------------------------- REMOTE BUILD OUTPUT ----------------------------------------------------------------------
+
+starting build "12345678-5678-1234-abcd-12345678abcd"
+
+FETCHSOURCE
+Fetching storage object: gs://staging.APPNAME.appspot.com/us.gcr.io/APPNAME/appengine/default.20160908t001234:latest#1473261186066000
+Copying gs://staging.APPNAME.appspot.com/us.gcr.io/APPNAME/appengine/default.20160908t001234:latest#1473261186066000...
+Downloading file:///tmp/source-archive.tgz:                      240.41 KiB/240.41 KiB
+BUILD
+Already have image (with digest): gcr.io/cloud-builders/docker
+Sending build context to Docker daemon 13.31 kB
+Step 1 : FROM gcr.io/google_appengine/nodejs
+ ---> 98351e5d6f8b
+Step 2 : RUN /usr/local/bin/install_node '~4.2'
+ ---> Running in a6007a62eb6f
+Installed Node.js v4.2.6
+ ---> 621feee82972
+Removing intermediate container a6007a62eb6f
+Step 3 : COPY . /app/
+ ---> 34a7277d80ec
+Removing intermediate container 3e15566a6954
+Step 4 : RUN npm install --unsafe-perm ||   ((if [ -f npm-debug.log ]; then       cat npm-debug.log;     fi) && false)
+ ---> Running in 05db7313ee3f
+express@4.14.0 node_modules/express
+├── escape-html@1.0.3
+├── array-flatten@1.1.1
+├── cookie-signature@1.0.6
+├── utils-merge@1.0.0
+├── merge-descriptors@1.0.1
+├── content-type@1.0.2
+├── methods@1.1.2
+├── encodeurl@1.0.1
+├── content-disposition@0.5.1
+├── parseurl@1.3.1
+├── fresh@0.3.0
+├── cookie@0.3.1
+├── vary@1.1.0
+├── range-parser@1.2.0
+├── etag@1.7.0
+├── serve-static@1.11.1
+├── path-to-regexp@0.1.7
+├── depd@1.1.0
+├── qs@6.2.0
+├── on-finished@2.3.0 (ee-first@1.1.1)
+├── finalhandler@0.5.0 (unpipe@1.0.0, statuses@1.3.0)
+├── debug@2.2.0 (ms@0.7.1)
+├── proxy-addr@1.1.2 (forwarded@0.1.0, ipaddr.js@1.1.1)
+├── send@0.14.1 (destroy@1.0.4, ms@0.7.1, statuses@1.3.0, mime@1.3.4, http-errors@1.5.0)
+├── accepts@1.3.3 (negotiator@0.6.1, mime-types@2.1.11)
+└── type-is@1.6.13 (media-typer@0.3.0, mime-types@2.1.11)
+ ---> 44ed162fa741
+Removing intermediate container 05db7313ee3f
+Step 5 : CMD npm start
+ ---> Running in 4ad6a6028093
+ ---> b0a0e5a09af2
+Removing intermediate container 4ad6a6028093
+Successfully built b0a0e5a09af2
+PUSH
+The push refers to a repository [us.gcr.io/APPNAME/appengine/default.20160908t001234] (len: 1)
+b0a0e5a09af2: Preparing
+b0a0e5a09af2: Pushing
+b0a0e5a09af2: Pushed
+44ed162fa741: Preparing
+44ed162fa741: Pushing
+44ed162fa741: Pushed
+34a7277d80ec: Preparing
+34a7277d80ec: Pushing
+34a7277d80ec: Pushed
+621feee82972: Preparing
+621feee82972: Pushing
+621feee82972: Pushed
+9ff051f37ab2: Image already exists
+363507e00b22: Image already exists
+818131a74c7c: Image already exists
+cc57a274adf5: Image already exists
+c7c7a273971f: Image already exists
+b21b3e3bc691: Image already exists
+latest: digest: sha256:3b6dfcb9b825ed4f0a3aade3a59a7087993e5bbdb075ccc3901487e9a9492985 size: 33253
+DONE
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Updating service [default]...done.
+Deployed service [default] to [https://APPNAME.appspot.com]
+
+You can read logs from the command line by running:
+  $ gcloud app logs read
+To view your application in the web browser run:
+  $ gcloud app browse
+
+>

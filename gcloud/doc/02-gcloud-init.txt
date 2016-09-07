@@ -1,0 +1,74 @@
+>gcloud init
+Welcome! This command will take you through the configuration of gcloud.
+
+Settings from your current configuration [OLD-APPNAME] are:
+Your active configuration is: [OLD-APPNAME]
+
+[core]
+account = MAIL1@gmail.com
+disable_usage_reporting = False
+project = OLD-APPNAME
+
+Pick configuration to use:
+ [1] Re-initialize this configuration [OLD-APPNAME] with new settings
+ [2] Create a new configuration
+ [3] Switch to and re-initialize existing configuration: [default]
+ [4] Switch to and re-initialize existing configuration: [APPNAMEX]
+Please enter your numeric choice:  2
+
+Enter configuration name:  APPNAME
+Your current configuration has been set to: [APPNAME]
+
+Network diagnostic detects and fixes local network connection issues.
+Checking network connection...done.
+Reachability Check passed.
+Network diagnostic (1/1 checks) passed.
+
+Choose the account you would like use to perform operations for this
+configuration:
+ [1] MAIL1@gmail.com
+ [2] MAIL2@gmail.com
+ [3] Log in with a new account
+Please enter your numeric choice:  1
+
+You are logged in as: [MAIL1@gmail.com].
+
+Pick cloud project to use:
+ [1] APPNAME1
+ [2] APPNAME2
+ [3] OLD-APPNAME
+ [4] APPNAME
+ [5] APPNAME3
+ [6] APPNAME4
+Please enter numeric choice or text value (must exactly match list
+item):  4
+
+Your current project has been set to: [APPNAME].
+
+Not setting default zone/region (this feature makes it easier to use
+[gcloud compute] by setting an appropriate default value for the
+--zone and --region flag).
+See https://cloud.google.com/compute/docs/gcloud-compute section on how to set
+default compute region and zone manually. If you would like [gcloud init] to be
+able to do this for you the next time you run it, make sure the
+Compute Engine API is enabled for your project on the
+https://console.developers.google.com/apis page.
+
+Created a default .boto configuration file at [C:\Users\Kazuaki\.boto]. See this file and
+[https://cloud.google.com/storage/docs/gsutil/commands/config] for more
+information about configuring Google Cloud Storage.
+Your Google Cloud SDK is configured and ready to use!
+
+* Commands that require authentication will use MAIL1@gmail.com by default
+* Commands will reference project `APPNAME` by default
+Run `gcloud help config` to learn how to change individual settings
+
+This gcloud configuration is called [APPNAME]. You can create additional configurations if you work with multiple accounts and/or projects.
+Run `gcloud topic configurations` to learn more.
+
+Some things to try next:
+
+* Run `gcloud --help` to see the Cloud Platform services you can interact with. And run `gcloud help COMMAND` to get help on any gcloud command.
+* Run `gcloud topic -h` to learn about advanced features of the SDK like arg files and output formatting
+
+>
