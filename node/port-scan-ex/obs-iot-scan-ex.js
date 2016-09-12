@@ -1,4 +1,4 @@
-// octet-scan
+// obs-iot-scan
 
 (function () {
 	'use strict';
@@ -101,6 +101,6 @@
 
 	}); // ips.forEach
 
-	setTimeout(process.exit, 1000);
+	setTimeout(process.exit, 2000);
 
 })();
