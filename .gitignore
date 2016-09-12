@@ -84,3 +84,4 @@ node.exe
 *.obj
 
 *コピー*
+.vscode
