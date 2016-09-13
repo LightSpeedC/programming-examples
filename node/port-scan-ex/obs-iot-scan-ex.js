@@ -101,6 +101,6 @@
 
 	}); // ips.forEach
 
-	setTimeout(process.exit, 2000);
+	setTimeout(process.exit, 10000);
 
 })();
