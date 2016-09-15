@@ -9,13 +9,6 @@ void function () {
 	process.env.AAA_TARGET_DIR = (process.env.AAA_TARGET_DIR
 		|| process.argv[2] || process.argv[1] || '..').replace('"', '');
 
-	// NWjs/node-webkit
-	if (global.nw) {
-		// Windowを開く
-		nw.Window.open('index.html', options);
-		return;
-	}
-
 	// Electron/Atom-Shell
 	const electron = require('electron');
 	const {app, BrowserWindow} = electron;
