@@ -3,41 +3,52 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.9 (2016/09/15)';
+	const version = 'version: 0.0.9 (2016/09/16)';
+
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
 	const aa = require('aa');
-	const findDirFiles = require('./find-dir-files');
+
 	const Rexfer = require('./rexfer');
+
+	const findDirFiles = require('./find-dir-files');
 	const findController = {isCancel:false, cancel, progress};
 	const INVISIBLE_PROP = findDirFiles.INVISIBLE_PROP;
 	const CLEAN_PROP = findDirFiles.CLEAN_PROP;
 	const ERROR_PROP = findDirFiles.ERROR_PROP;
 	const HIDE_PROP = findDirFiles.HIDE_PROP;
 
+	// prop変数
 	const flagDebug = m.prop(false);
 	const flagUsage = m.prop(false);
 	const flagReleaseNotes = m.prop(false);
 	const flagWishList = m.prop(false);
-	const textIncludes = m.prop('');
-	const textExcludes = m.prop('');
-	const textMessage = m.prop('検索できます');
+	// 検索文字列
+	const textSearch = propRex('');
+	// 含める文字列 (検索結果)
+	const textIncludes = propRex('');
+	// 含めない文字列 (検索結果)
+	const textExcludes = propRex('');
+
 	const textMaxFiles = m.prop(3000);
 	const textMaxTotalFiles = m.prop(100000);
+	// 閉じておく文字列 (検索結果)
+	const textClose = propRex('^old$,backup,^旧$,^save$,^保存$,^node_modules');
+	// 通知メッセージ
+	const textMessage = m.prop('検索できます');
 
 	const targetDir = process.env.AAA_TARGET_DIR;
-	const textSearch = m.prop('');
 	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
 	let timer; // 検索中のインターバルタイマー
 	const MAX_INDENT = 20; // 最大インデントの深さ
 	const indentSpace = ' ';
 	const SUBTREE_RETAIN = {subtree: 'retain'};
 
-	m.mount($div, {view});
+	m.mount($div, {view: viewMain});
 
 	// 使い方表示
-	function usageView() {
+	function viewUsage() {
 		const list = [
 			'ファイル名の一部として「検索したい文字列」を入れて「検索」します (Enterで検索)',
 			'ファイル名に「含む」文字列をフィルタします (Enterで更新)',
@@ -47,17 +58,21 @@ void function () {
 			'ツリー表示でき、チェックボックスで非表示にできます (再検索でリセット)',
 			'フォルダあたりの最大検索ファイル数を変更できます (超えたらスキップ)',
 			'トータルの最大検索ファイル数を変更できます (超えたら検索をキャンセル)',
-			'新旧のレイアウトを切替できます → 後で削除する予定',
-			'×ワイルドカード検索はまだできません',
+			'ワイルドカード検索ができます',
+			'　1. -A -> not A',
+			'　2. A,B -> A or  B',
+			'　3. A B -> A and B',
+			'　4. A;B -> A or  B',
+			'　ex. A,B C;E -F -> ((A or B) and C) or (E and (not F))',
 			'×あまりたくさんのファイルを検索するとハングする可能性があります',
 		];
-		return m('font[color=gray]', {}, m('ul', list.map(x => m('li', x))));
+		return m('ul', list.map(x => m('li', x)));
 	}
 
 	// リリース・ノート表示
-	function releaseNotesView() {
+	function viewReleaseNotes() {
 		const list = [
-			'0.0.9 (2016/09/15): 正規表現を追加',
+			'0.0.9 (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
 			'0.0.8 (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
 			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
 			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
@@ -67,20 +82,33 @@ void function () {
 			'0.0.2 (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)',
 			'0.0.1 (2016/06/09): 検索したファイルの一覧表示',
 		];
-		return m('font[color=darkblue]', {}, m('ul', list.map(x => m('li', x))));
+		return m('ul', list.map(x => m('li', x)));
 	}
 
 	// やりたいことリスト表示
-	function wishListView() {
+	function viewWishList() {
 		const list = [
-			'AND/OR検索したい',
-			'ワイルドカード検索したい',
+			'別のフォルダやディレクトリに移動したい',
+			'検索文字列の履歴を利用したい',
 		];
-		return m('font[color=purple]', {}, m('ul', list.map(x => m('li', x))));
+		return m('ul', list.map(x => m('li', x)));
+	}
+
+	// デバッグ表示
+	function viewDebug() {
+		const list = [
+			'カレント作業ディレクトリ process.cwd(): ' + process.cwd(),
+			'ディレクトリ名 __dirname: ' + __dirname,
+			'ファイル名 __filename: ' + __filename,
+			'プロセスID process.pid: ' + process.pid,
+			'バージョン process.versions: ' + JSON.stringify(process.versions, null, '\t'),
+			'環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'),
+		];
+		return m('ul', list.map(x => m('li', m('pre', x))));
 	}
 
 	// メインview
-	function view() {
+	function viewMain() {
 		return [
 			m('h3', {key: 'title'}, 'ファイル検索 - ',
 				m('font[color=green]', targetDir),
@@ -96,14 +124,18 @@ void function () {
 					textExcludes() ? m('div', '「', textExcludes(), '」を含まない') : '',
 					m('hr'),
 					m('div', '検索最大ファイル数を制限'),
-					m('div', '最大ファイル数/フォルダ:「', textMaxFiles(), '」'),
-					m('div', '最大ファイル数/トータル:「', textMaxTotalFiles(), '」')
+					m('div', '最大ファイル数/フォルダ: 「', textMaxFiles(), '」'),
+					m('div', '最大ファイル数/トータル: 「', textMaxTotalFiles(), '」'),
+					m('div', '検索時に閉じておくフォルダ: 「', textClose(), '」'),
 				] : [
 					m('form', {onsubmit: search},
 						m('div',
 							m('input', m_on('change', 'value', textSearch,
 								{autofocus: true, placeholder: '検索したい文字列', size: 100})),
 							m('button.button[type=submit]', {onclick: search}, '検索'))),
+					m('div', '※ワイルドカード*?検索できます。' +
+						'空白でAND、コンマとセミコロンでOR、マイナスでNOT。' +
+						'優先順位：マイナス、コンマ、空白、セミコロンの順。'),
 					m('hr'),
 					m('div', '検索結果フィルタ'),
 					m('div',
@@ -117,13 +149,17 @@ void function () {
 					m('hr'),
 					m('div', '検索最大ファイル数を制限'),
 					m('div',
-						'最大ファイル数/フォルダ:',
+						'最大ファイル数/フォルダ: ',
 							m('input', m_on('change', 'value', textMaxFiles,
 							{placeholder: '最大ファイル数/フォルダ', size: 10}))),
 					m('div',
-						'最大ファイル数/トータル:',
+						'最大ファイル数/トータル: ',
 							m('input', m_on('change', 'value', textMaxTotalFiles,
-							{placeholder: '最大ファイル数/トータル', size: 10})))
+							{placeholder: '最大ファイル数/トータル', size: 10}))),
+					m('div',
+						'検索時に閉じておくフォルダ: ',
+							m('input', m_on('change', 'value', textClose,
+							{placeholder: '検索時に閉じておくフォルダ', size: 75}))),
 				]
 			),
 			m('hr', {key: 'hr-search'}),
@@ -140,25 +176,29 @@ void function () {
 			m('div', {key: 'usage'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagUsage)),
-				'使い方', flagUsage() ? usageView() : ''),
+				m('font[color=gray]', '使い方',
+					flagUsage() ? viewUsage() : '')),
 
 			// リリース・ノート表示
 			m('div', {key: 'release-notes'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagReleaseNotes)),
-				'リリース・ノート: ' + version, flagReleaseNotes() ? releaseNotesView() : ''),
+				m('font[color=darkblue]', 'リリース・ノート: ' + version,
+					flagReleaseNotes() ? viewReleaseNotes() : '')),
 
 			// やりたいことリスト表示
 			m('div', {key: 'wish-list'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagWishList)),
-				'やりたいことリスト', flagWishList() ? wishListView() : ''),
+				m('font[color=purple]', 'やりたいことリスト',
+					flagWishList() ? viewWishList() : '')),
 
 			// デバッグ表示
 			m('div', {key: 'debug'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagDebug)),
-				'デバッグ表示 (環境変数など)', (flagDebug() ? debugView() : ''))
+				m('font[color=brown]', 'デバッグ表示 (環境変数など)',
+				(flagDebug() ? viewDebug() : '')))
 		];
 	}
 
@@ -170,7 +210,7 @@ void function () {
 	}
 
 	// ツリー表示
-	function viewNode(nodePath, node, i, n, txt, incl, excl) {
+	function viewNode(nodePath, node, i, n) {
 		if (typeof node === 'object' && node !== null) {
 			let keys = Object.getOwnPropertyNames(node);
 			return [
@@ -183,9 +223,10 @@ void function () {
 								range(i + 1).map(x => m('td.indent', indentSpace)),
 								m('td.error', {colspan: n - i}, child + ''));
 					let vdom = [];
-					if (child || prop.includes(txt) &&
-							(!incl || prop.includes(incl)) &&
-							(!excl || !prop.includes(excl))) {
+					if (child ||
+							(!textSearch.rex || textSearch.rex.test(prop)) &&
+							(!textIncludes.rex || textIncludes.rex.test(prop)) &&
+							(!textExcludes.rex || !textExcludes.rex.test(prop))) {
 
 							vdom.push(m('tr', {key: fullPath}, [
 								range(i).map(x => m('td.indent', indentSpace)),
@@ -206,7 +247,7 @@ void function () {
 							]));
 					}
 					if (child && !child[HIDE_PROP])
-						vdom.push(viewNode(nodePath.concat(prop), child, i + 1, n, txt, incl, excl));
+						vdom.push(viewNode(nodePath.concat(prop), child, i + 1, n));
 					return vdom;
 				})
 			];
@@ -219,8 +260,7 @@ void function () {
 	function viewSearchResult() {
 		return m('table',
 			{width: '100%', cellPadding: 0, border: 0, borderColor: 'lightgray', cellSpacing: 0},
-			viewNode([], {[targetDir]: wholeObject}, 0, MAX_INDENT,
-				textSearch(), textIncludes(), textExcludes())
+			viewNode([], {[targetDir]: wholeObject}, 0, MAX_INDENT)
 		);
 	}
 
@@ -242,7 +282,9 @@ void function () {
 			findController.maxTotalFiles = textMaxTotalFiles();
 
 			try {
-				yield findDirFiles(targetDir, textSearch(),
+				yield findDirFiles(targetDir,
+					textSearch.rex,
+					textClose.rex,
 					findController);
 				if (!findController.isCancel)
 					textMessage('完了しました');
@@ -287,17 +329,18 @@ void function () {
 		return;
 	}
 
-	// デバッグ表示
-	function debugView() {
-		const list = [
-			'カレント作業ディレクトリ process.cwd(): ' + process.cwd(),
-			'ディレクトリ名 __dirname: ' + __dirname,
-			'ファイル名 __filename: ' + __filename,
-			'プロセスID process.pid: ' + process.pid,
-			'バージョン process.versions: ' + JSON.stringify(process.versions, null, '\t'),
-			'環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'),
-		];
-		return m('font[color=brown]',{}, m('ul', list.map(x => m('li', m('pre', x)))));
+	// propRex
+	function propRex(str) {
+		f(str);
+		return f;
+
+		function f(x) {
+			if (arguments.length > 0) {
+				str = x;
+				f.rex = str ? new Rexfer(str, 'i') : null;
+			}
+			return str;
+		};
 	}
 
 	// HTML要素のイベントと値にプロパティを接続するユーティリティ

@@ -33,7 +33,7 @@ void function () {
 	}
 
 	// ディレクトリとファイルを検索
-	function *findDirFiles(dir, pattern, controller) {
+	function *findDirFiles(dir, rexSearch, rexClose, controller) {
 		if (!controller) controller = {};
 		if (controller.isCancel)
 			return new SpecialData(ERROR_PROP, CANCEL_ERROR);
@@ -124,8 +124,8 @@ void function () {
 								setDirty(result);
 								return yield *cancel();
 							}
-							if (r && /^old$|backup|^旧$|^save$|^保存$|^node_modules/.test(name)) r[HIDE_PROP] = true;
-							if (r || name.includes(pattern)) {
+							if (r && (rexClose && rexClose.test(name))) r[HIDE_PROP] = true;
+							if (r || !rexSearch || rexSearch.test(name)) {
 								result[name] = r || new SpecialData();
 								if (r) r[PARENT_PROP] = result;
 								setDirty(result);
@@ -134,7 +134,7 @@ void function () {
 							}
 							else delete result[name];
 						}
-						else if (name.includes(pattern)) {
+						else if (!rexSearch || rexSearch.test(name)) {
 							result[name] = null;
 							setDirty(result);
 							progress &&
