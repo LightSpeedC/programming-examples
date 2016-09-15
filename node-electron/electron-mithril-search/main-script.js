@@ -3,33 +3,34 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.8 (2016/08/31)';
+	const version = 'version: 0.0.9 (2016/09/15)';
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
 	const aa = require('aa');
 	const findDirFiles = require('./find-dir-files');
+	const Rexfer = require('./rexfer');
 	const findController = {isCancel:false, cancel, progress};
 	const INVISIBLE_PROP = findDirFiles.INVISIBLE_PROP;
 	const CLEAN_PROP = findDirFiles.CLEAN_PROP;
 	const ERROR_PROP = findDirFiles.ERROR_PROP;
 	const HIDE_PROP = findDirFiles.HIDE_PROP;
 
-	const debugFlag = m.prop(false);
-	const usageFlag = m.prop(false);
-	const releaseNotesFlag = m.prop(false);
-	const wishListFlag = m.prop(false);
-	const includes = m.prop('');
-	const excludes = m.prop('');
-	const message = m.prop('検索できます');
-	const maxFiles = m.prop(3000);
-	const maxTotalFiles = m.prop(100000);
+	const flagDebug = m.prop(false);
+	const flagUsage = m.prop(false);
+	const flagReleaseNotes = m.prop(false);
+	const flagWishList = m.prop(false);
+	const textIncludes = m.prop('');
+	const textExcludes = m.prop('');
+	const textMessage = m.prop('検索できます');
+	const textMaxFiles = m.prop(3000);
+	const textMaxTotalFiles = m.prop(100000);
 
 	const targetDir = process.env.AAA_TARGET_DIR;
-	const text = m.prop('');
+	const textSearch = m.prop('');
 	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
 	let timer; // 検索中のインターバルタイマー
-	const maxIndent = 20; // 最大インデントの深さ
+	const MAX_INDENT = 20; // 最大インデントの深さ
 	const indentSpace = ' ';
 	const SUBTREE_RETAIN = {subtree: 'retain'};
 
@@ -56,6 +57,7 @@ void function () {
 	// リリース・ノート表示
 	function releaseNotesView() {
 		const list = [
+			'0.0.9 (2016/09/15): 正規表現を追加',
 			'0.0.8 (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
 			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
 			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
@@ -87,68 +89,76 @@ void function () {
 				timer ? [
 					m('div',
 						m('button.button', {onclick: cancel}, 'ｷｬﾝｾﾙ'),
-						m('b', m('font[color=red]', text()))),
-					includes() ? m('div', '「', includes(), '」を含む') : '',
-					excludes() ? m('div', '「', excludes(), '」を含まない') : '',
-					m('div', '最大ファイル数/フォルダ:「', maxFiles(), '」'),
-					m('div', '最大ファイル数/トータル:「', maxTotalFiles(), '」')
+						m('span', ' '),
+						m('b', m('font[color=red]', textSearch()))),
+					textIncludes() || textExcludes() ? [m('hr'), m('div', '検索結果フィルタ')] : '',
+					textIncludes() ? m('div', '「', textIncludes(), '」を含む') : '',
+					textExcludes() ? m('div', '「', textExcludes(), '」を含まない') : '',
+					m('hr'),
+					m('div', '検索最大ファイル数を制限'),
+					m('div', '最大ファイル数/フォルダ:「', textMaxFiles(), '」'),
+					m('div', '最大ファイル数/トータル:「', textMaxTotalFiles(), '」')
 				] : [
 					m('form', {onsubmit: search},
 						m('div',
-							m('input', m_on('change', 'value', text,
+							m('input', m_on('change', 'value', textSearch,
 								{autofocus: true, placeholder: '検索したい文字列', size: 100})),
 							m('button.button[type=submit]', {onclick: search}, '検索'))),
+					m('hr'),
+					m('div', '検索結果フィルタ'),
 					m('div',
-						m('input', m_on('change', 'value', includes,
+						m('input', m_on('change', 'value', textIncludes,
 							{placeholder: '含む', size: 100})),
 						'を含む'),
 					m('div',
-						m('input', m_on('change', 'value', excludes,
+						m('input', m_on('change', 'value', textExcludes,
 							{placeholder: '含まない', size: 100})),
 						'を含まない'),
+					m('hr'),
+					m('div', '検索最大ファイル数を制限'),
 					m('div',
 						'最大ファイル数/フォルダ:',
-							m('input', m_on('change', 'value', maxFiles,
+							m('input', m_on('change', 'value', textMaxFiles,
 							{placeholder: '最大ファイル数/フォルダ', size: 10}))),
 					m('div',
 						'最大ファイル数/トータル:',
-							m('input', m_on('change', 'value', maxTotalFiles,
+							m('input', m_on('change', 'value', textMaxTotalFiles,
 							{placeholder: '最大ファイル数/トータル', size: 10})))
 				]
 			),
 			m('hr', {key: 'hr-search'}),
 
 			// メッセージ
-			m('div', {key: 'message'}, m('b', message())),
+			m('div', {key: 'message'}, m('b', textMessage())),
 			m('hr', {key: 'hr-message'}),
 
 			// 検索結果
-			myViewResult(),
+			viewSearchResult(),
 			m('hr', {key: 'hr-result'}),
 
 			// 使い方表示
 			m('div', {key: 'usage'},
 				m('input[type=checkbox]',
-					m_on('click', 'checked', usageFlag)),
-				'使い方', usageFlag() ? usageView() : ''),
+					m_on('click', 'checked', flagUsage)),
+				'使い方', flagUsage() ? usageView() : ''),
 
 			// リリース・ノート表示
 			m('div', {key: 'release-notes'},
 				m('input[type=checkbox]',
-					m_on('click', 'checked', releaseNotesFlag)),
-				'リリース・ノート: ' + version, releaseNotesFlag() ? releaseNotesView() : ''),
+					m_on('click', 'checked', flagReleaseNotes)),
+				'リリース・ノート: ' + version, flagReleaseNotes() ? releaseNotesView() : ''),
 
 			// やりたいことリスト表示
 			m('div', {key: 'wish-list'},
 				m('input[type=checkbox]',
-					m_on('click', 'checked', wishListFlag)),
-				'やりたいことリスト', wishListFlag() ? wishListView() : ''),
+					m_on('click', 'checked', flagWishList)),
+				'やりたいことリスト', flagWishList() ? wishListView() : ''),
 
 			// デバッグ表示
 			m('div', {key: 'debug'},
 				m('input[type=checkbox]',
-					m_on('click', 'checked', debugFlag)),
-				'デバッグ表示 (環境変数など)', (debugFlag() ? debugView() : ''))
+					m_on('click', 'checked', flagDebug)),
+				'デバッグ表示 (環境変数など)', (flagDebug() ? debugView() : ''))
 		];
 	}
 
@@ -206,12 +216,11 @@ void function () {
 	}
 
 	// 結果表示 ツリー形式
-	function myViewResult() {
-		const txt = text();
-		const incl = includes();
-		const excl = excludes();
-		return m('table', {width: '100%', cellPadding: 0, border: 0, borderColor: 'lightgray', cellSpacing: 0},
-			viewNode([], {[targetDir]: wholeObject}, 0, maxIndent, txt, incl, excl)
+	function viewSearchResult() {
+		return m('table',
+			{width: '100%', cellPadding: 0, border: 0, borderColor: 'lightgray', cellSpacing: 0},
+			viewNode([], {[targetDir]: wholeObject}, 0, MAX_INDENT,
+				textSearch(), textIncludes(), textExcludes())
 		);
 	}
 
@@ -222,21 +231,21 @@ void function () {
 
 	// 検索
 	function search() {
-		message('検索中...');
+		textMessage('検索中...');
 		if (timer) return;
 		aa(function *() {
 			m.redraw(true);
 			wholeObject = {};
 			timer = setInterval(() => m.redraw(true), 500);
 			findController.isCancel = false;
-			findController.maxFiles = maxFiles();
-			findController.maxTotalFiles = maxTotalFiles();
+			findController.maxFiles = textMaxFiles();
+			findController.maxTotalFiles = textMaxTotalFiles();
 
 			try {
-				yield findDirFiles(targetDir, text(),
+				yield findDirFiles(targetDir, textSearch(),
 					findController);
 				if (!findController.isCancel)
-					message('完了しました');
+					textMessage('完了しました');
 			} catch (e) {
 				cancel();
 				console.error('search err:');
@@ -251,7 +260,7 @@ void function () {
 	// キャンセル
 	function cancel() {
 		if (!findController.isCancel)
-			message('キャンセルしました');
+			textMessage('キャンセルしました');
 		finish();
 	}
 
