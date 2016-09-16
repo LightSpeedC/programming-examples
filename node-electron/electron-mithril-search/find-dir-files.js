@@ -33,7 +33,7 @@ void function () {
 	}
 
 	// ディレクトリとファイルを検索
-	function *findDirFiles(dir, rexSearch, rexClose, controller) {
+	function *findDirFiles(dir, rexSearch, rexSearchSkip, rexClose, controller) {
 		if (!controller) controller = {};
 		if (controller.isCancel)
 			return new SpecialData(ERROR_PROP, CANCEL_ERROR);
@@ -107,6 +107,9 @@ void function () {
 
 				//for (let name of names) {
 				yield names.map(name => function *() {
+					if (rexSearchSkip && rexSearchSkip.test(name))
+						return;
+
 					result[name] = undefined;
 					setDirty(result);
 					try {

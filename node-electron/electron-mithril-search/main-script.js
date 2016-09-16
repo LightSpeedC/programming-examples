@@ -24,8 +24,12 @@ void function () {
 	const flagUsage = m.prop(false);
 	const flagReleaseNotes = m.prop(false);
 	const flagWishList = m.prop(false);
+	const flagFilter = m.prop(false);
+	const flagAdvanced = m.prop(false);
 	// 検索文字列
 	const textSearch = propRex('');
+	// 検索スキップ文字列
+	const textSearchSkip = propRex('');
 	// 含める文字列 (検索結果)
 	const textIncludes = propRex('');
 	// 含めない文字列 (検索結果)
@@ -120,46 +124,72 @@ void function () {
 						m('span', ' '),
 						m('b', m('font[color=red]', textSearch()))),
 					textIncludes() || textExcludes() ? [m('hr'), m('div', '検索結果フィルタ')] : '',
-					textIncludes() ? m('div', '「', textIncludes(), '」を含む') : '',
-					textExcludes() ? m('div', '「', textExcludes(), '」を含まない') : '',
+					textIncludes() ? m('div', '絞込: 「', textIncludes(), '」を含む') : '',
+					textExcludes() ? m('div', '除外: 「', textExcludes(), '」を含まない') : '',
 					m('hr'),
 					m('div', '検索最大ファイル数を制限'),
 					m('div', '最大ファイル数/フォルダ: 「', textMaxFiles(), '」'),
 					m('div', '最大ファイル数/トータル: 「', textMaxTotalFiles(), '」'),
 					m('div', '検索時に閉じておくフォルダ: 「', textClose(), '」'),
 				] : [
+					m('font[color=gray][size=1]', '※ワイルドカード*?検索できます。' +
+						'空白でAND、コンマとセミコロンでOR、マイナスでNOT。' +
+						'優先順位：マイナス、コンマ、空白、セミコロンの順。'),
+
+					// 検索
 					m('form', {onsubmit: search},
-						m('div',
+						m('div', '検索: ',
 							m('input', m_on('change', 'value', textSearch,
 								{autofocus: true, placeholder: '検索したい文字列', size: 100})),
 							m('button.button[type=submit]', {onclick: search}, '検索'))),
-					m('div', '※ワイルドカード*?検索できます。' +
-						'空白でAND、コンマとセミコロンでOR、マイナスでNOT。' +
-						'優先順位：マイナス、コンマ、空白、セミコロンの順。'),
-					m('hr'),
-					m('div', '検索結果フィルタ'),
+					//m('hr'),
+
+					// 検索オプション
 					m('div',
-						m('input', m_on('change', 'value', textIncludes,
-							{placeholder: '含む', size: 100})),
-						'を含む'),
+						m('input[type=checkbox]',
+							m_on('click', 'checked', flagAdvanced)),
+						m('font[color=purple]', '検索オプション',
+							flagAdvanced() ? [
+
+								m('div', '検索したくない: ',
+									m('input', m_on('change', 'value', textSearchSkip,
+										{autofocus: true, size: 100,
+										 placeholder: '検索したくないファイルやフォルダ'})),
+									' : 検索したくないファイルやフォルダ'),
+
+								m('div',
+									'検索時に閉じる: ',
+										m('input', m_on('change', 'value', textClose,
+										{placeholder: '検索時に閉じておくフォルダ', size: 100})),
+									' : 検索時に閉じておくフォルダ'),
+								m('div', '検索最大ファイル数を制限: 　 ',
+									m('span',
+										' 　 最大ファイル数/フォルダ: ',
+											m('input', m_on('change', 'value', textMaxFiles,
+											{placeholder: '最大ファイル数/フォルダ', size: 10}))),
+									m('span',
+										' 　 最大ファイル数/トータル: ',
+											m('input', m_on('change', 'value', textMaxTotalFiles,
+											{placeholder: '最大ファイル数/トータル', size: 10})))),
+							] : '')),
+					//m('hr'),
+
+					// 検索結果フィルタ
 					m('div',
-						m('input', m_on('change', 'value', textExcludes,
-							{placeholder: '含まない', size: 100})),
-						'を含まない'),
-					m('hr'),
-					m('div', '検索最大ファイル数を制限'),
-					m('div',
-						'最大ファイル数/フォルダ: ',
-							m('input', m_on('change', 'value', textMaxFiles,
-							{placeholder: '最大ファイル数/フォルダ', size: 10}))),
-					m('div',
-						'最大ファイル数/トータル: ',
-							m('input', m_on('change', 'value', textMaxTotalFiles,
-							{placeholder: '最大ファイル数/トータル', size: 10}))),
-					m('div',
-						'検索時に閉じておくフォルダ: ',
-							m('input', m_on('change', 'value', textClose,
-							{placeholder: '検索時に閉じておくフォルダ', size: 75}))),
+						m('input[type=checkbox]',
+							m_on('click', 'checked', flagFilter)),
+						m('font[color=darkblue]', '検索結果フィルタ',
+							flagFilter() ? [
+								m('div', '結果を絞り込み: ',
+									m('input', m_on('change', 'value', textIncludes,
+										{placeholder: '含む', size: 100})),
+									' を含む'),
+								m('div', '結果から非表示: ',
+									m('input', m_on('change', 'value', textExcludes,
+										{placeholder: '含まない', size: 100})),
+									' を含まない'),
+							] : '')),
+
 				]
 			),
 			m('hr', {key: 'hr-search'}),
@@ -284,6 +314,7 @@ void function () {
 			try {
 				yield findDirFiles(targetDir,
 					textSearch.rex,
+					textSearchSkip.rex,
 					textClose.rex,
 					findController);
 				if (!findController.isCancel)
