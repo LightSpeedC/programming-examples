@@ -1,11 +1,11 @@
-
-	void function (obj) {
+	void function (proto, obj) {
 		for (var prop in obj)
-			Object.prototype[prop] ||
-			Object.defineProperty(Object.prototype, prop, {
+			proto[prop] ||
+			Object.defineProperty(proto, prop, {
 				configureable: true,
+				writable: true,
 				value: obj[prop]});
-	} ({
+	} (Object.prototype, {
 		forEach: function forEach(fn) {
 			for (var prop in this)
 				if (this.hasOwnProperty(prop))
@@ -53,3 +53,4 @@
 	console.log({x:1,y:2,z:3}.reduce((x,y) => x + y, 1));
 	console.log({x:1,y:2,z:3}.reduceRight((x,y) => x + y));
 	console.log({x:1,y:2,z:3}.reduceRight((x,y) => x + y, 1));
+	console.log(Object.keys({x:1,y:2,z:3}));
