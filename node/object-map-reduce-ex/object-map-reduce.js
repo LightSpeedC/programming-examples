@@ -2,7 +2,7 @@
 		for (var prop in obj)
 			proto[prop] ||
 			Object.defineProperty(proto, prop, {
-				configureable: true,
+				configurable: true,
 				writable: true,
 				value: obj[prop]});
 	} (Object.prototype, {
