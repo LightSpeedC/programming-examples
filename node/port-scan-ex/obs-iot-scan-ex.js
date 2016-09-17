@@ -14,7 +14,8 @@
 		for (var prop in obj)
 			Object.prototype[prop] ||
 			Object.defineProperty(Object.prototype, prop, {
-				configureable: true,
+				configurable: true,
+				writable: true,
 				value: obj[prop]});
 	} ({
 		forEach: function forEach(fn) {
