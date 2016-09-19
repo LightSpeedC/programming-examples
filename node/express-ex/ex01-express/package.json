@@ -4,8 +4,8 @@
   "description": "express example",
   "main": "index.js",
   "dependencies": {
-    "debug": "~2.2.0",
-    "express": "^4.13.3"
+    "debug": "^2.2.0",
+    "express": "^4.14.0"
   },
   "keywords": [
     "express"
