@@ -1,11 +1,11 @@
 (function () {
 	'use strict';
-	var fs = require('fs');
-	var url = require('url');
-	var path = require('path');
-	var port = process.argv[2] || process.env.PORT || 3000;
+	const fs = require('fs');
+	const url = require('url');
+	const path = require('path');
+	const port = process.argv[2] || process.env.PORT || 3000;
 	console.log('port:', port);
-	var express = require('express'), app = express();
+	const express = require('express'), app = express();
 	fs.readdirSync('.').filter(function (file) {
 		return !file.startsWith('.') &&
 			file !== 'node_modules' &&
@@ -15,7 +15,7 @@
 			app.use('/' + dir, express.static(dir));
 		});
 	app.get('/*', function (req, res) {
-		var x = url.parse(req.url);
+		const x = url.parse(req.url);
 		if (x.pathname === '/' || x.pathname === '/index.html')
 			res.sendFile(path.resolve('index.html'));
 		else if (x.pathname === '/index.json')
