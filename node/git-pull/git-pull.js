@@ -23,6 +23,12 @@
 
 	var dttm = DateTime.toDateTimeString().replace(/[\-:]/g, '').replace(/ /g, '-').substr(0, 13);
 
+	var REX_GIT = new RegExp(
+							"On branch [-a-zA-Z0-9/]+\n" +
+							"Your branch is up-to-date with '[-a-zA-Z0-9/]+'\\.\n*" +
+							"nothing to commit, working (tree|directory) clean\n" +
+							"Already up-to-date\\.\n");
+
 	// main
 	aa(function* main() {
 		var executor = Executors(N);
@@ -31,7 +37,7 @@
 		var w = require('fs').createWriteStream(
 			path.resolve(dir, 'git-pull-' + dttm + '.log'), {encoding: 'utf8'});
 
-		var rex = RegExp('\x1b\\[.*?m', 'g')
+		var rex = new RegExp('\x1b\\[.*?m', 'g')
 		function log(x)   { console.log(x);   w.write(x.replace(rex, '') + '\r\n'); }
 		function error(x) { console.error(x); w.write(x.replace(rex, '') + '\r\n'); }
 
@@ -42,11 +48,11 @@
 
 		// tree
 		function* tree(dir) {
-			var names = yield fs_readdir(dir);
+			var names = yield executor(fs_readdir, dir);
 
 			if (names.indexOf('.git') >= 0) {
 				log('Git ===> ' + dir);
-				if (yield fs_exists(path.resolve(dir, '.git/ORIG_HEAD.lock')))
+				if (yield executor(fs_exists, path.resolve(dir, '.git/ORIG_HEAD.lock')))
 					return error('*** ' + dir + '\n' + COLOR_WARN + 'SKIPPED (ORIG_HEAD.lock)!!!' + COLOR_NORMAL);
 				try {
 					if (testMode)
@@ -54,11 +60,7 @@
 					var res = yield executor(child_process_exec, cd + dir + ' & git status & git pull');
 					res = res.map(unescape);
 					if (res[0].indexOf('use "') === -1) {
-						if (res[0].replace(/\r\n/g, '\n').match(RegExp(
-							"On branch [-a-zA-Z0-9/]+\n" +
-							"Your branch is up-to-date with '[-a-zA-Z0-9/]+'\\.\n*" +
-							"nothing to commit, working (tree|directory) clean\n" +
-							"Already up-to-date\\.\n")))
+						if (res[0].replace(/\r\n/g, '\n').match(REX_GIT))
 							log('*** ' + dir + ' ===> ' + COLOR_OK + 'OK' + COLOR_NORMAL);
 						else
 							log('*** ' + dir + '\n' + COLOR_OK + res[0] + COLOR_NORMAL);
@@ -76,7 +78,7 @@
 			yield names.map(name => function *() {
 				if (name === 'node_modules') return;
 				var file = path.resolve(dir, name);
-				if ((yield fs_stat(file)).isDirectory())
+				if ((yield executor(fs_stat, file)).isDirectory())
 					yield tree(file);
 			}); // names.map
 
