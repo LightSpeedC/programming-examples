@@ -46,7 +46,7 @@ void function () {
 	let wholeObject = {[ERROR_PROP]: 'まだ検索していません'};
 	let timer; // 検索中のインターバルタイマー
 	const MAX_INDENT = 20; // 最大インデントの深さ
-	const indentSpace = ' ';
+	const indentSpace = '　';
 	const SUBTREE_RETAIN = {subtree: 'retain'};
 
 	m.mount($div, {view: viewMain});
@@ -151,18 +151,18 @@ void function () {
 						m('font[color=purple]', '検索オプション',
 							flagAdvanced() ? [
 
-								m('div', '検索したくない: ',
+								m('div', ' 　 　 検索したくない: ',
 									m('input', m_on('change', 'value', textSearchSkip,
 										{autofocus: true, size: 100,
 										 placeholder: '検索したくないファイルやフォルダ'})),
 									' : 検索したくないファイルやフォルダ'),
 
 								m('div',
-									'検索時に閉じる: ',
+									' 　 　 検索時に閉じる: ',
 										m('input', m_on('change', 'value', textClose,
 										{placeholder: '検索時に閉じておくフォルダ', size: 100})),
 									' : 検索時に閉じておくフォルダ'),
-								m('div', '検索最大ファイル数を制限: 　 ',
+								m('div', ' 　 　 検索最大ファイル数を制限: 　 ',
 									m('span',
 										' 　 最大ファイル数/フォルダ: ',
 											m('input', m_on('change', 'value', textMaxFiles,
@@ -180,11 +180,11 @@ void function () {
 							m_on('click', 'checked', flagFilter)),
 						m('font[color=darkblue]', '検索結果フィルタ',
 							flagFilter() ? [
-								m('div', '結果を絞り込み: ',
+								m('div', ' 　 　 結果を絞り込み: ',
 									m('input', m_on('change', 'value', textIncludes,
 										{placeholder: '含む', size: 100})),
 									' を含む'),
-								m('div', '結果から非表示: ',
+								m('div', ' 　 　 結果から非表示: ',
 									m('input', m_on('change', 'value', textExcludes,
 										{placeholder: '含まない', size: 100})),
 									' を含まない'),
