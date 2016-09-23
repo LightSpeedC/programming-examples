@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.9 (2016/09/16)';
+	const version = 'version: 0.0.10 (2016/09/23)';
 
 	const path = require('path');
 	const spawn = require('child_process').spawn;
@@ -11,6 +11,8 @@ void function () {
 	const aa = require('aa');
 
 	const Rexfer = require('./rexfer');
+	const Config = require('./config-local-storage');
+	const config = new Config('node-electron-search', {});
 
 	const findDirFiles = require('./find-dir-files');
 	const findController = {isCancel:false, cancel, progress};
@@ -24,21 +26,21 @@ void function () {
 	const flagUsage = m.prop(false);
 	const flagReleaseNotes = m.prop(false);
 	const flagWishList = m.prop(false);
-	const flagFilter = m.prop(false);
-	const flagAdvanced = m.prop(false);
+	const flagFilter = propCfg(false, 'flagFilter');
+	const flagAdvanced = propCfg(false, 'flagAdvanced');
 	// 検索文字列
-	const textSearch = propRex('');
+	const textSearch = propRex('', 'search');
 	// 検索スキップ文字列
-	const textSearchSkip = propRex('');
+	const textSearchSkip = propRex('', 'searchSkip');
 	// 含める文字列 (検索結果)
-	const textIncludes = propRex('');
+	const textIncludes = propRex('', 'includes');
 	// 含めない文字列 (検索結果)
-	const textExcludes = propRex('');
+	const textExcludes = propRex('', 'excludes');
 
-	const textMaxFiles = m.prop(3000);
-	const textMaxTotalFiles = m.prop(100000);
+	const textMaxFiles = propCfg(3000, 'maxFiles');
+	const textMaxTotalFiles = propCfg(100000, 'maxTotalFiles');
 	// 閉じておく文字列 (検索結果)
-	const textClose = propRex('^old$,backup,^旧$,^save$,^保存$,^node_modules');
+	const textClose = propRex('^old$,backup,^旧$,^save$,^保存$,^node_modules', 'close');
 	// 通知メッセージ
 	const textMessage = m.prop('検索できます');
 
@@ -76,15 +78,16 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
-			'0.0.9 (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
-			'0.0.8 (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
-			'0.0.7 (2016/06/16): 最大検索ファイル数の入力',
-			'0.0.6 (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
-			'0.0.5 (2016/06/13): リリース・ノート表示、リファクタリング',
-			'0.0.4 (2016/06/12): ツリー表示、新旧レイアウト切替',
-			'0.0.3 (2016/06/11): 検索中のキャンセル',
-			'0.0.2 (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)',
-			'0.0.1 (2016/06/09): 検索したファイルの一覧表示',
+			'0.0.10 (2016/09/23): 検索文字列などを、そのまま保存',
+			'0.0.9  (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
+			'0.0.8  (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
+			'0.0.7  (2016/06/16): 最大検索ファイル数の入力',
+			'0.0.6  (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
+			'0.0.5  (2016/06/13): リリース・ノート表示、リファクタリング',
+			'0.0.4  (2016/06/12): ツリー表示、新旧レイアウト切替',
+			'0.0.3  (2016/06/11): 検索中のキャンセル',
+			'0.0.2  (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)',
+			'0.0.1  (2016/06/09): 検索したファイルの一覧表示',
 		];
 		return m('ul', list.map(x => m('li', x)));
 	}
@@ -361,7 +364,8 @@ void function () {
 	}
 
 	// propRex
-	function propRex(str) {
+	function propRex(str, key) {
+		str = typeof config.value[key] === 'undefined' ? str : config.value[key];
 		f(str);
 		return f;
 
@@ -369,6 +373,24 @@ void function () {
 			if (arguments.length > 0) {
 				str = x;
 				f.rex = str ? new Rexfer(str, 'i') : null;
+				config.value[key] = str;
+				config.save();
+			}
+			return str;
+		};
+	}
+
+	// propCfg
+	function propCfg(str, key) {
+		str = typeof config.value[key] === 'undefined' ? str : config.value[key];
+		f(str);
+		return f;
+
+		function f(x) {
+			if (arguments.length > 0) {
+				str = x;
+				config.value[key] = str;
+				config.save();
 			}
 			return str;
 		};
