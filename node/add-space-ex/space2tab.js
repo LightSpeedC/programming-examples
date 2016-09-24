@@ -1,5 +1,5 @@
 	'use strict';
-	var NEWLINE = process.platform === 'win32' ? '\r\n' : '\n';
+	var NEWLINE = '\n';
 	var inFileName = process.argv[2];
 	var outFileName = process.argv[3] || (inFileName + '.log');
 	var numSpaces = Number(process.argv[4] || 2);
