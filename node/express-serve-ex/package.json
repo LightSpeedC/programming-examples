@@ -1,0 +1,21 @@
+{
+  "name": "express-serve-ex",
+  "version": "0.0.0",
+  "description": "",
+  "main": "express-serve-ex.js",
+  "private": true,
+  "dependencies": {
+    "express": "^4.14.0",
+    "serve-index": "^1.8.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "express",
+    "serve-index",
+    "serve-static"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
