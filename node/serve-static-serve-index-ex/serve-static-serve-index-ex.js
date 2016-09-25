@@ -20,4 +20,4 @@ require('http').createServer(function onRequest(req, res) {
 	})
 })
 // Listen
-.listen(3000);
+.listen(process.env.PORT || 3000);
