@@ -1,0 +1,15 @@
+{
+  "name": "web-server-simple-ex",
+  "version": "0.0.0",
+  "description": "",
+  "main": "web-server-simple-ex.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "aa": ">=0.1.40"
+  }
+}
