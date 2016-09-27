@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.10 (2016/09/23)';
+	const version = 'version: 0.0.11 (2016/09/27)';
 
 	const path = require('path');
 	const spawn = require('child_process').spawn;
@@ -78,6 +78,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.11 (2016/09/27): チェックボックスのラベルをクリックでトグル',
 			'0.0.10 (2016/09/23): 検索文字列などを、そのまま保存',
 			'0.0.9  (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
 			'0.0.8  (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
@@ -151,7 +152,9 @@ void function () {
 					m('div',
 						m('input[type=checkbox]',
 							m_on('click', 'checked', flagAdvanced)),
-						m('font[color=purple]', '検索オプション',
+						m('font[color=purple]',
+							{onclick: () => flagAdvanced(!flagAdvanced())},
+							'検索オプション',
 							flagAdvanced() ? [
 
 								m('div', ' 　 　 検索したくない: ',
@@ -181,7 +184,9 @@ void function () {
 					m('div',
 						m('input[type=checkbox]',
 							m_on('click', 'checked', flagFilter)),
-						m('font[color=darkblue]', '検索結果フィルタ',
+						m('font[color=darkblue]',
+							{onclick: () => flagFilter(!flagFilter())},
+							'検索結果フィルタ',
 							flagFilter() ? [
 								m('div', ' 　 　 結果を絞り込み: ',
 									m('input', m_on('change', 'value', textIncludes,
@@ -209,28 +214,36 @@ void function () {
 			m('div', {key: 'usage'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagUsage)),
-				m('font[color=gray]', '使い方',
+				m('font[color=gray]',
+					{onclick: () => flagUsage(!flagUsage())},
+					'使い方',
 					flagUsage() ? viewUsage() : '')),
 
 			// リリース・ノート表示
 			m('div', {key: 'release-notes'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagReleaseNotes)),
-				m('font[color=darkblue]', 'リリース・ノート: ' + version,
+				m('font[color=darkblue]',
+					{onclick: () => flagReleaseNotes(!flagReleaseNotes())},
+					'リリース・ノート: ' + version,
 					flagReleaseNotes() ? viewReleaseNotes() : '')),
 
 			// やりたいことリスト表示
 			m('div', {key: 'wish-list'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagWishList)),
-				m('font[color=purple]', 'やりたいことリスト',
+				m('font[color=purple]',
+					{onclick: () => flagWishList(!flagWishList())},
+					'やりたいことリスト',
 					flagWishList() ? viewWishList() : '')),
 
 			// デバッグ表示
 			m('div', {key: 'debug'},
 				m('input[type=checkbox]',
 					m_on('click', 'checked', flagDebug)),
-				m('font[color=brown]', 'デバッグ表示 (環境変数など)',
+				m('font[color=brown]',
+					{onclick: () => flagDebug(!flagDebug())},
+					'デバッグ表示 (環境変数など)',
 				(flagDebug() ? viewDebug() : '')))
 		];
 	}
