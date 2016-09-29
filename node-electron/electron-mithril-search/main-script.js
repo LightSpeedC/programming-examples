@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.11 (2016/09/27)';
+	const version = 'version: 0.0.12 (2016/09/29)';
 
 	const path = require('path');
 	const spawn = require('child_process').spawn;
@@ -78,6 +78,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.12 (2016/09/29): チェックボックスのラベルの不具合修正',
 			'0.0.11 (2016/09/27): チェックボックスのラベルをクリックでトグル',
 			'0.0.10 (2016/09/23): 検索文字列などを、そのまま保存',
 			'0.0.9  (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
@@ -153,8 +154,8 @@ void function () {
 						m('input[type=checkbox]',
 							m_on('click', 'checked', flagAdvanced)),
 						m('font[color=purple]',
-							{onclick: () => flagAdvanced(!flagAdvanced())},
-							'検索オプション',
+							m('span', {onclick: () => flagAdvanced(!flagAdvanced())},
+								'検索オプション'),
 							flagAdvanced() ? [
 
 								m('div', ' 　 　 検索したくない: ',
@@ -185,8 +186,8 @@ void function () {
 						m('input[type=checkbox]',
 							m_on('click', 'checked', flagFilter)),
 						m('font[color=darkblue]',
-							{onclick: () => flagFilter(!flagFilter())},
-							'検索結果フィルタ',
+							m('span', {onclick: () => flagFilter(!flagFilter())},
+								'検索結果フィルタ'),
 							flagFilter() ? [
 								m('div', ' 　 　 結果を絞り込み: ',
 									m('input', m_on('change', 'value', textIncludes,
