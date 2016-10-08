@@ -43,6 +43,7 @@ final
 finally
 float
 for
+from
 function
 future
 generic
@@ -216,6 +217,7 @@ console.log
 console.warn
 constructor
 document
+document.getElementById
 exports
 forms
 frames
