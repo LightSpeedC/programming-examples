@@ -110,6 +110,7 @@ call
 .forEach
 .hasOwnProperty
 .indexOf
+.innerHTML
 .isPrototypeOf
 .join
 .length
@@ -218,6 +219,8 @@ console.warn
 constructor
 document
 document.getElementById
+document.write
+document.writeln
 exports
 forms
 frames
@@ -231,6 +234,7 @@ mimeTypes
 module
 module.exports
 navigator
+navigator.userAgent
 options
 plugins
 process
