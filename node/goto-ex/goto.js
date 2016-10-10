@@ -4,24 +4,24 @@ var target;
 
 target: for (;;) switch (target) {
 
-  case undefined:
-    console.log('init');
+	case undefined:
+		console.log('init');
 
-  case 'start':
-    console.log('start');
+	case 'start':
+		console.log('start');
 
-    // goto next;
-    target = 'next';
-    continue target;
+		// goto next;
+		target = 'next';
+		continue target;
 
-  case 'skip':
-    console.log('skip');
+	case 'skip':
+		console.log('skip');
 
-  case 'next':
-    console.log('next');
+	case 'next':
+		console.log('next');
 
-  default:
-    break target;
+	default:
+		break target;
 
 }
 
