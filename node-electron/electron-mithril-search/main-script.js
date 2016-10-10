@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.12 (2016/09/29)';
+	const version = 'version: 0.0.13 (2016/10/10)';
 
 	const path = require('path');
 	const spawn = require('child_process').spawn;
@@ -78,6 +78,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.13 (2016/10/10): 起動時に入力テキストを選択',
 			'0.0.12 (2016/09/29): チェックボックスのラベルの不具合修正',
 			'0.0.11 (2016/09/27): チェックボックスのラベルをクリックでトグル',
 			'0.0.10 (2016/09/23): 検索文字列などを、そのまま保存',
@@ -145,7 +146,8 @@ void function () {
 					m('form', {onsubmit: search},
 						m('div', '検索: ',
 							m('input', m_on('change', 'value', textSearch,
-								{autofocus: true, placeholder: '検索したい文字列', size: 100})),
+								{autofocus: true, placeholder: '検索したい文字列', size: 100,
+								 onfocus: selectThisText})),
 							m('button.button[type=submit]', {onclick: search}, '検索'))),
 					//m('hr'),
 
@@ -247,6 +249,10 @@ void function () {
 					'デバッグ表示 (環境変数など)',
 				(flagDebug() ? viewDebug() : '')))
 		];
+	}
+
+	function selectThisText(e) {
+		this.select(0, this.value.length);
 	}
 
 	// range 0～n-1までの数字の配列
