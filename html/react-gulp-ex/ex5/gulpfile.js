@@ -1,39 +1,88 @@
-const gulp = require('gulp'), task = gulp.task.bind(gulp);
-const EventEmitter = require('events').EventEmitter;
-const aa = require('aa');
-const ins = require('util').inspect;
-//console.log('module', ins(module, {colors: true, depth:0}));
-//console.log('require', ins(require, {colors: true, depth:0}));
+'use strict';
 
-console.log(gulp);
+const gulp = require('gulp'), task = gulp.task.bind(gulp);
+const stream = require('stream');
+const aa = require('aa');
+
+const x = '[--:--:--]';
+
+task('default', [
+		'callback-task',
+		'thunk-task',
+		'promise-task',
+		'stream-task',
+		'sync-task',
+		'async-await-task'], () =>
+	console.log(x, 'default runs after callback, thunk, promise, stream'));
+
+task('callback-task', cb => sleep(600, 'callback', cb));
+
+task('thunk-task', delay(500, 'thunk'));
+
+task('promise-task', () => wait(400, 'promise'));
+
+task('stream-task', () => {
+	console.log(x, 'Starting  stream')
+	const w = new stream.Writable;
+	setTimeout(() => {
+		console.log(x, 'Finished  stream');
+		w.end();
+	}, 300);
+	return w;
+});
+
+task('sync-task', () => {
+	console.log(x, 'Starting  sync');
+	console.log(x, 'Finished  sync');
+});
+
+task('async-await-task', () => aa(function *() {
+	console.log(x, 'Starting  async-await');
+	yield wait(10, 'async-await promise');
+	yield delay(10, 'async-await thunk');
+	yield cb => sleep(10, 'async-await callback', cb);
+	yield function *() {
+		yield wait(10, 'async-await gtor fn promise');
+		yield delay(10, 'async-await gtor fn thunk');
+		yield cb => sleep(10, 'async-await gtor fn callback', cb);
+	};
+	yield function *() {
+		yield wait(10, 'async-await gtor promise');
+		yield delay(10, 'async-await gtor thunk');
+		yield cb => sleep(10, 'async-await gtor callback', cb);
+	} ();
+	yield *function *() {
+		yield wait(10, 'async-await *gtor promise');
+		yield delay(10, 'async-await *gtor thunk');
+		yield cb => sleep(10, 'async-await *gtor callback', cb);
+	} ();
+	console.log(x, 'Finished  async-await');
+}));
 
 function sleep(ms, val, cb) {
-	setTimeout(cb, ms, null, val);
+	console.log(x, 'Starting ', val);
+	setTimeout(() => {
+		console.log(x, 'Finished ', val);
+		cb(null, val);
+	}, ms);
 }
 
 function delay(ms, val) {
-	return function (cb) { setTimeout(cb, ms, null, val); };
+	return cb => {
+		console.log(x, 'Starting ', val);
+		setTimeout(() => {
+			console.log(x, 'Finished ', val);
+			cb(null, val);
+		}, ms);
+	};
 }
 
 function wait(ms, val) {
-	return new Promise(function (res, rej) {
-		setTimeout(res, ms, val);
+	return new Promise(res => {
+		console.log(x, 'Starting ', val);
+		setTimeout(() => {
+			console.log(x, 'Finished ', val);
+			res(val);
+		}, ms);
 	});
 }
-
-
-task('default', ['task1', 'task2', 'task3', 'task4'], function (cb) {
-	console.log('default function');
-	cb();
-});
-
-task('task1', [], cb => sleep(300, 'task1', cb));
-task('task2', [], delay(100, 'task2'));
-task('task3', [], () => wait(200, 'task3'));
-task('task4', [], () => {
-	//const ev = new EventEmitter();
-	//ev.on('end', () => console.log('ev end'));
-	//ev.on('error', err => console.log('ev err', err));
-	//return ev;
-	return task('task5', ['task2']);
-});
