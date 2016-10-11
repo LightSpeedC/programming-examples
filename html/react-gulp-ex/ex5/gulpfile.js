@@ -12,8 +12,8 @@ task('default', [
 		'promise-task',
 		'stream-task',
 		'sync-task',
-		'async-await-task'], () =>
-	console.log(x, 'default runs after callback, thunk, promise, stream'));
+		'aa-task'], () =>
+	console.log(x, 'default runs after all tasks'));
 
 task('callback-task', cb => sleep(600, 'callback', cb));
 
@@ -36,42 +36,39 @@ task('sync-task', () => {
 	console.log(x, 'Finished  sync');
 });
 
-task('async-await-task', () => aa(function *() {
-	console.log(x, 'Starting  async-await');
-	yield wait(10, 'async-await promise');
-	yield delay(10, 'async-await thunk');
-	yield cb => sleep(10, 'async-await callback', cb);
+task('aa-task', () => aa(function *() {
+	console.log(x, 'Starting  aa');
+	yield wait(10, 'aa promise');
+	yield delay(10, 'aa thunk');
+	yield cb => sleep(10, 'aa callback', cb);
 	yield function *() {
-		yield wait(10, 'async-await gtor fn promise');
-		yield delay(10, 'async-await gtor fn thunk');
-		yield cb => sleep(10, 'async-await gtor fn callback', cb);
+		yield wait(10, 'aa gtor fn promise');
+		yield delay(10, 'aa gtor fn thunk');
 	};
-	yield function *() {
-		yield wait(10, 'async-await gtor promise');
-		yield delay(10, 'async-await gtor thunk');
-		yield cb => sleep(10, 'async-await gtor callback', cb);
-	} ();
-	yield *function *() {
-		yield wait(10, 'async-await *gtor promise');
-		yield delay(10, 'async-await *gtor thunk');
-		yield cb => sleep(10, 'async-await *gtor callback', cb);
-	} ();
-	console.log(x, 'Finished  async-await');
+	yield function *(arg) {
+		yield wait(10, arg + 'promise');
+		yield delay(10, arg + 'thunk');
+	} ('aa gtor ');
+	yield *function *(arg) {
+		yield wait(10, arg + 'promise');
+		yield delay(10, arg + 'thunk');
+	} ('aa *gtor ');
+	console.log(x, 'Finished  aa');
 }));
 
 function sleep(ms, val, cb) {
-	console.log(x, 'Starting ', val);
+	console.log(x, 'Starting ', val, 'sleep');
 	setTimeout(() => {
-		console.log(x, 'Finished ', val);
+		console.log(x, 'Finished ', val, 'sleep');
 		cb(null, val);
 	}, ms);
 }
 
 function delay(ms, val) {
 	return cb => {
-		console.log(x, 'Starting ', val);
+		console.log(x, 'Starting ', val, 'delay');
 		setTimeout(() => {
-			console.log(x, 'Finished ', val);
+			console.log(x, 'Finished ', val, 'delay');
 			cb(null, val);
 		}, ms);
 	};
@@ -79,9 +76,9 @@ function delay(ms, val) {
 
 function wait(ms, val) {
 	return new Promise(res => {
-		console.log(x, 'Starting ', val);
+		console.log(x, 'Starting ', val, 'wait');
 		setTimeout(() => {
-			console.log(x, 'Finished ', val);
+			console.log(x, 'Finished ', val, 'wait');
 			res(val);
 		}, ms);
 	});
