@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta charset="UTF-8">
+
+<h1>test1-main</h1>
+
+<h2>
+<a href="http://test2.testdomain.com:8002/test2-popup.html?par1=val1" target="_blank">
+子供を開く
+</a>
+</h2>
+
+<div>ev.origin=<span id="ev_origin"></span></div>
+<div>ev.data  =<span id="ev_data"></span></div>
+<div>ev.data.x=<span id="ev_data_x"></span></div>
+<div>ev.data.y=<span id="ev_data_y"></span></div>
+
+<button onclick="PopupButton_click()">子供を開く</button>
+
+<script>
+// messageイベントを受ける
+onmessage = function (ev) {
+	// 子供から受け取ったデータを表示する
+	ev_origin.innerHTML = ev.origin;
+	ev_data.innerHTML   = JSON.stringify(ev.data);
+	ev_data_x.innerHTML = ev.data.x;
+	ev_data_y.innerHTML = ev.data.y;
+};
+
+// 子供を開くボタン
+function PopupButton_click() {
+	ev_origin.innerHTML = '';
+	ev_data.innerHTML   = '';
+	ev_data_x.innerHTML = '';
+	ev_data_y.innerHTML = '';
+
+	// 子供のウィンドウを開く
+	var child = open(
+		'http://test2.testdomain.com:8002/test2-popup.html?par1=val1',
+		'_blank', 'width=600,height=500');
+
+	// 子供に何かメッセージを送る (今回必要ありません)
+	setTimeout(function () {
+		child.postMessage(
+			{message: 'send-to-child', x:789, y:654}, '*');
+	}, 2000); // 2秒後
+
+	// 子供にtimeoutメッセージを送る (今回必要ありません)
+	setTimeout(function () {
+		child.postMessage({message: 'timeout'}, '*');
+	}, 6000); // 6秒後
+}
+</script>

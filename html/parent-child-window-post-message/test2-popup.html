@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta charset="UTF-8">
+
+<h1>test2-popup</h1>
+
+<div>ev.origin=<span id="ev_origin"></span></div>
+<div>ev.data  =<span id="ev_data"></span></div>
+<div>ev.data.x=<span id="ev_data_x"></span></div>
+<div>ev.data.y=<span id="ev_data_y"></span></div>
+
+<button onclick="CloseButton_click()">閉じる</button>
+
+<script>
+// messageイベントを受ける
+onmessage = function (ev) {
+	// timeoutメッセージを受け取ったら自分を閉じる
+	if (ev.data.message === 'timeout')
+		return goodbye({message: 'cancel', x:999, y:888});
+
+	// 親から受け取ったデータを表示する
+	ev_origin.innerHTML = ev.origin;
+	ev_data.innerHTML   = JSON.stringify(ev.data);
+	ev_data_x.innerHTML = ev.data.x;
+	ev_data_y.innerHTML = ev.data.y;
+};
+
+// 自分を閉じるボタン
+function CloseButton_click() {
+	goodbye({message: 'send-to-parent', x:123, y:456});
+}
+
+// フォーカスを失ったら閉じる (例えば)
+onblur = function () {
+	goodbye({message: 'blur', x:777, y:666});
+};
+
+var closing = false; 
+function goodbye(msg) {
+	// 閉じている途中の場合何もしない
+	if (closing) return;
+	closing = true;
+
+	// 親ウィンドウにメッセージを送る
+	opener.postMessage(msg, '*');
+	// 自分のウィンドウを閉じる
+	close();
+}
+</script>

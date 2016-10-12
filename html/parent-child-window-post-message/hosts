@@ -1,0 +1,7 @@
+# hosts に以下を設定してください
+
+127.0.0.1	localhost
+127.0.0.1	test1.testdomain.com
+127.0.0.1	test2.testdomain.com
+
+# *.testdomain.com をProxy除外に設定しておくこと
