@@ -106,6 +106,7 @@ call
 .caller
 .catch
 .constructor
+.contains
 .filter
 .forEach
 .hasOwnProperty
@@ -257,7 +258,6 @@ undefined
 window
 
 #Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
-.contains
 console.debug
 console.trace
 
