@@ -2,16 +2,16 @@ var co = require(process.argv[2] || 'co');
 var next = require('./next');
 
 next(co(function* () {
-  var res = yield [
-    Promise.resolve(1),
-    Promise.resolve(2),
-    Promise.resolve(3),
-  ];
-  console.log(res); // => [1, 2, 3] 
+	var res = yield [
+		Promise.resolve(1),
+		Promise.resolve(2),
+		Promise.resolve(3),
+	];
+	console.log(res); // => [1, 2, 3] 
 }));
 
 function delay(ms, val) {
-  return function (cb) { setTimeout(cb, ms, null, val); };
+	return function (cb) { setTimeout(cb, ms, null, val); };
 }
 
 next(co(function* () {

@@ -3,10 +3,10 @@ var next = require('./next');
 
 next(co(function *() {
 
-  console.log('\nundefined');
-  yield next(co());
+	console.log('\nundefined');
+	yield next(co());
 
-  console.log('\nnull');
-  yield next(co(null));
+	console.log('\nnull');
+	yield next(co(null));
 
 }));
