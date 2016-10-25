@@ -3,10 +3,15 @@
 module.exports = Config;
 
 // Config
-function Config(key, value) {
+function Config(key, value, version) {
 	this.key = key;
+	//this.version = version;
 	this.value = value || {};
 	this.load();
+	//if (this.value.version !== version) {
+	//	this.value = value || {};
+	//	this.value.version = version
+	//}
 }
 
 // #load

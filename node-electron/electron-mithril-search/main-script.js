@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.13 (2016/10/10)';
+	const version = 'version: 0.0.14 (2016/10/25)';
 
 	const path = require('path');
 	const spawn = require('child_process').spawn;
@@ -30,17 +30,19 @@ void function () {
 	const flagAdvanced = propCfg(false, 'flagAdvanced');
 	// 検索文字列
 	const textSearch = propRex('', 'search');
-	// 検索スキップ文字列
-	const textSearchSkip = propRex('', 'searchSkip');
 	// 含める文字列 (検索結果)
 	const textIncludes = propRex('', 'includes');
 	// 含めない文字列 (検索結果)
 	const textExcludes = propRex('', 'excludes');
+	// 検索スキップ文字列
+	const textSearchSkip = propRex(
+		'^node_modules,^.git$,^.svn$', 'searchSkip');
+	// 閉じておく文字列 (検索結果)
+	const textClose = propRex(
+		'^old$,backup,^旧$,^save$,^保存$,^node_modules,^.git$,^.svn$', 'close');
 
 	const textMaxFiles = propCfg(3000, 'maxFiles');
 	const textMaxTotalFiles = propCfg(100000, 'maxTotalFiles');
-	// 閉じておく文字列 (検索結果)
-	const textClose = propRex('^old$,backup,^旧$,^save$,^保存$,^node_modules', 'close');
 	// 通知メッセージ
 	const textMessage = m.prop('検索できます');
 
@@ -78,6 +80,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.14 (2016/10/25): デフォルト値を変更 configバージョン変更',
 			'0.0.13 (2016/10/10): 起動時に入力テキストを選択',
 			'0.0.12 (2016/09/29): チェックボックスのラベルの不具合修正',
 			'0.0.11 (2016/09/27): チェックボックスのラベルをクリックでトグル',
@@ -136,6 +139,7 @@ void function () {
 					m('div', '検索最大ファイル数を制限'),
 					m('div', '最大ファイル数/フォルダ: 「', textMaxFiles(), '」'),
 					m('div', '最大ファイル数/トータル: 「', textMaxTotalFiles(), '」'),
+					m('div', '検索したくないファイルやフォルダ: 「', textSearchSkip(), '」'),
 					m('div', '検索時に閉じておくフォルダ: 「', textClose(), '」'),
 				] : [
 					m('font[color=gray][size=1]', '※ワイルドカード*?検索できます。' +
