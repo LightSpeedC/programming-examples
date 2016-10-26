@@ -1,5 +1,5 @@
 // start main app
-setTimeout(require, 3000, './app');
+//setTimeout(require, 3000, './app');
 
 // gulpfile.js
 var gulp       = require('gulp'),
