@@ -1,12 +1,12 @@
 'use strict';
 
-const gulp = require('gulp'), task = gulp.task.bind(gulp);
+const gulp = require('gulp');
 const stream = require('stream');
 const aa = require('aa');
 
 const x = '[--:--:--]';
 
-task('default', [
+gulp.task('default', [
 		'callback-task',
 		'thunk-task',
 		'promise-task',
@@ -15,13 +15,13 @@ task('default', [
 		'aa-task'], () =>
 	console.log(x, 'default runs after all tasks'));
 
-task('callback-task', cb => sleep(600, 'callback', cb));
+gulp.task('callback-task', cb => sleep(600, 'callback', cb));
 
-task('thunk-task', delay(500, 'thunk'));
+gulp.task('thunk-task', delay(500, 'thunk'));
 
-task('promise-task', () => wait(400, 'promise'));
+gulp.task('promise-task', () => wait(400, 'promise'));
 
-task('stream-task', () => {
+gulp.task('stream-task', () => {
 	console.log(x, 'Starting  stream')
 	const w = new stream.Writable;
 	setTimeout(() => {
@@ -31,12 +31,12 @@ task('stream-task', () => {
 	return w;
 });
 
-task('sync-task', () => {
+gulp.task('sync-task', () => {
 	console.log(x, 'Starting  sync');
 	console.log(x, 'Finished  sync');
 });
 
-task('aa-task', () => aa(function *() {
+gulp.task('aa-task', () => aa(function *() {
 	console.log(x, 'Starting  aa');
 	yield wait(10, 'aa promise');
 	yield delay(10, 'aa thunk');
