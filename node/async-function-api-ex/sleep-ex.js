@@ -42,30 +42,36 @@ function wait(opts, msec, val) {
 sleep.thunk = delay;
 sleep.promise = wait;
 
-sleep(1000, 'cb', (err, val) => console.log('sleep1', err, val));
-delay(1000, 'thunk')((err, val) => console.log('delay1', err, val));
+sleep(1000, 'cb',
+	(err, val) => console.log('sleep1', err, val));
+delay(1000, 'thunk')
+	((err, val) => console.log('delay1', err, val));
 wait(1000, 'promise')
-	.then(val => console.log('wait1', val),
+	.then(val => console.log('wait-1', val),
 		err => console.log('wait1e', err));
 wait(1500, 'promise')
 	.then(val => console.log('wait15', val))
 	.catch(err => console.log('wait15e', err));
 sleep(1600, () => console.log());
 
-sleep(2000, (err, val) => console.log('sleep2', err, val));
-delay(2000)((err, val) => console.log('delay2', err, val));
+sleep(2000,
+	(err, val) => console.log('sleep2', err, val));
+delay(2000)
+	((err, val) => console.log('delay2', err, val));
 wait(2000)
-	.then(val => console.log('wait2', val),
+	.then(val => console.log('wait-2', val),
 		err => console.log('wait2e', err));
 wait(2500)
 	.then(val => console.log('wait25', val))
 	.catch(err => console.log('wait25e', err));
 sleep(2600, () => console.log());
 
-sleep({}, 3000, (err, val) => console.log('sleep3', err, val));
-delay({}, 3000)((err, val) => console.log('delay3', err, val));
+sleep({}, 3000,
+	(err, val) => console.log('sleep3', err, val));
+delay({}, 3000)
+	((err, val) => console.log('delay3', err, val));
 wait({}, 3000)
-	.then(val => console.log('wait3', val),
+	.then(val => console.log('wait-3', val),
 		err => console.log('wait3e', err));
 wait({}, 3500)
 	.then(val => console.log('wait35', val))
