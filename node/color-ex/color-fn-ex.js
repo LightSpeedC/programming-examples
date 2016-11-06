@@ -10,7 +10,8 @@ void function () {
 			blue: csi + '34m',
 			magenta: csi + '35m',
 			cyan: csi + '36m',
-			white: csi + '37m'}
+			white: csi + '37m',
+			gray: csi + '90m'}
 	var bgColors = {
 			bgBlack: csi + '40m',
 			bgRed: csi + '41m',
