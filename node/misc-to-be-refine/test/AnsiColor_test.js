@@ -2,7 +2,7 @@
 
 'use strict';
 
-var c = '\u001B[';
+var c = '\x1B[';
 function p2(n) { return n < 10 ? ' ' + n : n; }
 var s = '     ';
 for (var n = 30; n < 38; ++n) s += p2(n) + '     ';
