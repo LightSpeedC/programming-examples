@@ -19,6 +19,7 @@ void function () {
 	}
 
 
+	println(dir);
 	const tree = searchFiles(dir, 3, regex);
 
 	function searchFiles(dir, maxDepth) {
