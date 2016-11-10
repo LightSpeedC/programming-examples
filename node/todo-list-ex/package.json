@@ -1,0 +1,19 @@
+{
+  "name": "todo-list-ex",
+  "version": "0.0.0",
+  "description": "todo list",
+  "main": "todo-show.js",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "merge-light": "0.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "todo"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
