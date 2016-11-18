@@ -1,0 +1,22 @@
+{
+  "name": "winser-nssm-ex",
+  "version": "0.0.0",
+  "description": "winser-nssm-ex",
+  "main": "server.js",
+  "dependencies": {
+    "winser": "^1.0.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "winser",
+    "nssm",
+    "windows",
+    "service"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
