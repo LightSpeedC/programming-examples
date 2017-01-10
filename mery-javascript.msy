@@ -234,6 +234,7 @@ location
 mimeTypes
 module
 module.exports
+module.parent
 navigator
 navigator.userAgent
 options
@@ -250,6 +251,7 @@ process.version
 radio
 regular expression
 require
+require.main
 screen
 self
 setImmediate
