@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html lang='ja'>
+	<!-- https://teratail.com/questions/61908 -->
+	<!-- 参考 http://qiita.com/ShibuyaKosuke/items/8c47ae51195ddc42ce67 -->
+	<head>
+		<meta charset='UTF-8'>
+		<title></title>
+		<style type='text/css'>
+		html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1.5em; }
+		td { text-align: center; }
+		.table_style { background-color: #ddffff; }
+		thead { background-color: #ccffcc; }
+		</style>
+	</head>
+	<body>
+		<div id="$calendar"></div>
+		<script type="text/javascript">
+
+//addEventlistener および attachEvent かを 判断(関数addListener)＝＝作成
+function addListener(element, event, listener) {
+	if (element.addEventListener)
+		element.addEventListener(event, listener, false);
+	else if (element.attachEvent)
+		element.attachEvent('on' + event, listener);
+	else
+		throw new Error('イベントリスナに未対応です。');
+};
+//上記 判断がら 関数を実行(div#calendar を 扱い其のelement から 
+//日付のDATAオブジェクトを 要素と絡めて カレンダーを 構築
+addListener(window, 'load', calendar_00);
+
+//関数koyomi()＝＝カレンダーを LOAD時 に画面に出力 
+function calendar_00() {
+	var currentmeantime = new Date(2017, 1, 1);
+
+	var year = currentmeantime.getFullYear();
+	var month = currentmeantime.getMonth() + 1;
+	currentmeantime.setDate(1);
+
+	var monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	var numOfMonth = monthDays[month - 1];
+
+	var daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+
+	var column;
+
+	if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0)))
+		numOfMonth = 29;
+
+	var str = '<table class="table_style">';
+
+	str += '<thead>';
+	str += '<tr>';
+	for (var i = 0; i <= 6; i++)
+		str += '<th>' + daysOfWeek[i] + '</th>';
+	str += '</tr>';
+	str += '</thead>';
+
+	str += '<tbody>';
+	str += '<tr>';
+	for (column = 0; column < currentmeantime.getDay() ; column++)
+		str += '<td></td>';
+
+	for (var i = 1; i <= numOfMonth; i++) {
+		str += '<td>' + i + '</td>';
+		if (column == 6) {
+			str += '</tr>';
+			column = 0;
+			if (!(i == numOfMonth))
+				str += '<tr>';
+		} else
+			column++;
+	}
+	str += '</tbody>';
+	str += '</table>';
+	$calendar.innerHTML = str;
+};
+
+		</script>
+	</body>
+</html>

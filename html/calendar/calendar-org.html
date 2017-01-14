@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<!-- http://qiita.com/ShibuyaKosuke/items/8c47ae51195ddc42ce67 -->
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+
+		<div id="calendar"></div>
+
+		<script type="text/javascript">
+			function calendar(element, y, m) {
+
+				var weeks = ['日', '月', '火', '水', '木', '金', '土'];
+
+				var start_dt = new Date(y, m - 1, 1);
+				start_dt.setDate(start_dt.getDate() - start_dt.getDay());
+				var end_dt = new Date(y, m, 0);
+				end_dt.setDate(end_dt.getDate() + (7 - end_dt.getDay()));
+
+				var table = document.createElement('table');
+				element.appendChild(table);
+
+				var caption = document.createElement('caption');
+				caption.innerHTML = y + '/' + m;
+				table.appendChild(caption);
+
+				var thead = document.createElement('thead');
+				table.appendChild(thead);
+
+				var tr = document.createElement('tr');
+				thead.appendChild(tr);
+				for (var i in weeks) {
+					var th = document.createElement('th');
+					th.innerHTML = weeks[i];
+					tr.appendChild(th);
+				}
+
+				var tbody = document.createElement('tbody');
+				table.appendChild(tbody);
+
+				while (start_dt < end_dt) {
+					if (start_dt.getDay() === 0) {
+						var tr = document.createElement('tr');
+						tbody.appendChild(tr);
+					}
+					var td = document.createElement('td');
+					td.innerHTML = start_dt.getDate();
+					tr.appendChild(td);
+
+					start_dt.setDate(start_dt.getDate() + 1);
+				}
+			}
+
+			calendar(document.getElementById('calendar'), 2017, 1);
+		</script>
+	</body>
+</html>

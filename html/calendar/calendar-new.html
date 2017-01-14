@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<!-- http://qiita.com/ShibuyaKosuke/items/8c47ae51195ddc42ce67 -->
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+		html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1.5em; }
+		td { text-align: center; }
+		</style>
+	</head>
+	<body>
+
+		<div id="$calendar1"></div>
+		<hr/>
+		<div id="$calendar2"></div>
+		<hr/>
+		<div id="$calendar3"></div>
+
+		<script type="text/javascript">
+			function calendar(element, y, m) {
+				var h = document.createElement.bind(document);
+				var weeks = ['日', '月', '火', '水', '木', '金', '土'];
+
+				var start_dt = new Date(y, m - 1, 1);
+				console.log(y, m, start_dt.toLocaleDateString());
+				start_dt.setDate(start_dt.getDate() - start_dt.getDay());
+				console.log(y, m, start_dt.toLocaleDateString());
+				var end_dt = new Date(y, m, 0);
+				console.log(y, m, end_dt.toLocaleDateString());
+				end_dt.setDate(end_dt.getDate() + (7 - end_dt.getDay()));
+				console.log(y, m, end_dt.toLocaleDateString());
+
+				var table = h('table');
+				element.appendChild(table);
+
+				var caption = h('caption');
+				caption.innerHTML = y + '/' + m;
+				table.appendChild(caption);
+
+				var thead = h('thead');
+				table.appendChild(thead);
+
+				var tr = h('tr');
+				thead.appendChild(tr);
+				for (var i in weeks) {
+					var th = h('th');
+					th.innerHTML = weeks[i];
+					tr.appendChild(th);
+				}
+
+				var tbody = h('tbody');
+				table.appendChild(tbody);
+
+				while (start_dt < end_dt) {
+					if (start_dt.getDay() === 0) {
+						var tr = h('tr');
+						tbody.appendChild(tr);
+					}
+					var td = h('td');
+					td.innerHTML = start_dt.getMonth() === m - 1 ?
+						start_dt.getDate() : ' ';
+					tr.appendChild(td);
+
+					start_dt.setDate(start_dt.getDate() + 1);
+				}
+			}
+
+			//calendar(document.getElementById('calendar'), 2017, 1);
+			calendar($calendar1, 2016, 12);
+			calendar($calendar2, 2017, 1);
+			calendar($calendar3, 2017, 2);
+		</script>
+	</body>
+</html>

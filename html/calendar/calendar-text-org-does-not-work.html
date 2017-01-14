@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<!-- http://qiita.com/ShibuyaKosuke/items/8c47ae51195ddc42ce67 -->
+	<!-- https://teratail.com/questions/61908 -->
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+		html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1.5em; }
+		td { text-align: center; }
+		</style>
+	</head>
+	<body>
+
+		<div id="calendar"></div>
+		<hr/>
+		<div id="calendar_00"></div>
+		<hr/>
+		<div id="$calendar1"></div>
+		<hr/>
+		<div id="$calendar2"></div>
+		<hr/>
+		<div id="$calendar3"></div>
+
+		<script type="text/javascript">
+
+//addEventlistener および attachEvent かを 判断(関数addListener)＝＝作成
+function addListener(element, event, listener) {
+	//addEventlistener(InternetExplorer以外)の処理
+	if (element.addEventListener) {
+		element.addEventListener(event, listener, false);
+		//attachEvent(InternetExplorer および其の)処理
+	} else if (element.attachEvent) {
+		element.attachEvent('on' + event, listener);
+	} else {
+		//どちらも 扱えない 場合の 処理
+		throw new Error('イベントリスナに未対応です。');
+	}
+};
+//上記 判断がら 関数を実行(div#calendar を 扱い其のelement から 
+//日付のDATAオブジェクトを 要素と絡めて カレンダーを 構築
+addListener(window, 'load', init);
+addListener(window, 'load', calendar_00);
+
+//init()関数 
+function init() {
+	var element = document.getElementById("calendar");
+	//calendar の 範囲 style.backgroundColor="red" 赤色表記(確認用)  
+	return element.style.backgroundColor = "red";
+};
+
+//関数koyomi()＝＝カレンダーを LOAD時 に画面に出力 
+function calendar_00() {
+	var calendar_00 = document.getElementById("calendar_00");
+
+	var currentmeantime = new Date();
+
+	var year = currentmeantime.getFullYear();
+	var month = currentmeantime.getMonth() + 1;
+	currentmeantime.setDate(1);
+
+	var monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	var numOfMonth = monthDays[month - 1];
+
+	var daysOfWeek = ['日', '月', '火', '水', '木', '金', '土'];
+
+	var column;
+	var i;
+
+	if (month == 2 && ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))) {
+		numOfMonth = 29;
+	}
+	calendar_00.innerHTML = "<table class='table_style'>";
+
+	calendar_00.innerHTML += "<tr>";
+	for (i = 0; i <= 6; i++) {
+		calendar_00.innerHTML += "<th>" + daysOfWeek[i] + "</th>";
+	}
+	calendar_00.innerHTML += "</tr>";
+
+	calendar_00.innerHTML += "<tr>";
+	for (column = 0; column < currentmeantime.getDay() ; column++) {
+		calendar_00.innerHTML += "<td></td>";
+	}
+
+	for (i = 1; i <= numOfMonth; i++) {
+		calendar_00.innerHTML += "<td>" + i + "</td>";
+		if (column == 6) {
+
+			calendar_00.innerHTML += "</tr>";
+
+			column = 0;
+			if (!(i == numOfMonth)) {
+				calendar_00.innerHTML += "<tr>";
+			}
+		} else {
+			column++;
+		}
+	}
+
+	calendar_00.innerHTML += "</table>";
+
+	return calendar_00;
+};
+		</script>
+	</body>
+</html>
