@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>scroll window</title>
+		<style type="text/css">
+		html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1.5em; }
+		td { text-align: center; }
+		html { background-color: #ccf; }
+		#app_header  { background-color: #cfc; }
+		#app_toolbar { background-color: #cff; }
+		#app_work {
+			background-color: #ffc;
+			position: fixed;
+			top: 120px; left: 8px; bottom: 8px; right: 0px;
+			overflow-y: scroll;
+		}
+		#app_footer {
+			background-color: #fcc;
+			position: fixed;
+			left: 8px; bottom: 0px; right: 0px;
+			height: 80px;
+			overflow-y: scroll;
+		}
+		</style>
+		<!--
+		<script src="https://unpkg.com/react@15/dist/react.min.js"></script>
+		<script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.38/browser.min.js"></script>
+		-->
+	</head>
+	<body>
+
+		<div class="">
+			<div id="app_header">
+				<script>
+				for (var i = 11; i <= 20; ++i)
+					document.writeln('<span>(' + i + ' app header)</span>');
+				</script>
+			</div>
+			<div id="app_toolbar">
+				<script>
+				for (var i = 11; i <= 20; ++i)
+					document.writeln('<span>(' + i + ' app toolbar)</span>');
+				</script>
+			</div>
+			<div id="app_work">
+				<script>
+				for (var i = 11; i <= 50; ++i)
+					document.writeln(
+						'<div id="app_work_' + i + '">(' + i + ' app work)</div>');
+				setTimeout(function () {
+					app_work.scrollTop = 10000000;
+				}, 100);
+				</script>
+			</div>
+			<div id="app_footer">
+				<script>
+				for (var i = 11; i <= 25; ++i)
+					document.writeln('<div>(' + i + ' app footer)</div>');
+				</script>
+			</div>
+		</div>
+
+		<!--<script type="text/babel">-->
+		<script>
+			function resize1() {
+				var h = app_toolbar.getBoundingClientRect();
+				var f = app_footer.getBoundingClientRect();
+				app_work.style.top = (h.bottom + 8) + 'px';
+				app_work.style.bottom = (f.bottom - f.top) + 'px';
+				app_footer.scrollTop = 100000; //app_footer.clientHeight; //f.bottom;
+			}
+			addEventListener('load', resize1);
+			addEventListener('resize', resize1);
+
+			addEventListener('load', function () {
+				var iii = 51; nnn = 99;
+
+				var ttt = setInterval(function () {
+					var e = document.createElement('div');
+					e.id = 'app_work_' + iii;
+					e.innerHTML = '(' + iii + ' app work)';
+					app_work.appendChild(e);
+					app_work.scrollTop = 100000;
+
+					var bb = app_work.getBoundingClientRect();
+					var bbi = window['app_work_' + iii].getBoundingClientRect();
+					console.log('work:', bb.top, bb.bottom,
+						'scTop:', app_work.scrollTop,
+						'app_work', iii, ':', bbi.top, bbi.bottom);
+
+					if (++iii > nnn) clearInterval(ttt);
+				}, 100);
+
+				var w_sc_top = 0;
+				var w_bb = app_work.getBoundingClientRect();
+				setInterval(function () {
+					var x = app_work.scrollTop;
+					var bb = app_work.getBoundingClientRect();
+					if (w_sc_top !== x ||
+						bb.top !== w_bb.top ||
+						bb.bottom !== w_bb.bottom) {
+
+						console.log('work:', bb.top, bb.bottom, '(' + (bb.bottom - w_bb.bottom) + ')',
+							'scTop:', x, '(' + (x - w_sc_top) + ')');
+						w_sc_top = x;
+						w_bb = bb;
+					}
+				}, 100);
+			});
+		</script>
+	</body>
+</html>
