@@ -34,5 +34,10 @@ class EventEmitter {
 		return this;
 	}
 }
+
 EventEmitter.prototype.addEventListener = EventEmitter.prototype.on;
 EventEmitter.prototype.removeEventListener = EventEmitter.prototype.off;
+
+EventEmitter.prototype.subscribe = EventEmitter.prototype.on;
+EventEmitter.prototype.unsubscribe = EventEmitter.prototype.off;
+EventEmitter.prototype.publish = EventEmitter.prototype.emit;
