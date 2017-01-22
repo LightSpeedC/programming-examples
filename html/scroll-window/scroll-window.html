@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+		html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1.5em; }
+		td { text-align: center; }
+		html { background-color: #ccf; }
+		#app_header  { background-color: #cfc; }
+		#app_toolbar { background-color: #cff; }
+		#app_work {
+			background-color: #ffc;
+			position: fixed;
+			top: 120px; left: 8px; bottom: 8px; right: 0px;
+			overflow-y: scroll;
+		}
+		#app_footer {
+			background-color: #fcc;
+			position: fixed;
+			left: 8px; bottom: 0px; right: 0px;
+			height: 80px;
+			overflow-y: scroll;
+		}
+		</style>
+		<!--
+		<script src="https://unpkg.com/react@15/dist/react.min.js"></script>
+		<script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.38/browser.min.js"></script>
+		-->
+	</head>
+	<body>
+
+		<script>
+			function lpad(x, n) {
+				return ('0000000000' + x).substr(-n);
+			}
+		</script>
+
+		<div class="">
+			<div id="app_header">
+				<script>
+				for (var i = 1; i <= 10; ++i)
+					document.writeln('<span>(' + lpad(i, 2) + ' app header)</span>');
+				</script>
+			</div>
+			<div id="app_toolbar">
+				<script>
+				for (var i = 1; i <= 10; ++i)
+					document.writeln('<span>(' + lpad(i, 2) + ' app toolbar)</span>');
+				</script>
+			</div>
+			<div id="app_work">
+				<script>
+				for (var i = 1; i <= 20; ++i)
+					document.writeln('<p>(' + lpad(i, 2) + ' app work)</p>');
+				</script>
+			</div>
+			<div id="app_footer">
+				<script>
+				for (var i = 1; i <= 15; ++i)
+					document.writeln('<div>(' + lpad(i, 2) + ' app footer)</div>');
+				</script>
+			</div>
+		</div>
+
+		<!--<script type="text/babel">-->
+		<script>
+			function resize1() {
+				var h = app_toolbar.getBoundingClientRect();
+				//console.log(h);
+				var f = app_footer.getBoundingClientRect();
+				//console.log(f);
+				app_work.style.top = (h.bottom + 8) + 'px';
+				app_work.style.bottom = (f.bottom - f.top) + 'px';
+				app_footer.scrollTop = 10000; //app_footer.clientHeight; //f.bottom;
+			}
+			addEventListener('load', resize1);
+			addEventListener('resize', resize1);
+		</script>
+	</body>
+</html>
