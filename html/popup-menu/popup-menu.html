@@ -1,0 +1,82 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>右クリック、メニュー</title>
+	</head>
+	<body>
+
+		<style type="text/css">
+		#menu {
+			position: absolute;
+			background-color: #ccffff;
+			padding: 3pt;
+			/* font-size: 15px; */
+			/* background-image: url('image.png'); */
+			filter: alpha(opacity=85);
+			visibility: hidden;
+		}
+
+		a.tono {
+			width: 100%;
+			white-space: nowrap;
+			background-color: white;
+		}
+
+		a.tono:link {
+			color: black;
+			text-decoration: none;
+		}
+
+		a.tono:visited {
+			color: black;
+			text-decoration: none;
+		}
+
+		a.tono:hover {
+			color: white;
+			background-color: blue;
+		}
+		</style>
+		<!--<div style="position; fixed;">-->
+			<div id="menu">
+				<div align="center"><a class="tono" href="./index.html?1" target="_self">リンク先1.</a></div>
+				<div align="center"><a class="tono" href="./index.html?2" target="_self">リンク先2..</a></div>
+				<div align="center">&nbsp;</div>
+				<div align="center"><a class="tono" href="./index.html?3" target="_self">リンク先3...</a></div>
+				<div align="center"><a class="tono" href="./index.html?4" target="_self">リンク先4....</a></div>
+				<div align="center"><a class="tono" href="./index.html?5" target="_self">リンク先5.....</a></div>
+			</div>
+		<!--</div>-->
+
+		<script>
+		addEventListener('load', function () {
+			for (var i = 1; i <= 2000; ++i) {
+				var elem = document.createElement('span');
+				elem.innerHTML = '(' + i + ') This is a sentence. ';
+				document.body.appendChild(elem);
+			}
+		});
+
+		document.oncontextmenu = OnRightButton;
+		document.onclick = OnLeftButton;
+
+		function OnRightButton() {
+			menu.style.top = document.body.scrollTop + event.y;
+			menu.style.left = document.body.scrollLeft + event.x;
+
+			if (menu.style.width < 120) menu.style.width = 120;
+
+			menu.style.visibility = 'visible';
+			return false;
+		}
+
+		function OnLeftButton() {
+			menu.style.visibility = 'hidden';
+			return true;
+		}
+
+		</script>
+
+	</body>
+</html>
