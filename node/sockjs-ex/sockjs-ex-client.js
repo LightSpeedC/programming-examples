@@ -1,4 +1,4 @@
-const SockJS = require('sockjs-client');
+// SockJS
 var sock = new SockJS('https://localhost:9050/echo');
 sock.onopen = function() {
 	console.log('open');
