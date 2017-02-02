@@ -4,12 +4,15 @@
   "description": "",
   "main": "socket-io-server.js",
   "dependencies": {
-    "socket.io": "^1.7.2"
+    "socket.io": "^1.7.2",
+    "socket.io-client": "^1.7.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["socket.io"],
+  "keywords": [
+    "socket.io"
+  ],
   "author": "LightSpeedC",
   "license": "MIT"
 }
