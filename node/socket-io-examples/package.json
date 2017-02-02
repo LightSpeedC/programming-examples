@@ -2,14 +2,14 @@
   "name": "socket-io-examples",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "socket-io-server.js",
+  "dependencies": {
+    "socket.io": "^1.7.2"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "socket.io": "^1.7.2"
-  }
+  "keywords": ["socket.io"],
+  "author": "LightSpeedC",
+  "license": "MIT"
 }

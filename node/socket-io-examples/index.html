@@ -1,0 +1,57 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Socket.IO chat</title>
+		<style>
+			* { margin: 0; padding: 0; box-sizing: border-box; }
+			body { font: 13px Helvetica, Arial; }
+			form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+			form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+			form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+			#messages { list-style-type: none; margin: 0; padding: 0; }
+			#messages li { padding: 5px 10px; }
+			#messages li:nth-child(odd) { background: #eee; }
+		</style>
+	</head>
+	<body>
+		<ul id="my-messages"></ul>
+		<form id="my-form" action="">
+			<input id="my-message" autocomplete="off" /><button>Send</button>
+		</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+(function () {
+	var socket = io();
+	var gpSessionId;
+
+	var $myForm = document.getElementById('my-form');
+	var $myMessage = document.getElementById('my-message');
+	var $myMessages = document.getElementById('my-messages');
+
+	$myForm.onsubmit = function () {
+		socket.emit('chat message', $myMessage.value);
+		$myMessage.value = '';
+		return false;
+	};
+
+	socket.on('chat message', onReceiveMessage);
+	socket.on('session id', sessionId => {
+		(sessionStorage.gp || {}).sessionId = sessionId;
+		console.log(sessionStorage.gp);
+		//sessionStorage.gp = {sessionId};
+	});
+	//socket.on('hi', onReceiveMessage);
+	//socket.on('some event', onReceiveMessage);
+
+	function onReceiveMessage(msg) {
+		if (typeof msg === 'object') msg = JSON.stringify(msg);
+		var li = document.createElement('li');
+		li.innerHTML = msg;
+		$myMessages.appendChild(li);
+	}
+})();
+</script>
+
+	</body>
+</html>
