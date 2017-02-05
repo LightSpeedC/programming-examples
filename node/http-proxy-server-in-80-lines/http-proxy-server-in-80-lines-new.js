@@ -12,7 +12,7 @@ void function () {
 	}
 
 	const server = http.createServer(function onCliReq(cliReq, cliRes) {
-		var svrSoc;
+		let svrSoc;
 		const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
 		const svrReq = http.request({host: PROXY_HOST || x.hostname,
 				port: PROXY_PORT || x.port || 80,
@@ -35,7 +35,7 @@ void function () {
 
 	server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
 		const x = url.parse('https://' + cliReq.url);
-		var svrSoc;
+		let svrSoc;
 		if (PROXY_URL) {
 			const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
 					path: cliReq.url, method: cliReq.method, headers: cliReq.headers,
