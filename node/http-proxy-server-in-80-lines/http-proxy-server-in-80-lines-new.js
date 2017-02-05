@@ -23,11 +23,9 @@ const server = http.createServer(function onCliReq(cliReq, cliRes) {
     cliRes.end('<h1>' + err.message + '<br/>' + cliReq.url + '</h1>');
     onErr(err, 'svrReq', x.hostname + ':' + (x.port || 80), svrSoc);
   });
-}).listen(HTTP_PORT);
-
-server.on('clientError', (err, soc) => onErr(err, 'cliErr', '', soc));
-
-server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
+})
+.on('clientError', (err, soc) => onErr(err, 'cliErr', '', soc))
+.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
   const x = url.parse('https://' + cliReq.url);
   let svrSoc;
   if (PROXY_URL) {
@@ -56,17 +54,16 @@ server.on('connect', function onCliConn(cliReq, cliSoc, cliHead) {
     svrSoc.on('error', err => onErr(err, 'svrSoc', cliReq.url, cliSoc));
   }
   cliSoc.on('error', err => onErr(err, 'cliSoc', cliReq.url, svrSoc));
-});
-
-server.on('connection', function onConn(cliSoc) {
+})
+.on('connection', function onConn(cliSoc) {
   cliSoc.$agent = new http.Agent({keepAlive: true});
   cliSoc.$agent.on('error', err => console.log('agent:', err));
-});
+})
+.listen(HTTP_PORT, () =>
+  console.log('http proxy server started on port ' + HTTP_PORT +
+    (PROXY_URL ? ' -> ' + PROXY_HOST + ':' + PROXY_PORT : '')));
 
 function onErr(err, msg, url, soc) {
   if (soc) soc.end();
-  console.log('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err);
+  console.log('%s %s: %s', new Date().toLocaleTimeString(), msg, url, err + '');
 }
-
-console.log('http proxy server started on port ' + HTTP_PORT +
-    (PROXY_URL ? ' -> ' + PROXY_HOST + ':' + PROXY_PORT : ''));
