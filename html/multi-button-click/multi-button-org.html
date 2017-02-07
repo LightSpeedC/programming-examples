@@ -1,0 +1,33 @@
+<!-- https://teratail.com/questions/63801 -->
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script>
+$(function(){
+	$(".enter").click(function(){
+		if($('#a1' && '#b2')){
+			alert('これはa1とb2です');
+		}
+	});
+});
+</script>
+<div id="content">
+	<form>
+		<div class="agun">
+			<p>
+				<input type="button" id="a1" />
+				<input type="button" id="a2" />
+			</p>
+		</div>
+		<div class="bgun">
+			<p>
+				<input type="button" id="b1" />
+				<input type="button" id="b2" />
+			</p>
+		</div>
+		<div>
+			<p>
+				<input type="button" value="入力" class="enter" />
+				<input type="reset" />
+			</p>
+		</div>
+	</form>
+</div>

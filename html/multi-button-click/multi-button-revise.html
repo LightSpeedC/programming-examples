@@ -1,0 +1,154 @@
+<!doctype html>
+<html>
+<head>
+<!-- https://teratail.com/questions/63801 -->
+<meta charset="UTF-8">
+
+<style>
+.selected-class { background-color: green; color: white; }
+.enter          { background-color: lightyellow; }
+#message        { background-color: lightyellow; }
+#message2       { background-color: lightyellow; }
+
+.radio-buttons-class input { display: none; }
+.radio-buttons-class label {
+	display: block;
+	float: left;
+	cursor: pointer;
+	width: 40px;
+	margin: 0;
+	padding: 3px;
+	background: lightgray;
+	color: gray;
+	text-align: center;
+	transition: .5s;
+	border: 0px;
+}
+.radio-buttons-class label:first-of-type { border-radius: 5px 0 0 5px; }
+.radio-buttons-class label:last-of-type  { border-radius: 0 5px 5px 0; }
+.radio-buttons-class input:checked + label {
+	background-color: blue;
+	color: white;
+	border: 0px;
+}
+.radio-buttons-class span { float: left; }
+</style>
+
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<script>
+$(function () {
+	var NONE = '無';
+	var state = {a: {a1:0, a2:0, a3:0}, b: {b1:0, b2:0, b3:0}};
+	var elems = {}, selected = {};
+
+	$('#enter').click(function () {
+		/*
+		if      (state.a.a1 && state.b.b1) alert('これはa1とb1です');
+		else if (state.a.a2 && state.b.b1) alert('これはa2とb1です');
+		else if (state.a.a1 && state.b.b2) alert('これはa1とb2です');
+		else if (state.a.a2 && state.b.b2) alert('これはa2とb2です');
+		// ...
+		else alert('選択が足りない!');
+		// ↑これらのコード要る?
+		*/
+		alert('「' + selected.a + '」と「' + selected.b + '」が選択されました');
+	});
+	Object.keys(state).forEach(function (x) {
+		var statex = state[x], elemsx = elems[x] = {};
+		selected[x] = NONE;
+		Object.keys(statex).forEach(function (y) {
+			var elem = elemsx[y] = $('#' + y);
+			elem.click(function () {
+				statex[y] ^= 1, elem.toggleClass('selected-class');
+				selected[x] = statex[y] ? y : NONE;
+				Object.keys(statex).forEach(function (yy) {
+					if (y === yy) return;
+					if (statex[yy])
+						statex[yy] ^= 1, elemsx[yy].toggleClass('selected-class');
+				});
+				msg();
+			});
+		});
+	});
+	var $message = $('#message');
+	msg();
+	function msg() {
+		var x = '「' + selected.a + '」と「' + selected.b + '」が選択されました';
+		$message.text(x);
+	}
+});
+
+addEventListener('load', function () {
+	// ここからラジオボタン形式の場合 (jQueryも要らないかな)
+	var NONE = '無';
+	var state2 = {c: {c1:0, c2:0, c3:0}, d: {d1:0, d2:0, d3:0}};
+	var selected2 = {};
+
+	Object.keys(state2).forEach(function (x) {
+		selected2[x] = NONE;
+		Object.keys(state2[x]).forEach(function (y) {
+			document.getElementById(y).onclick = function () {
+				selected2[x] = y;
+				msg2();
+			};
+		});
+	});
+
+	msg2();
+	function msg2() {
+		var x = '「' + selected2.c + '」と「' + selected2.d + '」が選択されました';
+		message2.innerHTML = x;
+	}
+});
+// 指摘事項
+// 1. 見映え: <input value="a1" /> の value を追加
+// 2. class="enter" と $('.enter') は id="enter" と $('#enter') が良い
+// 3. もしA群とB群はそれぞれ1つしか選べないのなら、radioボタンがいいと思う
+// *. そもそも codeが足りなさ過ぎて、問題が理解できない
+// *. HTMLではダブルクォート、JSではシングルクォートを使うといいですよ。JavaScript Coding Style
+</script>
+</head>
+<body>
+<div id="content">
+	<form>
+		<p id="message">...</p>
+		<div class="agun">
+			<span>A群:</span>
+			<input type="button" id="a1" value="a1" />
+			<input type="button" id="a2" value="a2" />
+			<input type="button" id="a3" value="a3" />
+		</div>
+		<div class="bgun">
+			<span>B群:</span>
+			<input type="button" id="b1" value="b1" />
+			<input type="button" id="b2" value="b2" />
+			<input type="button" id="b3" value="b3" />
+		</div>
+		<p>
+			<input type="button" value="入力" class="enter" id="enter" />
+			<input type="reset" />
+		</p>
+	</form>
+
+	<hr/>
+
+	<form>
+		<p id="message2">...</p>
+		<div>
+			<span>C群:</span>
+			<label><input type="radio" name="c" id="c1" value="c1">c1</label>
+			<label><input type="radio" name="c" id="c2" value="c2">c2</label>
+			<label><input type="radio" name="c" id="c3" value="c3">c3</label>
+		</div>
+		<div class="radio-buttons-class">
+			<span>D群:</span>
+			<input type="radio" name="d" id="d1" value="d1"><label for="d1">d1</label>
+			<input type="radio" name="d" id="d2" value="d2"><label for="d2">d2</label>
+			<input type="radio" name="d" id="d3" value="d3"><label for="d3">d3</label>
+		</div>
+	</form>
+
+</div>
+</body>
+</html>
