@@ -1,5 +1,7 @@
 // EventEmitter
 
+// http://nodejs.jp/nodejs.org_ja/api/events.html
+
 const EventEmitter = (function () {
 
 	// EventEmitter
@@ -11,43 +13,80 @@ const EventEmitter = (function () {
 
 		// reset
 		reset() {
-			this.listeners = Object.create(null);
-			this.listeners1 = Object.create(null);
+			this.$listeners0 = Object.create(null);
+			this.$listeners1 = Object.create(null);
 			return this;
+		}
+
+		// addListener
+		addListener(event, listener) {
+			// this.emit('newListener', event, listener);
+			if (!this.$listeners0) this.$listeners0 = Object.create(null);
+			return addListener(this.$listeners0, event, listener), this;
 		}
 
 		// on
 		on(event, listener) {
-			if (!this.listeners) this.listeners = Object.create(null);
-			return add(this.listeners, event, listener), this;
+			// this.emit('newListener', event, listener);
+			if (!this.$listeners0) this.$listeners0 = Object.create(null);
+			return addListener(this.$listeners0, event, listener), this;
 		}
 
-		// one
-		one(event, listener) {
-			if (!this.listeners1) this.listeners1 = Object.create(null);
-			return add(this.listeners1, event, listener), this;
+		// once
+		once(event, listener) {
+			// this.emit('newListener', event, listener);
+			if (!this.$listeners1) this.$listeners1 = Object.create(null);
+			return addListener(this.$listeners1, event, listener), this;
+		}
+
+		// removeListener
+		removeListener(event, listener) {
+			if (!event) return this.reset();
+			removeListener(this.$listeners0, event, listener);
+			removeListener(this.$listeners1, event, listener);
+			return this;
+		}
+
+		// removeAllListeners
+		removeAllListeners(event) {
+			if (!event) return this.reset();
+			removeAllListeners(this.$listeners0, event);
+			removeAllListeners(this.$listeners1, event);
+			return this;
 		}
 
 		// off
 		off(event, listener) {
 			if (!event) return this.reset();
-			remove(this.listeners, event, listener);
-			remove(this.listeners1, event, listener);
+			removeListener(this.$listeners0, event, listener);
+			removeListener(this.$listeners1, event, listener);
 			return this;
 		}
 
-		// fire
-		fire(event, ...args) {
-			fire(this.listeners, event, args);
-			fire(this.listeners1, event, args);
-			if (this.listeners1 && this.listeners1[event])
-				delete this.listeners1[event];
+		// emit(event, ...args)
+		emit(event, ...args) {
+			emit(this.$listeners0, event, args);
+			emit(this.$listeners1, event, args);
+			if (this.$listeners1 && this.$listeners1[event])
+				delete this.$listeners1[event];
 			return this;
 		}
 
-		// mixin
+		// listeners(event)
+		listeners(event) {
+			return (this.$listeners0 && this.$listeners0[event] || [])
+				.concat(this.$listeners1 && this.$listeners1[event] || []);
+		}
+
+		// setMaxListeners(n)
+		// static defaultMaxListeners
+		// static listenerCount(emitter, event)
+
+		// static mixin
 		static mixin(Class) {
-			Object.getOwnPropertyNames(EventEmitter.prototype).forEach(x => {
+			Object.getOwnPropertyNames(EventEmitter.prototype)
+				.filter(x => x !== 'constructor')
+				.forEach(x => {
 				if (Class.prototype[x]) return;
 				Object.defineProperty(Class.prototype, x, {
 					value: EventEmitter.prototype[x],
@@ -55,37 +94,46 @@ const EventEmitter = (function () {
 				});
 			});
 		}
+
+		// Event: newListener
+		// Event: removeListener
 	}
 
-	// add
-	function add(listeners, event, listener) {
-		(listeners[event] || (listeners[event] = [])).push(listener);
+	// addListener
+	function addListener($listeners0, event, listener) {
+		($listeners0[event] || ($listeners0[event] = [])).push(listener);
 	}
 
-	// remove
-	function remove(listeners, event, listener) {
-		if (!listeners || !listeners[event]) return;
-		if (!listener) return delete listeners[event];
+	// removeListener
+	function removeListener($listeners0, event, listener) {
+		if (!$listeners0 || !$listeners0[event]) return;
+		if (!listener) return delete $listeners0[event];
 
-		listeners[event] = listeners[event].filter(fn => fn !== listener);
-		if (listeners[event].length === 0) delete listeners[event]
+		$listeners0[event] = $listeners0[event].filter(fn => fn !== listener);
+		if ($listeners0[event].length === 0) delete $listeners0[event]
 	}
 
-	// fire
-	function fire(listeners, event, args) {
-		if (listeners && listeners[event])
-			listeners[event].forEach(listener => listener.apply(null, args));
+	// removeAllListeners
+	function removeAllListeners($listeners0, event) {
+		if (!$listeners0 || !$listeners0[event]) return;
+		delete $listeners0[event];
+	}
+
+	// emit
+	function emit($listeners0, event, args) {
+		if ($listeners0 && $listeners0[event])
+			$listeners0[event].forEach(listener => listener.apply(null, args));
 	}
 
 	alias(EventEmitter, 'clear', 'reset');
-	alias(EventEmitter, 'once', 'one');
-	alias(EventEmitter, 'addEventListener', 'on');
-	alias(EventEmitter, 'removeEventListener', 'off');
-	alias(EventEmitter, 'emit', 'fire');
+	alias(EventEmitter, 'one', 'once');
+	//alias(EventEmitter, 'addListener', 'on');
+	//alias(EventEmitter, 'removeListener', 'off');
+	alias(EventEmitter, 'fire', 'emit');
 	alias(EventEmitter, 'subscribe', 'on');
 	alias(EventEmitter, 'unsubscribe', 'off');
-	alias(EventEmitter, 'publish', 'fire');
-	alias(EventEmitter, 'trigger', 'fire');
+	alias(EventEmitter, 'publish', 'emit');
+	alias(EventEmitter, 'trigger', 'emit');
 
 	// alias
 	function alias(Class, x, y) {
@@ -96,25 +144,9 @@ const EventEmitter = (function () {
 		// Class.prototype[x] = Class.prototype[y];
 	}
 
-	// EventEmitter.prototype.clear = EventEmitter.prototype.reset;
-	// EventEmitter.prototype.once = EventEmitter.prototype.one;
-	// EventEmitter.prototype.addEventListener = EventEmitter.prototype.on;
-	// EventEmitter.prototype.removeEventListener = EventEmitter.prototype.off;
-	// EventEmitter.prototype.emit = EventEmitter.prototype.fire;
-	// EventEmitter.prototype.subscribe = EventEmitter.prototype.on;
-	// EventEmitter.prototype.unsubscribe = EventEmitter.prototype.off;
-	// EventEmitter.prototype.publish = EventEmitter.prototype.fire;
-	// EventEmitter.prototype.trigger = EventEmitter.prototype.fire;
-
 	return EventEmitter;
 
 })();
-
-// console.log(Object.keys(EventEmitter.prototype));
-// console.log(Object.getOwnPropertyNames(EventEmitter.prototype));
-// Object.getOwnPropertyNames(EventEmitter.prototype).forEach(x => {
-//	console.log(x, Object.getOwnPropertyDescriptor(EventEmitter.prototype, x));
-// });
 
 // class MyClass extends EventEmitter {};
 class MyClass {};
@@ -123,10 +155,10 @@ EventEmitter.mixin(MyClass);
 // var ee = new EventEmitter();
 var ee = new MyClass();
 ee.on('eventx', (arg1, arg2) => console.log('eventx', arg1, arg2));
-ee.fire('eventx', 11, 12);
-ee.fire('eventx', 21, 22);
+ee.emit('eventx', 11, 12);
+ee.emit('eventx', 21, 22);
 ee.one('event1', (arg1, arg2) => console.log('event1', arg1, arg2));
-ee.fire('event1', 11, 12);
-ee.fire('event1', 21, 22);
+ee.emit('event1', 11, 12);
+ee.emit('event1', 21, 22);
 ee.off('eventx');
-ee.fire('eventx', 31, 32);
+ee.emit('eventx', 31, 32);
