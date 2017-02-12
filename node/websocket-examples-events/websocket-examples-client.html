@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>WebSocket examples client</title>
+	</head>
+	<body>
+		<div id="container"></div>
+
+<script>
+onload = function () {
+	'use strict';
+
+	// EventEmitter
+	function EventEmitter() {
+		this.listeners0 = {};
+		this.listeners1 = {};
+	}
+	// on
+	EventEmitter.prototype.on = function on(event, listener) {
+		(this.listeners0[event] || (this.listeners0[event] = [])).push(listener);
+	};
+	// once
+	EventEmitter.prototype.once = function once(event, listener) {
+		(this.listeners1[event] || (this.listeners1[event] = [])).push(listener);
+	};
+	// emit
+	EventEmitter.prototype.emit = function emit(event) {
+		var args = [].slice.call(arguments, 1);
+		if (this.listeners0[event])
+			for (var i in this.listeners0[event])
+				this.listeners0[event][i].apply(null, args);
+		if (this.listeners1[event]) {
+			for (var i in this.listeners1[event])
+				this.listeners1[event][i].apply(null, args);
+			delete this.listeners1[event];
+		}
+	};
+
+	var clientNo = 0;
+	var container = document.getElementById('container');
+
+	drawText(clientNo + ': client started.');
+
+	connect();
+
+	// 接続
+	function connect() {
+		var ws, timer;
+		var ee = new EventEmitter();
+
+		try {
+			ws = new WebSocket('ws://localhost:8080/');
+		} catch (e) {
+			drawText(clientNo + ': ' + e);
+			reconnect();
+		}
+
+		ws.onopen = function open() {
+			drawText(clientNo + ': ws on open');
+			emit('message', clientNo + ': something from client');
+		};
+
+		ee.on('you are', function incoming(message) {
+			clientNo = message;
+			drawText(clientNo + ': received: you are ' + message);
+		});
+
+		ee.on('message', function incoming(message) {
+			drawText(clientNo + ': received: ' + message);
+		});
+
+		ws.onmessage = function incoming(ev) {
+			var message = ev.data;
+			var data = JSON.parse(message);
+			ee.emit(data.event, data.message);
+			//drawText(clientNo + ': received: ' + message);
+		};
+
+		var interval = setInterval(function () {
+			emit('message', clientNo + ': something from client every 3s');
+		}, 3000);
+
+		ws.onclose = function close() {
+			interval && (interval = clearInterval(interval));
+			drawText(clientNo + ': ws on close');
+			reconnect();
+		};
+
+		ws.onerror = function error(ev) {
+			drawText(clientNo + ': ws on error: ' + JSON.stringify(ev));
+			reconnect();
+		};
+
+		function reconnect() {
+			if (timer) clearTimeout(timer);
+			timer = setTimeout(function () { ws = connect(); }, 3000);
+		}
+
+		function emit(event, msg) {
+			ws.send(JSON.stringify({event: event, message: msg}));
+		}
+	}
+
+	function drawText(message) {
+		console.log(message);
+		const div = document.createElement('div');
+		div.innerHTML = message;
+		container.appendChild(div);
+	}
+};
+</script>
+
+	</body>
+</html>
