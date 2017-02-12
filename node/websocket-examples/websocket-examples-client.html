@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<title>WebSocket examples client</title>
+	</head>
+	<body>
+		<div id="container"></div>
+
+<script>
+onload = function () {
+	'use strict';
+
+	var clientNo = 0;
+	var container = document.getElementById('container');
+
+	drawText(clientNo + ': client started.');
+
+	connect();
+
+	// 接続
+	function connect() {
+		var ws, timer;
+
+		try {
+			ws = new WebSocket('ws://localhost:8080/');
+		} catch (e) {
+			drawText(clientNo + ': ' + e);
+			reconnect();
+		}
+
+		ws.onopen = function open() {
+			drawText(clientNo + ': ws on open');
+			ws.send(clientNo + ': something from client');
+		};
+
+		ws.onmessage = function incoming(ev) {
+			const message = ev.data;
+			if (message.substr(0, 8) === 'you are ')
+				clientNo = message.substr(8);
+			drawText(clientNo + ': received: ' + message);
+		};
+
+		var interval = setInterval(function () {
+			ws.send(clientNo + ': something from client every 3s');
+		}, 3000);
+
+		ws.onclose = function close() {
+			interval && (interval = clearInterval(interval));
+			drawText(clientNo + ': ws on close');
+			reconnect();
+		};
+
+		ws.onerror = function error(ev) {
+			drawText(clientNo + ': ws on error: ' + JSON.stringify(ev));
+			reconnect();
+		};
+
+		function reconnect() {
+			if (timer) clearTimeout(timer);
+			timer = setTimeout(function () { ws = connect(); }, 3000);
+		}
+	}
+
+	function drawText(message) {
+		console.log(message);
+		const div = document.createElement('div');
+		div.innerHTML = message;
+		container.appendChild(div);
+	}
+};
+</script>
+
+	</body>
+</html>

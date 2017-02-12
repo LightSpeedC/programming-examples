@@ -1,0 +1,20 @@
+{
+  "name": "websocket-examples",
+  "version": "0.0.0",
+  "description": "websocket-examples",
+  "main": "websocket-examples-server.js",
+  "private": true,
+  "dependencies": {
+    "control-c": "0.0.9",
+    "ws": "^2.0.3"
+  },
+  "scripts": {
+    "start": "node websocket-examples-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "websocket"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
