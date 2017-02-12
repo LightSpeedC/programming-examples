@@ -58,7 +58,7 @@ onload = function () {
 
 		function reconnect() {
 			if (timer) clearTimeout(timer);
-			timer = setTimeout(function () { connect(); }, 3000);
+			timer = setTimeout(connect, 3000);
 		}
 	}
 
