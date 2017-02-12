@@ -11,7 +11,7 @@ const wss = new WebSocket.Server({
 let clientSeq = 0;
 
 wss.on('connection', function connection(ws) {
-	const ev = new EventEmitter();
+	const ee = new EventEmitter();
 	const clientNo = (++clientSeq) + '';
 
 	function emit(event, msg) {
@@ -24,9 +24,25 @@ wss.on('connection', function connection(ws) {
 	emit('you are', clientNo);
 	console.log(clientNo + ': wss on connection');
 
-	ws.on('message', function incoming(message) {
+	ee.on('message', function (message) {
+		console.log(clientNo + ': message: ' + message);
+	});
+
+	ee.on('rpc-req', function (message) {
+		console.log(clientNo + ': rpc-req: ' + JSON.stringify(message));
+		ee.emit('rpc-req-' + message.method, message);
+	});
+
+	ee.on('rpc-req-add', function (message) {
+		emit('rpc-res',
+			{id: message.id, result: message.params.x + message.params.y});
+	});
+
+	ws.on('message', function (message) {
 		//try { console.log(JSON.parse(message)); } catch (e) {}
-		console.log(clientNo + ': received: ' + message);
+		const data = JSON.parse(message);
+		ee.emit(data.event, data.message);
+		//console.log(clientNo + ': received: ' + message);
 	});
 
 	setTimeout(() => emit('message', clientNo + ': something from server 0.2s'), 200);

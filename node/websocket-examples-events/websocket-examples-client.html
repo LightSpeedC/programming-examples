@@ -61,29 +61,29 @@ onload = function () {
 			emit('message', clientNo + ': something from client');
 		};
 
-		ee.on('you are', function incoming(message) {
+		ee.on('you are', function (message) {
 			clientNo = message;
-			drawText(clientNo + ': received: you are ' + message);
+			drawText(clientNo + ': you are: ' + message);
 		});
 
-		ee.on('message', function incoming(message) {
-			drawText(clientNo + ': received: ' + message);
+		ee.on('message', function (message) {
+			drawText(clientNo + ': message: ' + message);
 		});
 
-		ws.onmessage = function incoming(ev) {
-			var message = ev.data;
-			var data = JSON.parse(message);
+		ws.onmessage = function (ev) {
+			var data = JSON.parse(ev.data);
 			ee.emit(data.event, data.message);
-			//drawText(clientNo + ': received: ' + message);
 		};
 
 		var interval = setInterval(function () {
 			emit('message', clientNo + ': something from client every 3s');
+			rpc('add', {x:2, y:3}).then(res => drawText(JSON.stringify(res)));
 		}, 3000);
 
 		ws.onclose = function close() {
 			interval && (interval = clearInterval(interval));
 			drawText(clientNo + ': ws on close');
+			clientNo = 0;
 			reconnect();
 		};
 
@@ -100,6 +100,20 @@ onload = function () {
 		function emit(event, msg) {
 			ws.send(JSON.stringify({event: event, message: msg}));
 		}
+
+		var rpcSeq = 0;
+		function rpc(method, params) {
+			var id = clientNo + '.' + (++rpcSeq);
+			return new Promise(function (resolve, reject) {
+				emit('rpc-req', {id: id, method: method, params: params});
+				ee.once('rpc-res-' + id, resolve);
+			});
+		}
+
+		ee.on('rpc-res', function (message) {
+			ee.emit('rpc-res-' + message.id, message);
+		});
+
 	}
 
 	function drawText(message) {
