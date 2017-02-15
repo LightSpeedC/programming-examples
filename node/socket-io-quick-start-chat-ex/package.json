@@ -1,13 +1,13 @@
 {
-  "name": "socket-io-ex",
+  "name": "socket-io-quick-start-chat-ex",
   "version": "0.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "socket.io quick start chat application example",
+  "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["socket.io"],
+  "author": "LightSpeedC",
   "license": "MIT",
   "dependencies": {
     "express": "^4.14.1",
