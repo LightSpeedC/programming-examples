@@ -1,0 +1,40 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Socket.IO chat</title>
+		<style>
+			* { margin: 0; padding: 0; box-sizing: border-box; }
+			body { font: 13px Helvetica, Arial; }
+			form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
+			form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+			form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
+			#my_messages { list-style-type: none; margin: 0; padding: 0; }
+			#my_messages li { padding: 5px 10px; }
+			#my_messages li:nth-child(odd) { background: #eee; }
+		</style>
+	</head>
+	<body>
+		<ul id="my_messages"></ul>
+		<form id="my_form" action="">
+			<input id="my_input" autocomplete="off" /><button>Send</button>
+		</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io();
+	my_form.onsubmit = function () {
+		socket.emit('chat message', my_input.value);
+		my_input.value = '';
+		return false;
+	};
+	socket.on('chat message', appendToList);
+	socket.on('disconnect', () => appendToList('disconnect'));
+	function appendToList(msg) {
+		var li = document.createElement('li');
+		li.innerHTML = msg;
+		my_messages.appendChild(li);
+	}
+</script>
+
+	</body>
+</html>
