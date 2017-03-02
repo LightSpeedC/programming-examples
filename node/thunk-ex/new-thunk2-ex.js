@@ -6,7 +6,12 @@ void function () {
 
 	function delay(ms, val) {
 		console.log('delay', ms, val);
-		return new Thunk(cb => setTimeout(cb, ms, null, val));
+		return Thunk(function (cb) {
+			setTimeout(function (err, val) {
+				console.log('delay', ms, val, 'END');
+				cb(err, val);
+			}, ms, null, val);
+		});
 	}
 
 	delay(500, 'a')
@@ -18,10 +23,12 @@ void function () {
 	setTimeout(aa(function *() {
 		console.log('aa start');
 		yield delay(500, 'd0');
-		var a = yield Thunk.all([delay(200, 'd1'), delay(100, 'd2'), delay(300, 'd3')]);
-		console.log(a);
-		var b = yield Thunk.all({x:delay(200, 'd1'), y:delay(100, 'd2'), z:delay(300, 'd3')});
-		console.log(b);
+		console.log(yield Thunk.all([delay(200, 'd1'), delay(100, 'd2'), delay(300, 'd3')]));
+		console.log(yield Thunk.all({x:delay(200, 'd1'), y:delay(100, 'd2'), z:delay(300, 'd3')}));
+		console.log(yield []);
+		console.log(yield {});
+		console.log(yield Thunk.race([delay(200, 'd1'), delay(100, 'd2'), delay(300, 'd3')]));
+		console.log(yield Thunk.race({x:delay(200, 'd1'), y:delay(100, 'd2'), z:delay(300, 'd3')}));
 	}), 2500, function () { console.log('aa end'); });
 
 } ();

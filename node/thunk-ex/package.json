@@ -5,7 +5,7 @@
   "main": "thunk-ex.js",
   "private": true,
   "dependencies": {
-    "new-thunk": "0.0.1"
+    "new-thunk": "0.0.2"
   },
   "repository": {
     "type": "git",
