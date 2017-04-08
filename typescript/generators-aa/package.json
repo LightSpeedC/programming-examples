@@ -1,0 +1,17 @@
+{
+  "name": "generators-aa",
+  "version": "0.0.0",
+  "description": "generators-aa",
+  "main": "gtor-aa.js",
+  "private": true,
+  "dependencies": {
+    "aa": "^0.1.40"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC",
+  "license": "MIT"
+}
