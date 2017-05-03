@@ -262,6 +262,3 @@ window
 #Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=False
 console.debug
 console.trace
-
-#Word Color=6, WholeWord=True, RightSide=False, MatchCase=True, InsideTag=False, RegEx=True
-/(\\.|[ -.@-ﾝ])+?/
