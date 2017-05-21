@@ -1,0 +1,398 @@
+<!DOCTYPE HTML>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+		<title></title>
+		<style type="text/css">
+			html { font-family: 'ＭＳ Ｐゴシック'; font-size: 1em; }
+			td { text-align: center; }
+		</style>
+	</head>
+	<body>
+
+		<hr/>
+		<div id="$content">Loading...</div>
+		<hr/>
+		<div id="$console"></div>
+		<hr/>
+
+		<!--
+		<script>
+		setTimeout(function () {
+			console.log(window.navigator.userAgent);
+		}, 3000);
+		// Trident/7
+		// Mozilla/5.0 Chrome/58.0.3029.110
+		</script>
+		-->
+
+		<script src="https://unpkg.com/react@15/dist/react.min.js"></script>
+		<script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+		<script src="https://unpkg.com/babel-polyfill@6/dist/polyfill.min.js"></script>
+		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+		<!--
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.24.2/babel.min.js"></script>
+		-->
+
+		<script type="text/babel" data-presets="es2015,react">
+//======================================================================
+// コンソールをとりあえず画面に出しちゃうコンポーネント
+class ConsoleComponent extends React.Component {
+	// コンストラクタ
+	constructor(props) {
+		super(props);
+		this.state = {list: [{key: '0', type: 'log', args: ['コンソールログ']}]};
+		this.consoleSave = {};
+	} // constructor コンストラクタ
+
+	// 最初に
+	componentDidMount() {
+		const that = this;
+		['log', 'warn', 'error'].forEach(method =>
+			console[method] = function (f) {
+				that.consoleSave[method] = f;
+				return function () {
+					f.apply(console, arguments);
+					that.push({
+						key: Date.now() + Math.random() + '',
+						type: method,
+						args: [].slice.call(arguments)
+					});
+				};
+			} (console[method])
+		);
+	} // componentDidMount
+
+	// 最後に
+	componentWillUnmount() {
+		['log', 'warn', 'error'].forEach(method =>
+			console[method] = this.consoleSave[method]);
+	} // componentWillUnmount
+
+	// データをリストへ追加
+	push(elem) {
+		const list = this.state.list;
+		list.push(elem);
+		if (list.length > 10)
+			list.shift();
+		this.setState({list});
+	} // push
+
+	// レンダー(仮想DOMを返す)
+	render() {
+		const list = this.state.list;
+		return <div style={{color: 'lightgray'}}>
+			{list.map(elem => <div key={elem.key}>
+				{elem.type + ': ' + elem.args.join(' ')}
+			</div>)}
+		</div>;
+	} // render
+}
+
+//======================================================================
+ReactDOM.render(<ConsoleComponent/>, $console);
+
+//======================================================================
+		</script>
+
+		<script type="text/babel" data-presets="es2015,react">
+//======================================================================
+// now: 現在時刻を返す
+const now = () => new Date().toLocaleTimeString();
+
+//======================================================================
+// api条件検索: なんらかの、API呼び出しだよ...
+const api条件検索 = params => new Promise(resolve => {
+	// console.log(now(), JSON.stringify(params).replace(/\"/g, ''));
+	const 件数 = Math.floor(Math.random() * 5); // 0～4
+	setTimeout(() => resolve({body: {result:
+		{時刻: now(), 件数, リスト: range(件数).map(n => n + 1).map(n =>
+			({NO:n, 名前:'山田　' + n + '太郎', 年齢: 20 + n}))}
+	}}), 1000); // 1秒後に結果が出る
+}); // api条件検索
+
+//======================================================================
+// 条件のコンポーネントは入力に専念し、api呼び出しなどはしない
+class Form条件 extends React.Component {
+	// props.data: 条件: {名前: string}
+	// props.onClick条件検索: () => void
+
+	// コンストラクタ
+	constructor(props) {
+		super(props);
+		const {data条件} = props;
+		this.state = {名前: data条件.名前, メッセージ: false};
+
+		// 以下、thisを予めbindしておく(render時より性能が良い)
+		this.onClick条件検索 = this.onClick条件検索.bind(this);
+		this.onChange条件名前 = this.onChange条件名前.bind(this);
+		this.onKeyDown条件名前 = this.onKeyDown条件名前.bind(this);
+	} // constructor コンストラクタ
+
+	// レンダー(仮想DOMを返す)
+	render() {
+		return <div><b>条件</b><br/>
+			名前:
+			<input autoFocus
+				placeholder="名前"
+				value={this.state.名前}
+				onChange={this.onChange条件名前}
+				onKeyDown={this.onKeyDown条件名前} /><br/>
+			<button onClick={this.onClick条件検索}>検索</button><br/>
+			{this.state.メッセージ &&
+			<span style={{color: 'red'}}>{this.state.メッセージ}</span>}
+		</div>;
+	} // render
+
+	// 検索ボタンをクリックした時
+	onClick条件検索() {
+		// console.log(now(), 'Form条件.onClick条件検索');
+
+		// コンポーネント側で可能な入力チェックを行う
+		if (!this.state.名前) {
+			this.setState({メッセージ: '名前を入れてね'});
+			console.warn(now(), '名前を入れてね');
+			return;
+		}
+
+		// プロパティに関数が指定されている場合、コールバックする
+		this.props.onClick条件検索 &&
+		this.props.onClick条件検索();
+	} // onClick条件検索
+
+	// 名前の入力変更があった時
+	onChange条件名前(e) {
+		const {data条件} = this.props;
+		this.setState({名前: e.target.value, メッセージ: false});
+		data条件.名前 = e.target.value;
+	} // onChange条件名前
+
+	// 名前入力で改行
+	onKeyDown条件名前(e) {
+		e.keyCode === 13 &&
+		this.onClick条件検索();
+	} // onKeyDown条件名前
+} // Form条件
+
+//======================================================================
+// 結果のコンポーネントは表示と選択に専念し、api呼び出しなどはしない
+class Form結果 extends React.Component {
+	// props.data: 結果: {件数: number, リスト: []}
+	// props.onClick結果選択: (i: number) => void
+
+	// コンストラクタ
+	constructor(props) {
+		super(props);
+	} // constructor コンストラクタ
+
+	// レンダー(仮想DOMを返す)
+	render() {
+		const {data結果} = this.props;
+
+		return <div><b>結果</b><br/>
+			時刻: {data結果.時刻},
+			件数: {data結果.件数}<br/>
+			{data結果.件数 > 0 &&
+			<table>
+				<thead>
+					<tr>
+						{Object.keys(data結果.リスト[0])
+							.map((x, i) => <th key={i}>{x}</th>)}
+					</tr>
+				</thead>
+				<tbody>
+					{data結果.リスト.map((x, i) => <tr key={i}>
+						{Object.keys(x).map((y, j) =>
+							<td key={j}>{
+								y === 'NO' && this.props.onClick結果選択 ?
+									<button onClick={() =>
+										this.props.onClick結果選択(i)}>
+										{x[y]}
+									</button> : x[y]
+							}</td>
+						)}
+					</tr>)}
+				</tbody>
+			</table>}
+		</div>;
+	} // render
+} // Form結果
+
+//======================================================================
+// 詳細のコンポーネントは表示に専念し、api呼び出しなどはしない
+class Form詳細 extends React.Component {
+	// props.data: 詳細: {...}
+	// props.onReturn: () => void
+
+	// コンストラクタ
+	constructor(props) {
+		super(props);
+	} // constructor コンストラクタ
+
+	// レンダー(仮想DOMを返す)
+	render() {
+		const {data詳細} = this.props;
+
+		return <div><b>詳細</b><br/>
+			{Object.keys(data詳細).map(x => <div key={x}>{x}: {data詳細[x]}</div>)}
+			{this.props.onReturn &&
+			<button onClick={this.props.onReturn}>戻る</button>}
+		</div>;
+	} // render
+} // Form詳細
+
+//======================================================================
+// 全体はコンポーネントを統括し、api呼び出しなどを行う
+class Form全体 extends React.Component {
+	// コンストラクタ
+	constructor(props) {
+		super(props);
+		this.state = {
+			モード: '条件',
+			条件: {名前: ''},
+			結果: {時刻: '', 件数: 0, リスト: []},
+			詳細: {},
+			メッセージ: false
+		};
+
+		// 以下、thisを予めbindしておく(render時より性能が良い)
+		this.onClick条件検索Async = this.onClick条件検索Async.bind(this);
+		this.onClick結果選択 = this.onClick結果選択.bind(this);
+		this.onReturn詳細 = this.onReturn詳細.bind(this);
+	} // constructor コンストラクタ
+
+
+	// 最初に
+	componentDidMount() {
+		// 外部からprops経由で直接条件を指定したい場合
+		// this.props.外部指定 &&
+		// this.props.管理番号 &&
+		// this.setState({条件: {...} });
+		// this.onClick条件検索();
+	}
+
+	// レンダー(仮想DOMを返す)
+	render () {
+		const s = this.state;
+		const is結果表示 =
+			(s.モード === '結果' || s.モード === '詳細') &&
+			s.結果.件数 !== 1;
+
+		//return <div>
+		//	<Form条件 data条件={{}} />
+		//	<Form結果 data結果={{}} />
+		//	<Form詳細 data詳細={{}} />
+		//</div>;
+
+		return <div>
+			<Form条件
+				data条件={this.state.条件}
+				onClick条件検索={this.onClick条件検索Async} />
+			{is結果表示 && <hr/>}
+			{is結果表示 &&
+			<Form結果
+					data結果={s.結果}
+					onClick結果選択={this.onClick結果選択} />}
+			{s.モード === '詳細' && <hr/>}
+			{s.モード === '詳細' &&
+			<Form詳細
+				data詳細={s.詳細}
+				onReturn={this.onReturn詳細} />}
+			{s.メッセージ &&
+			<div style={{color: 'magenta'}}>{s.メッセージ}</div>}
+		</div>;
+
+		/*
+		const s = this.state;
+		const form条件 = <Form条件
+					data条件={s.条件}
+					onClick条件検索={this.onClick条件検索Async} />;
+		if (s.モード === '条件')
+			return <div>{form条件}</div>;
+		else if (s.モード === '結果')
+			return <div>{form条件}<hr/>
+				<Form結果
+					data結果={s.結果}
+					onClick結果選択={this.onClick結果選択} />
+			</div>;
+		else if (s.モード === '詳細' && s.結果.件数 !== 1)
+			return <div>{form条件}<hr/>
+				<Form結果
+					data結果={s.結果}
+					onClick結果選択={this.onClick結果選択} />
+				<hr/>
+				<Form詳細 data詳細={s.詳細} />
+			</div>;
+		else if (s.モード === '詳細') // 件数 === 1
+			return <div>{form条件}<hr/>
+				<Form詳細 data詳細={s.詳細} />
+			</div>;
+		else
+			return <div>こんなはずじゃ...</div>;
+		//*/
+	} // render
+
+	// 行の選択ボタンをクリックした時
+	onClick結果選択(i) {
+		this.setState(s => ({
+			モード: '詳細',
+			詳細: s.結果.リスト[i]
+		}));
+	} // onClick結果選択
+
+	// 詳細で戻るをクリックされた時
+	onReturn詳細() {
+		this.setState(s => ({
+			モード: s.結果.件数 === 1 ?
+				'条件' : '結果'
+		}));
+	} // onReturn詳細
+
+	/*
+	// 検索ボタンをクリックした時
+	async onClick条件検索Async() {
+		this.setState({モード: '条件', メッセージ: '通信中...'});
+		const {result} = (await api条件検索(this.state.条件)).body;
+		that.setState(result.件数 === 1 ?
+			{モード: '詳細', メッセージ: false,
+			 結果: result, 詳細: result.リスト[0]} :
+			{モード: '結果', メッセージ: false,
+			 結果: result, 詳細: {}});
+	} // onClick条件検索Async
+	//*/
+
+	//*
+	// 検索ボタンをクリックした時
+	onClick条件検索Async() {
+		this.setState({モード: '条件', メッセージ: '通信中...'});
+		api条件検索(this.state.条件)
+		.then(response => response.body.result)
+		.then(result =>
+			this.setState(result.件数 === 1 ?
+				{モード: '詳細', メッセージ: false,
+				 結果: result, 詳細: result.リスト[0]} :
+				{モード: '結果', メッセージ: false,
+				 結果: result, 詳細: {}}));
+	//*/
+	} // onClick条件検索Async
+} // Form全体
+
+//======================================================================
+ReactDOM.render(<Form全体/>, $content);
+
+//======================================================================
+// range([from], to)
+function range(from, to) {
+	if (arguments.length === 1) to = from, from = 0;
+	const arr = [];
+	for (let i = from; i < to; ++i)
+		arr.push(i);
+	return arr;
+}
+
+//======================================================================
+		</script>
+	</body>
+</html>
