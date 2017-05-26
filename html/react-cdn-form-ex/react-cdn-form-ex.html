@@ -17,20 +17,18 @@
 		<div id="$console"></div>
 		<hr/>
 
-		<!--
-		<script>
-		setTimeout(function () {
-			console.log(window.navigator.userAgent);
-		}, 3000);
-		// Trident/7
-		// Mozilla/5.0 Chrome/58.0.3029.110
-		</script>
-		-->
+		<script src="react.min.js"></script>
+		<script src="react-dom.min.js"></script>
+		<script src="babel.min.js"></script>
 
+		<!--
 		<script src="https://unpkg.com/react@15/dist/react.min.js"></script>
 		<script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
-		<script src="https://unpkg.com/babel-polyfill@6/dist/polyfill.min.js"></script>
 		<script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+		-->
+
+		<!--<script src="https://unpkg.com/babel-polyfill@6/dist/polyfill.min.js"></script>-->
+
 		<!--
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.23.0/polyfill.min.js"></script>
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.24.2/babel.min.js"></script>
@@ -103,27 +101,37 @@ ReactDOM.render(<ConsoleComponent/>, $console);
 const now = () => new Date().toLocaleTimeString();
 
 //======================================================================
-// api条件検索: なんらかの、API呼び出しだよ...
-const api条件検索 = params => new Promise(resolve => {
+// api一覧検索: なんらかの、API呼び出しだよ...
+const api一覧検索 = params => new Promise(resolve => {
 	// console.log(now(), JSON.stringify(params).replace(/\"/g, ''));
 	const 件数 = Math.floor(Math.random() * 5); // 0～4
 	setTimeout(() => resolve({body: {result:
 		{時刻: now(), 件数, リスト: range(件数).map(n => n + 1).map(n =>
 			({NO:n, 名前:'山田　' + n + '太郎', 年齢: 20 + n}))}
 	}}), 1000); // 1秒後に結果が出る
-}); // api条件検索
+}); // api一覧検索
+
+//======================================================================
+// api詳細検索: なんらかの、API呼び出しだよ...
+const api詳細検索 = params => new Promise(resolve => {
+	// console.log(now(), JSON.stringify(params).replace(/\"/g, ''));
+	const n = params.NO;
+	setTimeout(() => resolve({body: {result:
+		{NO:n, 名前:'山田　' + n + '太郎', 年齢: 20 + n,
+			住所: '青空村' + n + '番地'}
+	}}), 1000); // 1秒後に結果が出る
+}); // api詳細検索
 
 //======================================================================
 // 条件のコンポーネントは入力に専念し、api呼び出しなどはしない
 class Form条件 extends React.Component {
-	// props.data: 条件: {名前: string}
+	// props.vm条件: {名前: string}
 	// props.onClick条件検索: () => void
 
 	// コンストラクタ
 	constructor(props) {
 		super(props);
-		const {data条件} = props;
-		this.state = {名前: data条件.名前, メッセージ: false};
+		this.state = {メッセージ: null};
 
 		// 以下、thisを予めbindしておく(render時より性能が良い)
 		this.onClick条件検索 = this.onClick条件検索.bind(this);
@@ -133,11 +141,13 @@ class Form条件 extends React.Component {
 
 	// レンダー(仮想DOMを返す)
 	render() {
+		const {vm条件} = this.props;
+
 		return <div><b>条件</b><br/>
 			名前:
 			<input autoFocus
 				placeholder="名前"
-				value={this.state.名前}
+				value={vm条件.名前}
 				onChange={this.onChange条件名前}
 				onKeyDown={this.onKeyDown条件名前} /><br/>
 			<button onClick={this.onClick条件検索}>検索</button><br/>
@@ -151,7 +161,7 @@ class Form条件 extends React.Component {
 		// console.log(now(), 'Form条件.onClick条件検索');
 
 		// コンポーネント側で可能な入力チェックを行う
-		if (!this.state.名前) {
+		if (!this.props.vm条件.名前) {
 			this.setState({メッセージ: '名前を入れてね'});
 			console.warn(now(), '名前を入れてね');
 			return;
@@ -164,9 +174,9 @@ class Form条件 extends React.Component {
 
 	// 名前の入力変更があった時
 	onChange条件名前(e) {
-		const {data条件} = this.props;
-		this.setState({名前: e.target.value, メッセージ: false});
-		data条件.名前 = e.target.value;
+		const {vm条件} = this.props;
+		vm条件.名前 = e.target.value;
+		this.setState({メッセージ: null});
 	} // onChange条件名前
 
 	// 名前入力で改行
@@ -179,7 +189,7 @@ class Form条件 extends React.Component {
 //======================================================================
 // 結果のコンポーネントは表示と選択に専念し、api呼び出しなどはしない
 class Form結果 extends React.Component {
-	// props.data: 結果: {件数: number, リスト: []}
+	// props.vm結果: {件数: number, リスト: []}
 	// props.onClick結果選択: (i: number) => void
 
 	// コンストラクタ
@@ -189,21 +199,21 @@ class Form結果 extends React.Component {
 
 	// レンダー(仮想DOMを返す)
 	render() {
-		const {data結果} = this.props;
+		const {vm結果} = this.props;
 
 		return <div><b>結果</b><br/>
-			時刻: {data結果.時刻},
-			件数: {data結果.件数}<br/>
-			{data結果.件数 > 0 &&
+			時刻: {vm結果.時刻},
+			件数: {vm結果.件数}<br/>
+			{vm結果.件数 > 0 &&
 			<table>
 				<thead>
 					<tr>
-						{Object.keys(data結果.リスト[0])
+						{Object.keys(vm結果.リスト[0])
 							.map((x, i) => <th key={i}>{x}</th>)}
 					</tr>
 				</thead>
 				<tbody>
-					{data結果.リスト.map((x, i) => <tr key={i}>
+					{vm結果.リスト.map((x, i) => <tr key={i}>
 						{Object.keys(x).map((y, j) =>
 							<td key={j}>{
 								y === 'NO' && this.props.onClick結果選択 ?
@@ -223,7 +233,7 @@ class Form結果 extends React.Component {
 //======================================================================
 // 詳細のコンポーネントは表示に専念し、api呼び出しなどはしない
 class Form詳細 extends React.Component {
-	// props.data: 詳細: {...}
+	// props.vm詳細: {...}
 	// props.onReturn: () => void
 
 	// コンストラクタ
@@ -233,10 +243,10 @@ class Form詳細 extends React.Component {
 
 	// レンダー(仮想DOMを返す)
 	render() {
-		const {data詳細} = this.props;
+		const {vm詳細} = this.props;
 
 		return <div><b>詳細</b><br/>
-			{Object.keys(data詳細).map(x => <div key={x}>{x}: {data詳細[x]}</div>)}
+			{Object.keys(vm詳細).map(x => <div key={x}>{x}: {vm詳細[x]}</div>)}
 			{this.props.onReturn &&
 			<button onClick={this.props.onReturn}>戻る</button>}
 		</div>;
@@ -251,10 +261,10 @@ class Form全体 extends React.Component {
 		super(props);
 		this.state = {
 			モード: '条件',
-			条件: {名前: ''},
-			結果: {時刻: '', 件数: 0, リスト: []},
-			詳細: {},
-			メッセージ: false
+			vm条件: {名前: ''},
+			vm結果: {時刻: '', 件数: 0, リスト: []},
+			vm詳細: {},
+			メッセージ: null
 		};
 
 		// 以下、thisを予めbindしておく(render時より性能が良い)
@@ -269,113 +279,84 @@ class Form全体 extends React.Component {
 		// 外部からprops経由で直接条件を指定したい場合
 		// this.props.外部指定 &&
 		// this.props.管理番号 &&
-		// this.setState({条件: {...} });
+		// this.setState({vm条件: {...} });
 		// this.onClick条件検索();
 	}
 
 	// レンダー(仮想DOMを返す)
 	render () {
 		const s = this.state;
-		const is結果表示 =
-			(s.モード === '結果' || s.モード === '詳細') &&
-			s.結果.件数 !== 1;
+		const msg = s.メッセージ &&
+				<div style={{color: 'magenta'}}>{s.メッセージ}</div>;
 
-		//return <div>
-		//	<Form条件 data条件={{}} />
-		//	<Form結果 data結果={{}} />
-		//	<Form詳細 data詳細={{}} />
-		//</div>;
-
-		return <div>
-			<Form条件
-				data条件={this.state.条件}
-				onClick条件検索={this.onClick条件検索Async} />
-			{is結果表示 && <hr/>}
-			{is結果表示 &&
-			<Form結果
-					data結果={s.結果}
-					onClick結果選択={this.onClick結果選択} />}
-			{s.モード === '詳細' && <hr/>}
-			{s.モード === '詳細' &&
-			<Form詳細
-				data詳細={s.詳細}
-				onReturn={this.onReturn詳細} />}
-			{s.メッセージ &&
-			<div style={{color: 'magenta'}}>{s.メッセージ}</div>}
-		</div>;
-
-		/*
-		const s = this.state;
-		const form条件 = <Form条件
-					data条件={s.条件}
-					onClick条件検索={this.onClick条件検索Async} />;
 		if (s.モード === '条件')
-			return <div>{form条件}</div>;
+			return <div>
+				<Form条件
+					vm条件={s.vm条件}
+					onClick条件検索={this.onClick条件検索Async} />
+				{msg}
+			</div>;
 		else if (s.モード === '結果')
-			return <div>{form条件}<hr/>
-				<Form結果
-					data結果={s.結果}
-					onClick結果選択={this.onClick結果選択} />
-			</div>;
-		else if (s.モード === '詳細' && s.結果.件数 !== 1)
-			return <div>{form条件}<hr/>
-				<Form結果
-					data結果={s.結果}
-					onClick結果選択={this.onClick結果選択} />
+			return <div>
+				<Form条件
+					vm条件={s.vm条件}
+					onClick条件検索={this.onClick条件検索Async} />
 				<hr/>
-				<Form詳細 data詳細={s.詳細} />
+				<Form結果
+					vm結果={s.vm結果}
+					onClick結果選択={this.onClick結果選択} />
+				{msg}
 			</div>;
-		else if (s.モード === '詳細') // 件数 === 1
-			return <div>{form条件}<hr/>
-				<Form詳細 data詳細={s.詳細} />
+		else if (s.モード === '詳細')
+			return <div>
+				<Form詳細
+					vm詳細={s.vm詳細}
+					onReturn={this.onReturn詳細} />
+				{msg}
 			</div>;
 		else
 			return <div>こんなはずじゃ...</div>;
-		//*/
 	} // render
 
 	// 行の選択ボタンをクリックした時
 	onClick結果選択(i) {
-		this.setState(s => ({
-			モード: '詳細',
-			詳細: s.結果.リスト[i]
-		}));
+		this.setState({メッセージ: '通信中...(詳細検索)'});
+
+		const s = this.state;
+		api詳細検索({NO: s.vm結果.リスト[i].NO})
+		.then(response => {
+			const vm詳細 = response.body.result;
+
+			this.setState({
+				モード: '詳細', メッセージ: null,
+				vm詳細: vm詳細
+			});
+		});
 	} // onClick結果選択
 
 	// 詳細で戻るをクリックされた時
 	onReturn詳細() {
 		this.setState(s => ({
-			モード: s.結果.件数 === 1 ?
+			モード: s.vm結果.件数 === 1 ?
 				'条件' : '結果'
 		}));
 	} // onReturn詳細
 
-	/*
-	// 検索ボタンをクリックした時
-	async onClick条件検索Async() {
-		this.setState({モード: '条件', メッセージ: '通信中...'});
-		const {result} = (await api条件検索(this.state.条件)).body;
-		that.setState(result.件数 === 1 ?
-			{モード: '詳細', メッセージ: false,
-			 結果: result, 詳細: result.リスト[0]} :
-			{モード: '結果', メッセージ: false,
-			 結果: result, 詳細: {}});
-	} // onClick条件検索Async
-	//*/
-
-	//*
 	// 検索ボタンをクリックした時
 	onClick条件検索Async() {
 		this.setState({モード: '条件', メッセージ: '通信中...'});
-		api条件検索(this.state.条件)
-		.then(response => response.body.result)
-		.then(result =>
-			this.setState(result.件数 === 1 ?
-				{モード: '詳細', メッセージ: false,
-				 結果: result, 詳細: result.リスト[0]} :
-				{モード: '結果', メッセージ: false,
-				 結果: result, 詳細: {}}));
-	//*/
+		api一覧検索(this.state.vm条件)
+		.then(response => {
+			const vm結果 = response.body.result;
+
+			this.setState({メッセージ: null,
+				vm結果, vm詳細: {}});
+
+			if (vm結果.件数 === 1)
+				return this.onClick結果選択(0);
+
+			this.setState({モード: '結果'});
+		});
 	} // onClick条件検索Async
 } // Form全体
 
