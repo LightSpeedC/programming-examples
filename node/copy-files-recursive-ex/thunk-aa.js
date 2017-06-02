@@ -1,5 +1,8 @@
 var slice = [].slice;
 
+require('./common-methods')(Thunk);
+require('./common-aa')(Thunk);
+
 // var backgroundTasks = [];
 
 function Thunk(setup, cb) {
@@ -7,30 +10,46 @@ function Thunk(setup, cb) {
 		throw new TypeError('first argument "setup" must be a function');
 
 	// callback mode
-	if (typeof cb === 'function') return setup(cb);
+	if (typeof cb === 'function') {
+		var last = function (err, val) {
+			var args = arguments.length > 2 ? [err, slice.call(arguments, 1)] :
+				arguments.length === 1 && !(err instanceof Error) ? [null, err] :
+					arguments;
+			cb.apply(null, args);
+		};
+		try { return setup(last, last); }
+		catch (err) { return cb(err); }
+	}
 
 	// promise & thunk mode
 
 	var called = false, bombs = [], results;
 
-	function callback(err, val) {
+	var callback = function callback(err, val) {
 		if (!results)
 			results = arguments.length > 2 ? [err, slice.call(arguments, 1)] :
 				arguments.length === 1 && !(err instanceof Error) ? [null, err] :
-				arguments;
+					arguments;
 		fire();
 	}
 
 	// pre-setup
-	if (cb === true) called = true, setup(callback);
+	if (cb === true)
+		try { called = true, setup(callback, callback); }
+		catch (err) { callback(err); }
 
-	function thunk(cb) {
-		if (!called) called = true, setup(callback);
-
+	var thunk = function thunk(cb) {
 		var next, thunk = Thunk(function (cb) { next = cb; }, true);
 
+		try {
+			if (!called) called = true, setup(callback, callback);
+		} catch (err) { next(err); }
+
 		bombs.push(function (err, val) {
-			try { next(null, cb.apply(null, arguments)); }
+			try {
+				var r = cb.apply(null, arguments);
+				next(null, r);
+			}
 			catch (err) { next(err); }
 		});
 
@@ -41,13 +60,17 @@ function Thunk(setup, cb) {
 
 	thunk.then = function then(res, rej) {
 		return thunk(function (err, val) {
-			return err ? rej(err) : res(val);
+			return err ?
+				typeof rej === 'function' ? rej(err) : err :
+				typeof res === 'function' ? res(val) : val;
 		});
 	};
 
 	thunk['catch'] = function (rej) {
 		return thunk(function (err, val) {
-			return err ? rej(err) : val;
+			return err ?
+				typeof rej === 'function' ? rej(err) : err :
+				val;
 		});
 	};
 
@@ -61,39 +84,5 @@ function Thunk(setup, cb) {
 	}
 }
 
-function aa(gtor, cb) {
-	return Thunk(function (cb) {
-		next();
-		function next(err, val) {
-			if (arguments.length > 2)
-				val = slice.call(arguments, 1);
-			if (arguments.length === 1 && !(err instanceof Error))
-				val = err, err = null;
-			try { var obj = err ? gtor.throw(err) : gtor.next(val); }
-			catch (err) { cb(err); }
-			if (obj.done) return cb(null, value);
-			val = obj.value;
-			if (typeof val === 'function') return val(next);
-			if (typeof val === 'object' && val !== null &&
-				typeof val.then === 'function') return val.then(next, next);
-			next(null, val);
-		}
-	}, cb);
-}
-
-Thunk(function (cb) {
-	setTimeout(function () { console.log('1a:OK?'); cb(null, '1b:OK!'); }, 1000);
-}, function (err, val) { return console.log('1c:end:', err, val), '1d:end'; });
-
-Thunk(function (cb) {
-	setTimeout(function () { console.log('2a:OK?'); cb(null, '2b:OK!'); }, 1000);
-})
-(function (err, val) { return console.log('2c:end:', err, val), '2d:end'; })
-(function (err, val) { return console.log('2e:end:', err, val), '2f:end'; });
-
-Thunk(function (cb) {
-	setTimeout(function () { console.log('3a:OK?'); cb(null, '3b:OK!'); }, 1000);
-})
-.then(function (val) { return console.log('3c:val:', val), '3d:end'; })
-.then(function (val) { return console.log('3g:val:', val), '3h:end'; })
-.catch(function (err) { return console.log('3e:err:', err), '3f:end'; });
+require('./common-bench')(Thunk);
+Thunk.bench('Thunk');
