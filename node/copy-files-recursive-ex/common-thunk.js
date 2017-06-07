@@ -1,3 +1,7 @@
+'use strict';
+
+module.exports = Thunk;
+
 var slice = [].slice;
 
 require('./common-methods')(Thunk);
@@ -31,7 +35,7 @@ function Thunk(setup, cb) {
 				arguments.length === 1 && !(err instanceof Error) ? [null, err] :
 					arguments;
 		nextTick(fire);
-	};
+	}
 
 	// pre-setup
 	if (cb === true)
@@ -54,8 +58,9 @@ function Thunk(setup, cb) {
 		});
 
 		if (results) nextTick(fire);
+
 		return thunk;
-	};
+	}
 
 	thunk.then = function then(res, rej) {
 		return thunk(function (err, val) {
@@ -82,6 +87,3 @@ function Thunk(setup, cb) {
 			bomb.apply(null, results);
 	}
 }
-
-require('./common-bench')(Thunk);
-Thunk.bench('Thunk');
