@@ -1,6 +1,5 @@
-'use strict';
-
-module.exports = function (Base) {
+function commonAa(Base) {
+	'use strict';
 
 	Base.aa || (Base.aa = aa);
 
@@ -30,3 +29,6 @@ module.exports = function (Base) {
 
 	return Base;
 };
+
+if (typeof module === 'object' && module && module.exports)
+	module.exports = commonAa;

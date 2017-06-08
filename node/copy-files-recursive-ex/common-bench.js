@@ -1,6 +1,5 @@
-'use strict';
-
-module.exports = function (Base) {
+function commonBench(Base) {
+	'use strict';
 
 	Base.bench || (Base.bench = bench);
 
@@ -62,3 +61,6 @@ module.exports = function (Base) {
 
 	return Base;
 };
+
+if (typeof module === 'object' && module && module.exports)
+	module.exports = commonBench;

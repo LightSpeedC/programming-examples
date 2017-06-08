@@ -1,6 +1,5 @@
-'use strict';
-
-module.exports = function (Base) {
+function commonMethods(Base) {
+	'use strict';
 
 	Base.resolve || (Base.resolve = resolve);
 	Base.reject || (Base.reject = reject);
@@ -26,3 +25,6 @@ module.exports = function (Base) {
 
 	return Base;
 };
+
+if (typeof module === 'object' && module && module.exports)
+	module.exports = commonMethods;

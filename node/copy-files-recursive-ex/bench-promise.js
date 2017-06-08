@@ -1,11 +1,17 @@
-'use strict';
+function benchPromise() {
+	'use strict';
 
-require('./common-methods')
-	(require('./common-aa')
-		(Dummy));
+	(typeof commonMethods === 'function' ? commonMethods : require('./common-methods'))(Dummy);
+	(typeof commonAa === 'function' ? commonAa : require('./common-aa'))(Dummy);
 
-function Dummy(setup) {
-	return new Promise(setup);
+	function Dummy(setup) {
+		return new Promise(setup);
+	}
+
+	(typeof commonBench === 'function' ? commonBench : require('./common-bench'))(Dummy)
+		.bench('Promise');
 }
 
-require('./common-bench')(Dummy).bench('Promise');
+benchPromise();
+// if (typeof module === 'object' && module && module.exports)
+// 	module.exports = benchPromise;
