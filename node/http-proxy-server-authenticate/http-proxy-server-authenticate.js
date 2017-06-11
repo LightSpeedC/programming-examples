@@ -1,9 +1,30 @@
 'use strict';
+
 const http = require('http'), url = require('url'), net = require('net');
+
+process.env.APP_PROXY &&
+console.log(url.parse(process.env.APP_PROXY));
+// Url {
+//  protocol: 'http:',
+//  slashes: true,
+//  auth: 'user:pass', ********************
+//  host: 'proxyhost:proxyport',
+//  port: 'proxyport', ********************
+//  hostname: 'proxyhost', ****************
+//  hash: null,
+//  search: null,
+//  query: null,
+//  pathname: '/',
+//  path: '/',
+//  href: 'http://user:pass@proxyhost:proxyport/' }
+
 const HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
-const PROXY_URL = process.argv[3] || null;  // external proxy server URL
+// external proxy server URL
+const PROXY_URL = process.argv[3] || process.env.APP_PROXY || null;
 const PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
 const PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
+const PROXY_AUTH = PROXY_URL ?
+	Buffer.from(url.parse(PROXY_URL).auth).toString('base64')    : null;
 
 const getNow = () => new Date().toLocaleTimeString();
 console.log(new Date().toLocaleDateString(), getNow());
@@ -32,10 +53,13 @@ const server = http.createServer(function onCliReq(cliReq, cliRes) {
 	let svrSoc;
 	const cliSoc = cliReq.socket, x = url.parse(cliReq.url);
 
-	//@@
-	console.log(getNow(), COLORS.GREEN + cliReq.method, cliReq.url + CRLF +
-			COLORS.CYAN + headersToString(cliReq.headers,
-			{exclude: ['cookie']}) + COLORS.RESET);
+	if (PROXY_AUTH)
+		cliReq.headers['proxy-authorization'] = 'Basic ' + PROXY_AUTH;
+
+	// @@
+	// console.log(getNow(), COLORS.GREEN + cliReq.method, cliReq.url + CRLF +
+	//		COLORS.CYAN + headersToString(cliReq.headers,
+	//		{exclude: ['cookie']}) + COLORS.RESET);
 
 	const svrReq = http.request({host: PROXY_HOST || x.hostname,
 			port: PROXY_PORT || x.port || 80,
@@ -43,12 +67,12 @@ const server = http.createServer(function onCliReq(cliReq, cliRes) {
 			method: cliReq.method, headers: cliReq.headers,
 			agent: cliSoc.$agent}, function onSvrRes(svrRes) {
 
-		//@@
-		console.log(getNow(), COLORS.YELLOW + cliReq.method, cliReq.url,
-			COLORS.RESET + CRLF, svrRes.statusCode, svrRes.statusMessage +
-			CRLF + COLORS.CYAN +
-				headersToString(svrRes.headers,
-				{exclude: ['set-cookie']}) + COLORS.RESET);
+		// @@
+		// console.log(getNow(), COLORS.YELLOW + cliReq.method, cliReq.url,
+		//	COLORS.RESET + CRLF, svrRes.statusCode, svrRes.statusMessage +
+		//	CRLF + COLORS.CYAN +
+		//		headersToString(svrRes.headers,
+		//		{exclude: ['set-cookie']}) + COLORS.RESET);
 
 		svrSoc = svrRes.socket;
 		cliRes.writeHead(svrRes.statusCode, svrRes.headers);
@@ -66,6 +90,8 @@ const server = http.createServer(function onCliReq(cliReq, cliRes) {
 	const x = url.parse('https://' + cliReq.url);
 	let svrSoc;
 	if (PROXY_URL) {
+		if (PROXY_AUTH)
+			cliReq.headers['proxy-authorization'] = 'Basic ' + PROXY_AUTH;
 		const svrReq = http.request({host: PROXY_HOST, port: PROXY_PORT,
 				path: cliReq.url, method: cliReq.method, headers: cliReq.headers,
 				agent: cliSoc.$agent});
