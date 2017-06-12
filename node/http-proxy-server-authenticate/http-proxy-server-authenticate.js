@@ -2,8 +2,8 @@
 
 const http = require('http'), url = require('url'), net = require('net');
 
-process.env.APP_PROXY &&
-console.log(url.parse(process.env.APP_PROXY));
+// process.env.AUTH_PROXY &&
+/// console.log(url.parse(process.env.AUTH_PROXY));
 // Url {
 //  protocol: 'http:',
 //  slashes: true,
@@ -18,9 +18,11 @@ console.log(url.parse(process.env.APP_PROXY));
 //  path: '/',
 //  href: 'http://user:pass@proxyhost:proxyport/' }
 
-const HTTP_PORT = process.argv[2] || 8080;  // internal proxy server port
+// internal proxy server port
+const HTTP_PORT = Number(process.argv[2] ||
+	(process.env.HTTP_PROXY ? url.parse(process.env.HTTP_PROXY).port : 8080));
 // external proxy server URL
-const PROXY_URL = process.argv[3] || process.env.APP_PROXY || null;
+const PROXY_URL = process.argv[3] || process.env.AUTH_PROXY || null;
 const PROXY_HOST = PROXY_URL ?  url.parse(PROXY_URL).hostname    : null;
 const PROXY_PORT = PROXY_URL ? (url.parse(PROXY_URL).port || 80) : null;
 const PROXY_AUTH = PROXY_URL ?

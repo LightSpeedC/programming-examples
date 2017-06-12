@@ -1,2 +1,2 @@
-node http-proxy-server-authenticate 9999
+node http-proxy-server-authenticate
 pause
