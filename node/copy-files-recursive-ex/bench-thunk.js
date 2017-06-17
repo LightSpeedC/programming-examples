@@ -21,8 +21,8 @@ function benchThunk() {
 						arguments;
 				cb.apply(null, args);
 			};
-			try { return setup(last, last); }
-			catch (err) { return cb(err); }
+			try { setup(last, last); return; }
+			catch (err) { cb(err); return; }
 		}
 
 		// promise & thunk mode

@@ -9,6 +9,8 @@ var Thunk = function () {
 	var nextTick = typeof nextTickBackgroundTasks === 'function' ?
 		nextTickBackgroundTasks : require('./next-tick-background-tasks');
 
+	return Thunk;
+
 	function Thunk(setup, cb) {
 		if (typeof setup !== 'function')
 			throw new TypeError('first argument "setup" must be a function');
@@ -21,8 +23,8 @@ var Thunk = function () {
 						arguments;
 				cb.apply(null, args);
 			};
-			try { return setup(last, last); }
-			catch (err) { return cb(err); }
+			try { setup(last, last); return; }
+			catch (err) { cb(err); return; }
 		}
 
 		// promise & thunk mode
@@ -87,7 +89,7 @@ var Thunk = function () {
 				bomb.apply(null, results);
 		} // fire
 	} // Thunk
-};
+}();
 
 if (typeof module === 'object' && module && module.exports)
 	module.exports = Thunk;
