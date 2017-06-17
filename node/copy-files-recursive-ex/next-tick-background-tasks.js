@@ -11,7 +11,6 @@ var nextTickBackgroundTasks = function () {
 				typeof setImmediate === 'function' ? setImmediate :
 					function setTimeout_(fn) { setTimeout(fn, 0) };
 
-	console.log(nextTickDo + '');
 	return nextTick;
 
 	function nextTick(fn) {
