@@ -20,10 +20,10 @@ function commonAa(Base) {
 				if (obj.done) res(val);
 				else if (!val) next(null, val);
 				else if (val instanceof Error) next(val);
-				else if (val.constructor === Object) Base.all(val, next);
-				else if (val.constructor === Array) Base.all(val, next);
-				//else if (val.constructor === Object) Base.all(val).then(next, next);
-				//else if (val.constructor === Array) Base.all(val).then(next, next);
+				else if (val.constructor === Array ||
+					val.constructor === Object)
+						Base.all(val, next);
+						// Base.all(val).then(next, next);
 				else if (typeof val === 'function') val(next);
 				else if (typeof val.then === 'function') val.then(next, next);
 				else next(null, val);
