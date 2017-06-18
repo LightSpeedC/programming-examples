@@ -16,7 +16,7 @@ function commonBench(Base) {
 				err => console.log('no cb style err:', err));
 
 		p = Base(function (cb) {
-			setTimeout(() => (console.log('2a:OK?'), cb(null, '2b:OK!')), 1000);
+			setTimeout(() => (console.log('2a:OK?'), cb(null, '2b:OK!')), 1100);
 		});
 		if (typeof p === 'function')
 			p((err, val) => (console.log('2c:end:', err, val), '2d:end'))
@@ -26,7 +26,7 @@ function commonBench(Base) {
 				err => console.log('no thunk style err:', err));
 
 		Base(function (cb) {
-			setTimeout(() => (console.log('3a:OK?'), cb(null, '3b:OK!')), 1000);
+			setTimeout(() => (console.log('3a:OK?'), cb(null, '3b:OK!')), 1200);
 		})
 			.then(val => (console.log('3c:val:', val), '3d:end'))
 			.then(val => (console.log('3g:val:', val), '3h:end'))
@@ -34,28 +34,28 @@ function commonBench(Base) {
 
 		p = Base(function (cb) {
 			// throw new Error('err1!');
-			setTimeout(() => (console.log('2a:OK?'), cb(null, '2b:OK!')), 1000);
+			setTimeout(() => (console.log('4a:OK?'), cb(null, '4b:OK!')), 1300);
 		}, true)
 		if (typeof p === 'function')
-			p((err, val) => (console.log('2c:end:', err, val), '2d:end'))
-				((err, val) => (console.log('2e:end:', err, val), '2f:end'));
+			p((err, val) => (console.log('4c:end:', err, val), '4d:end'))
+				((err, val) => (console.log('4e:end:', err, val), '4f:end'));
 
 		Base(function (cb) {
 			// throw new Error('err2!');
-			setTimeout(() => (console.log('3a:OK?'), cb(null, '3b:OK!')), 1000);
+			setTimeout(() => (console.log('5a:OK?'), cb(null, '5b:OK!')), 1400);
 		}, true)
-			.then(val => (console.log('3c:val:', val), '3d:end'))
-			.then(val => (console.log('3g:val:', val), '3h:end'))
-			.catch(err => (console.log('3e:err:', err), '3f:end'));
+			.then(val => (console.log('5c:val:', val), '5d:end'))
+			.then(val => (console.log('5g:val:', val), '5h:end'))
+			.catch(err => (console.log('5e:err:', err), '5f:end'));
 
 		Base.aa(function* () {
-			console.log('100', yield Base.wait(100, 100));
-			console.log('200', yield Base.wait(200, 200));
-			return '4a:end';
+			console.log('6a: 2000', yield Base.wait(2000, 2000));
+			console.log('6a: 1000', yield Base.wait(1000, 1000));
+			return '6a:end';
 		})
-			.then(val => (console.log('4c:val:', val), '4d:end'))
-			.then(val => (console.log('4g:val:', val), '4h:end'))
-			.catch(err => (console.log('4e:err:', err), '4f:end'));
+			.then(val => (console.log('6c:val:', val), '6d:end'))
+			.then(val => (console.log('6g:val:', val), '6h:end'))
+			.catch(err => (console.log('6e:err:', err), '6f:end'));
 
 	} // bench
 
