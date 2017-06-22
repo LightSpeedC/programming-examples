@@ -1,13 +1,17 @@
-function commonAa(Base) {
+var aa = function () {
 	'use strict';
-
-	Base.aa || (Base.aa = aa);
 
 	var slice = [].slice;
 
+	return aa;
+
 	function aa(gtor, cb) {
+
+		var Base = this || typeof Promise === 'function' ? Promise : 'no thunk or promise';
+
 		if (typeof gtor === 'function') gtor = gtor();
-		return Base(function (res, rej) {
+
+		return new Base(function (res, rej) {
 			next();
 			function next(err, val) {
 				if (arguments.length > 2)
@@ -22,17 +26,15 @@ function commonAa(Base) {
 				else if (val instanceof Error) next(val);
 				else if (val.constructor === Array ||
 					val.constructor === Object)
-						Base.all(val, next);
-						// Base.all(val).then(next, next);
+						Base.all(val).then(next, next);
+						// Base.all(val, next);
 				else if (typeof val === 'function') val(next);
 				else if (typeof val.then === 'function') val.then(next, next);
 				else next(null, val);
 			} // next
 		}, cb);
 	} // aa
-
-	return Base;
-};
+}();
 
 if (typeof module === 'object' && module && module.exports)
-	module.exports = commonAa;
+	module.exports = aa;

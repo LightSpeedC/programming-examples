@@ -1,28 +1,24 @@
-function commonMakeSync(Base) {
+function makeSync(num) {
 	'use strict';
 
-	Base.makeSync || (Base.makeSync = makeSync);
+	var Base = this;
 
-	function makeSync(num) {
-		if (typeof num !== 'number' || num !== num)
-			throw new TypeError('number of parallel must be a number');
+	if (typeof num !== 'number' || num !== num)
+		throw new TypeError('number of parallel must be a number');
 
-		if (num <= 0)
-			throw new RangeError('number of parallel must be a positive number');
+	if (num <= 0)
+		throw new RangeError('number of parallel must be a positive number');
 
-		var resolves = [];
+	var resolves = [];
 
-		return function sync(val) {
-			return Base(function (res, rej) {
-				resolves.push({res: res, val: val});
-				if (resolves.length >= num)
-					resolves.forEach(elem => (elem.res)(elem.val));
-			});
-		} // sync
-	} // makeSync
-
-	return Base;
-};
+	return function sync(val) {
+		return new Base(function (res, rej) {
+			resolves.push({res: res, val: val});
+			if (resolves.length >= num)
+				resolves.forEach(elem => (elem.res)(elem.val));
+		});
+	} // sync
+} // makeSync
 
 if (typeof module === 'object' && module && module.exports)
-	module.exports = commonMakeSync;
+	module.exports = makeSync;
