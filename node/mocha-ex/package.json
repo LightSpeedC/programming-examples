@@ -1,0 +1,20 @@
+{
+  "name": "mocha-ex",
+  "version": "0.0.0",
+  "description": "mocha example\r ====",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "intelli-espower-loader": "^1.0.1",
+    "mocha": "^3.4.2",
+    "power-assert": "^1.4.4"
+  }
+}
