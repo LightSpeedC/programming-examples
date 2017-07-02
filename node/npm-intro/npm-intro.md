@@ -8,6 +8,8 @@ JavaScriptを使う上で必要となるライブラリは必ずnpmにある。
 
 + [package.json の 仕様 (日本語) - Blog](https://garafu.blogspot.jp/2016/11/packagejson-specification-ja.html)
 
++ [npm package.json 取扱説明書](http://liberty-technology.biz/PublicItems/npm/package.json.html)
+
 + [what is npm? - npm](https://docs.npmjs.com/getting-started/what-is-npm)
 
 以下の形式でパッケージはダウンロードできる
