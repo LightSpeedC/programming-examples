@@ -46,7 +46,7 @@ void function () {
 	// 通知メッセージ
 	const textMessage = m.prop('検索できます');
 
-	const targetDir = process.env.AAA_TARGET_DIR;
+	const targetDir = path.resolve(process.env.AAA_TARGET_DIR);
 	let wholeObject = { [ERROR_PROP]: 'まだ検索していません' };
 	let timer; // 検索中のインターバルタイマー
 	const MAX_INDENT = 20; // 最大インデントの深さ
