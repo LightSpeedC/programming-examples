@@ -266,7 +266,7 @@ void function () {
 
 	// range 0～n-1までの数字の配列
 	function range(n) {
-		var a = [];
+		const a = [];
 		for (let i = 0; i < n; ++i) a.push(i);
 		return a;
 	}
@@ -396,35 +396,35 @@ void function () {
 	}
 
 	// propRex
-	function propRex(str, key) {
-		str = typeof config.value[key] === 'undefined' ? str : config.value[key];
-		f(str);
-		return f;
+	function propRex(closureValue, key) {
+		closureValue = typeof config.value[key] === 'undefined' ? closureValue : config.value[key];
+		closureFunc(closureValue);
+		return closureFunc;
 
-		function f(x) {
+		function closureFunc(x) {
 			if (arguments.length > 0) {
-				str = x;
-				f.rex = str ? new Rexfer(str, 'i') : null;
-				config.value[key] = str;
+				closureValue = x;
+				closureFunc.rex = closureValue ? new Rexfer(closureValue, 'i') : null;
+				config.value[key] = closureValue;
 				config.save();
 			}
-			return str;
+			return closureValue;
 		};
 	}
 
 	// propCfg
-	function propCfg(str, key) {
-		str = typeof config.value[key] === 'undefined' ? str : config.value[key];
-		f(str);
-		return f;
+	function propCfg(closureValue, key) {
+		closureValue = typeof config.value[key] === 'undefined' ? closureValue : config.value[key];
+		closureFunc(closureValue);
+		return closureFunc;
 
-		function f(x) {
+		function closureFunc(x) {
 			if (arguments.length > 0) {
-				str = x;
-				config.value[key] = str;
+				closureValue = x;
+				config.value[key] = closureValue;
 				config.save();
 			}
-			return str;
+			return closureValue;
 		};
 	}
 
