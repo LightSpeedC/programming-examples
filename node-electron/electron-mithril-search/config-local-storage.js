@@ -1,28 +1,64 @@
 // config-local-storage.js
 
-module.exports = Config;
+const Rexfer = require('./rexfer');
 
 // Config
-function Config(key, value, version) {
-	this.key = key;
-	//this.version = version;
-	this.value = value || {};
-	this.load();
-	//if (this.value.version !== version) {
-	//	this.value = value || {};
-	//	this.value.version = version
-	//}
-}
+class Config {
+	// コンストラクタ
+	constructor(key, value) {
+		this.key = key;
+		this.value = value || {};
+		this.load();
+	}
 
-// #load
-Config.prototype.load = function load() {
-	if (typeof localStorage[this.key] === 'undefined')
-		this.save();
-	this.value = JSON.parse(localStorage[this.key]);
-}
-// #save
+	// load
+	load() {
+		if (typeof localStorage[this.key] === 'undefined')
+			this.save();
+		this.value = JSON.parse(localStorage[this.key]);
+	}
 
-Config.prototype.save = function save() {
-	localStorage[this.key] = JSON.stringify(this.value);
-	return this.value;
-}
+	// save
+	save() {
+		localStorage[this.key] = JSON.stringify(this.value);
+		return this.value;
+	}
+
+	// propValue
+	propValue(closureValue, key) {
+		const self = this;
+		closureValue = typeof this.value[key] === 'undefined' ? closureValue : this.value[key];
+		closureFunc(closureValue);
+		return closureFunc;
+
+		function closureFunc(x) {
+			if (arguments.length > 0) {
+				closureValue = x;
+				self.value[key] = closureValue;
+				self.save();
+			}
+			return closureValue;
+		}
+	}
+
+	// propRexfer
+	propRexfer(closureValue, key) {
+		const self = this;
+		closureValue = typeof this.value[key] === 'undefined' ? closureValue : this.value[key];
+		closureFunc(closureValue);
+		return closureFunc;
+
+		function closureFunc(x) {
+			if (arguments.length > 0) {
+				closureValue = x;
+				closureFunc.rexfer = closureValue ? new Rexfer(closureValue, 'i') : null;
+				self.value[key] = closureValue;
+				self.save();
+			}
+			return closureValue;
+		}
+	}
+
+} // class Config
+
+module.exports = Config;

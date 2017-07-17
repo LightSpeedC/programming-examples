@@ -11,7 +11,6 @@ void function () {
 	const electron = require('electron');
 	const aa = require('aa');
 
-	const Rexfer = require('./rexfer');
 	const Config = require('./config-local-storage');
 	const config = new Config('electron-mithril-async-file-search', {});
 
@@ -27,23 +26,23 @@ void function () {
 	const flagUsage = m.prop(false);
 	const flagReleaseNotes = m.prop(false);
 	const flagWishList = m.prop(false);
-	const flagFilter = propCfg(false, 'flagFilter');
-	const flagAdvanced = propCfg(false, 'flagAdvanced');
+	const flagFilter = config.propValue(false, 'flagFilter');
+	const flagAdvanced = config.propValue(false, 'flagAdvanced');
 	// 検索文字列
-	const textSearch = propRex('', 'search');
+	const textSearch = config.propRexfer('', 'search');
 	// 含める文字列 (検索結果)
-	const textIncludes = propRex('', 'includes');
+	const textIncludes = config.propRexfer('', 'includes');
 	// 含めない文字列 (検索結果)
-	const textExcludes = propRex('', 'excludes');
+	const textExcludes = config.propRexfer('', 'excludes');
 	// 検索スキップ文字列
-	const textSearchSkip = propRex(
+	const textSearchSkip = config.propRexfer(
 		'^node_modules,^.git$,^.svn$', 'searchSkip');
 	// 閉じておく文字列 (検索結果)
-	const textClose = propRex(
+	const textClose = config.propRexfer(
 		'^old$,backup,^旧$,^save$,^保存$,^node_modules,^.git$,^.svn$', 'close');
 
-	const textMaxFiles = propCfg(3000, 'maxFiles');
-	const textMaxTotalFiles = propCfg(100000, 'maxTotalFiles');
+	const textMaxFiles = config.propValue(3000, 'maxFiles');
+	const textMaxTotalFiles = config.propValue(100000, 'maxTotalFiles');
 	// 通知メッセージ
 	const textMessage = m.prop('検索できます');
 
@@ -60,9 +59,7 @@ void function () {
 	const SUBTREE_RETAIN = { subtree: 'retain' };
 
 	isWindows && require('./windows-get-drive-letters')().then(list => {
-		driveLetters = [driveLetters[0]].concat(
-			list.map(x => x + ':\\')
-				.filter(x => x !== driveLetters[0]));
+		driveLetters = list.map(x => x + ':\\');
 		m.redraw(true);
 	});
 
@@ -118,6 +115,7 @@ void function () {
 	// やりたいことリスト表示
 	function viewWishList() {
 		const list = [
+			'ディレクトリ・フォルダ移動の履歴を利用したい',
 			'検索文字列の履歴を利用したい',
 		];
 		return m('ul', list.map(x => m('li', x)));
@@ -343,9 +341,9 @@ void function () {
 								m('td.error', { colspan: n - i }, child + ''));
 					let vdom = [];
 					if (child ||
-						(!textSearch.rex || textSearch.rex.test(prop)) &&
-						(!textIncludes.rex || textIncludes.rex.test(prop)) &&
-						(!textExcludes.rex || !textExcludes.rex.test(prop))) {
+						(!textSearch.rexfer || textSearch.rexfer.test(prop)) &&
+						(!textIncludes.rexfer || textIncludes.rexfer.test(prop)) &&
+						(!textExcludes.rexfer || !textExcludes.rexfer.test(prop))) {
 
 						vdom.push(m('tr', { key: fullPath }, [
 							range(i).map(x => m('td.indent', indentSpace)),
@@ -404,9 +402,9 @@ void function () {
 
 			try {
 				yield findDirFiles(targetDir,
-					textSearch.rex,
-					textSearchSkip.rex,
-					textClose.rex,
+					textSearch.rexfer,
+					textSearchSkip.rexfer,
+					textClose.rexfer,
 					findController);
 				if (!findController.isCancel)
 					textMessage('完了しました');
@@ -471,39 +469,6 @@ void function () {
 			} catch (e) { }
 			m.redraw(true);
 		});
-	}
-
-	// propRex
-	function propRex(closureValue, key) {
-		closureValue = typeof config.value[key] === 'undefined' ? closureValue : config.value[key];
-		closureFunc(closureValue);
-		return closureFunc;
-
-		function closureFunc(x) {
-			if (arguments.length > 0) {
-				closureValue = x;
-				closureFunc.rex = closureValue ? new Rexfer(closureValue, 'i') : null;
-				config.value[key] = closureValue;
-				config.save();
-			}
-			return closureValue;
-		};
-	}
-
-	// propCfg
-	function propCfg(closureValue, key) {
-		closureValue = typeof config.value[key] === 'undefined' ? closureValue : config.value[key];
-		closureFunc(closureValue);
-		return closureFunc;
-
-		function closureFunc(x) {
-			if (arguments.length > 0) {
-				closureValue = x;
-				config.value[key] = closureValue;
-				config.save();
-			}
-			return closureValue;
-		};
 	}
 
 	// HTML要素のイベントと値にプロパティを接続するユーティリティ
