@@ -1,7 +1,7 @@
 {
   "name": "electron-mithril-async-file-search",
-  "version": "0.0.15",
-  "description": "file search electron mithril",
+  "version": "0.0.16",
+  "description": "async file search with electron and mithril",
   "main": "main.js",
   "private": true,
   "window": {

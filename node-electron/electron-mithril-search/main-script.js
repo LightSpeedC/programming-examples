@@ -3,8 +3,9 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.15 (2017/07/15)';
+	const version = 'version: 0.0.16 (2017/07/17)';
 
+	const fs = require('fs');
 	const path = require('path');
 	const spawn = require('child_process').spawn;
 	const electron = require('electron');
@@ -46,12 +47,26 @@ void function () {
 	// 通知メッセージ
 	const textMessage = m.prop('検索できます');
 
-	const targetDir = path.resolve(process.env.AAA_TARGET_DIR);
+	const isWindows = process.platform === 'win32';
+
+	let targetDir = path.resolve(process.env.AAA_TARGET_DIR);
+	let targetDirChildren; // ターゲット・ディレクトリ直下のサブ・ディレクトリ一覧
+	const initialTargetDir = targetDir;
+	let driveLetters = isWindows ? ['C:\\'] : null;
 	let wholeObject = { [ERROR_PROP]: 'まだ検索していません' };
 	let timer; // 検索中のインターバルタイマー
 	const MAX_INDENT = 20; // 最大インデントの深さ
 	const indentSpace = '　';
 	const SUBTREE_RETAIN = { subtree: 'retain' };
+
+	isWindows && require('./windows-get-drive-letters')().then(list => {
+		driveLetters = [driveLetters[0]].concat(
+			list.map(x => x + ':\\')
+				.filter(x => x !== driveLetters[0]));
+		m.redraw(true);
+	});
+
+	targetDirChanged();
 
 	m.mount($div, { view: viewMain });
 
@@ -80,6 +95,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.16 (2017/07/17): フォルダ移動できる様にした',
 			'0.0.15 (2017/07/15): WindowsだけでなくMacにも対応 for Gunma.web #28 (electron@1.5.1)',
 			'0.0.14 (2016/10/25): デフォルト値を変更 configバージョン変更',
 			'0.0.13 (2016/10/10): 起動時に入力テキストを選択',
@@ -102,7 +118,6 @@ void function () {
 	// やりたいことリスト表示
 	function viewWishList() {
 		const list = [
-			'別のフォルダやディレクトリに移動したい',
 			'検索文字列の履歴を利用したい',
 		];
 		return m('ul', list.map(x => m('li', x)));
@@ -123,9 +138,51 @@ void function () {
 
 	// メインview
 	function viewMain() {
+		let dir = targetDir;
+		if (dir.length > 1 && dir.endsWith(path.sep))
+			dir = dir.substr(0, dir.length - 1);
+		const paths = dir.split(path.sep).map(x => x + path.sep);
+		if (dir.substr(0, 2) === '\\\\') {
+			paths.shift(); paths.shift();
+			const host = paths.shift(), share = paths.shift();
+			paths.unshift('\\\\' + host + share);
+		}
 		return [
 			m('h3', { key: 'title' }, 'ファイル検索 - ',
-				m('font[color=green]', targetDir),
+				!timer && driveLetters &&
+				m('select.button', {
+					onchange: e => {
+						targetDir = e.target.value;
+						targetDirChanged();
+						m.redraw(true);
+					}
+				},
+					m('option.button', { value: initialTargetDir }, '<初>'),
+					// m('option.button', { value: '.' }, '<現>'),
+					driveLetters.map(x => m('option.button',
+						{ selected: x.substr(0, 2) === targetDir.substr(0, 2) }, x))),
+				timer ? m('font[color=green]', targetDir) :
+					paths.map((x, i) => i === paths.length - 1 ? m('span.current', ' ' + x + ' ') : [
+						m('button.button', {
+							onclick: () => {
+								if (i === 0) targetDir = paths[0];
+								else targetDir = paths.slice(0, i + 1).join('');
+								targetDirChanged();
+								m.redraw(true);
+							}
+						}, x),
+					]),
+				(timer || !targetDirChildren || !targetDirChildren.length ? ' ' :
+					m('select.button', {
+						onchange: e => {
+							if (e.target.value) {
+								targetDir = path.resolve(targetDir, e.target.value);
+								targetDirChanged();
+								m.redraw(true);
+							}
+						}
+					}, m('option.button'),
+						targetDirChildren.map(x => m('option.button', x)))),
 				(timer ? m('font[color=red]', ' - 検索中') : '')),
 			m('div', { key: 'condition' },
 				timer ? [
@@ -266,9 +323,9 @@ void function () {
 
 	// range 0～n-1までの数字の配列
 	function range(n) {
-		const a = [];
-		for (let i = 0; i < n; ++i) a.push(i);
-		return a;
+		const arr = new Array(n);
+		for (let i = 0; i < n; ++i) arr[i] = i;
+		return arr;
 	}
 
 	// ツリー表示
@@ -304,7 +361,7 @@ void function () {
 							m(child ? 'td.folder' : 'td.file', {
 								colspan: n - i,
 								title: fullPath.substring(targetDir.length + 1),
-								onclick: child && process.platform !== 'win32' ?
+								onclick: child && !isWindows ?
 									() => showItemInFolder(fullPath) :
 									() => openItem(fullPath)
 							}, prop)
@@ -382,7 +439,7 @@ void function () {
 
 	// フォルダやファイルを開く
 	function openItem(file) {
-		process.platform === 'win32' ?
+		isWindows ?
 			spawn('explorer', [file]) :
 			electron.shell.openItem(file);
 		return;
@@ -393,6 +450,27 @@ void function () {
 		blur();
 		electron.shell.showItemInFolder(file);
 		return;
+	}
+
+	// ターゲット・ディレクトリが変更された時に、サブ・ディレクトリ一覧を取得する
+	function targetDirChanged() {
+		aa(function* () {
+			targetDir = path.resolve(targetDir);
+			if (targetDir.length > (isWindows ? 3 : 2) && targetDir.substr(-1) === path.sep)
+				targetDir = targetDir.substr(0, targetDir.length - 1);
+			targetDirChildren = null;
+			m.redraw(true);
+			try {
+				const names = yield cb => fs.readdir(targetDir, cb);
+				targetDirChildren = (yield names.map(name => function* () {
+					try {
+						const stat = yield cb => fs.stat(path.resolve(targetDir, name), cb);
+						return { name, stat };
+					} catch (e) { return { name } }
+				})).filter(x => x.stat && x.stat.isDirectory()).map(x => x.name);
+			} catch (e) { }
+			m.redraw(true);
+		});
 	}
 
 	// propRex
