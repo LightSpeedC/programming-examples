@@ -3,7 +3,7 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.16 (2017/07/17)';
+	const version = 'version: 0.0.17 (2017/07/18)';
 
 	const fs = require('fs');
 	const path = require('path');
@@ -40,6 +40,12 @@ void function () {
 	// 閉じておく文字列 (検索結果)
 	const textClose = config.propRexfer(
 		'^old$,backup,^旧$,^save$,^保存$,^node_modules,^.git$,^.svn$', 'close');
+	// フォルダ履歴
+	const folderHistory = config.propValue([], 'folderHistory');
+	const folderHistorySearchResult = {}; // 検索結果
+	const folderHistorySearch = {}; // 検索文字列
+	// 検索文字列の履歴
+	const searchHistory = config.propValue([], 'searchHistory');
 
 	const textMaxFiles = config.propValue(3000, 'maxFiles');
 	const textMaxTotalFiles = config.propValue(100000, 'maxTotalFiles');
@@ -52,7 +58,6 @@ void function () {
 	let targetDirChildren; // ターゲット・ディレクトリ直下のサブ・ディレクトリ一覧
 	const initialTargetDir = targetDir;
 	let driveLetters = isWindows ? ['C:\\'] : null;
-	let wholeObject = { [ERROR_PROP]: 'まだ検索していません' };
 	let timer; // 検索中のインターバルタイマー
 	const MAX_INDENT = 20; // 最大インデントの深さ
 	const indentSpace = '　';
@@ -92,6 +97,7 @@ void function () {
 	// リリース・ノート表示
 	function viewReleaseNotes() {
 		const list = [
+			'0.0.17 (2017/07/18): 検索文字列履歴・フォルダ履歴・検索結果を切替可能にした',
 			'0.0.16 (2017/07/17): フォルダ移動できる様にした',
 			'0.0.15 (2017/07/15): WindowsだけでなくMacにも対応 for Gunma.web #28 (electron@1.5.1)',
 			'0.0.14 (2016/10/25): デフォルト値を変更 configバージョン変更',
@@ -115,8 +121,7 @@ void function () {
 	// やりたいことリスト表示
 	function viewWishList() {
 		const list = [
-			'ディレクトリ・フォルダ移動の履歴を利用したい',
-			'検索文字列の履歴を利用したい',
+			'いろいろと実現した。後、やることは?',
 		];
 		return m('ul', list.map(x => m('li', x)));
 	}
@@ -147,18 +152,27 @@ void function () {
 		}
 		return [
 			m('h3', { key: 'title' }, 'ファイル検索 - ',
-				!timer && driveLetters &&
+
+				timer || !driveLetters ? '' :
 				m('select.button', {
 					onchange: e => {
-						targetDir = e.target.value;
-						targetDirChanged();
-						m.redraw(true);
+						if (e.target.value) {
+							targetDir = e.target.value;
+							targetDirChanged();
+							// m.redraw(true);
+						}
 					}
 				},
-					m('option.button', { value: initialTargetDir }, '<初>'),
-					// m('option.button', { value: '.' }, '<現>'),
+					m('option.button', { key: '', value: '', selected: true }, ''),
+					m('option.button', { key: initialTargetDir, value: initialTargetDir }, '<初>'),
+					// m('option.button', { key: '.', value: '.' }, '<現>'),
+
+					// ドライブレターのリスト (Windowsのみ)
+					driveLetters &&
 					driveLetters.map(x => m('option.button',
-						{ selected: x.substr(0, 2) === targetDir.substr(0, 2) }, x))),
+						{ key: x, selected: x.substr(0, 2) === targetDir.substr(0, 2) }, x))),
+				' ',
+
 				timer ? m('font[color=green]', targetDir) :
 					paths.map((x, i) => i === paths.length - 1 ? m('span.current', ' ' + x + ' ') : [
 						m('button.button', {
@@ -181,7 +195,25 @@ void function () {
 						}
 					}, m('option.button'),
 						targetDirChildren.map(x => m('option.button', x)))),
-				(timer ? m('font[color=red]', ' - 検索中') : '')),
+				timer ? m('font[color=red]', ' - 検索中') : ''),
+
+			timer || !folderHistory().length ? '' :
+			m('h3', { key: 'folderHistory' }, 'フォルダ履歴 - ',
+				m('select.button', {
+					onchange: e => {
+						if (e.target.value) {
+							targetDir = e.target.value;
+							targetDirChanged();
+							// m.redraw(true);
+						}
+					}
+				},
+					m('option.button', { key: '', value: '' }, ''),
+					// フォルダ履歴
+					folderHistory().map(x =>
+						m('option.button', { key: x, selected: x === targetDir }, x))),
+				' ', m('button.button', { onclick: () => folderHistory([]) }, 'クリア')),
+
 			m('div', { key: 'condition' },
 				timer ? [
 					m('div',
@@ -204,13 +236,21 @@ void function () {
 
 						// 検索
 						m('form', { onsubmit: search },
-							m('div', '検索: ',
+							m('div', '検　索　: ',
 								m('input', m_on('change', 'value', textSearch,
 									{
 										autofocus: true, placeholder: '検索したい文字列', size: 100,
 										onfocus: selectThisText
 									})),
-								m('button.button[type=submit]', { onclick: search }, '検索'))),
+								' ', m('button.button[type=submit]', { onclick: search }, '検索')),
+
+							!searchHistory().length ? '' : m('div', '検索履歴: ',
+								m('select.button', { onclick: e =>
+									textSearch(e.target.value) },
+									searchHistory().map(x => m('option.button',
+										{ selected: x === textSearch() }, x))),
+								' ', m('button.button', { onclick: () =>
+									searchHistory([]) }, 'クリア'))),
 						//m('hr'),
 
 						// 検索オプション
@@ -274,6 +314,8 @@ void function () {
 			m('hr', { key: 'hr-message' }),
 
 			// 検索結果
+			folderHistorySearch[targetDir] ?
+				m('h3', '検索: ' + folderHistorySearch[targetDir]) : '',
 			viewSearchResult(),
 			m('hr', { key: 'hr-result' }),
 
@@ -379,13 +421,13 @@ void function () {
 	function viewSearchResult() {
 		return m('table',
 			{ width: '100%', cellPadding: 0, border: 0, borderColor: 'lightgray', cellSpacing: 0 },
-			viewNode([], { [targetDir]: wholeObject }, 0, MAX_INDENT)
+			viewNode([], { [targetDir]: folderHistorySearchResult[targetDir] }, 0, MAX_INDENT)
 		);
 	}
 
 	// 検索コールバック
 	function progress(object) {
-		wholeObject = object.wholeObject;
+		folderHistorySearchResult[targetDir] = object.wholeObject;
 	}
 
 	// 検索
@@ -394,7 +436,21 @@ void function () {
 		if (timer) return;
 		aa(function* () {
 			m.redraw(true);
-			wholeObject = {};
+
+			// 検索文字列の履歴に追加
+			const s = textSearch();
+			searchHistory([s]
+				.concat(searchHistory().filter(x => x !== s))
+				.filter((x, i) => i < 10));
+
+			// 検索フォルダ履歴に追加
+			folderHistory([targetDir]
+				.concat(folderHistory().filter(x => x !== targetDir))
+				.filter((x, i) => i < 10));
+
+			folderHistorySearchResult[targetDir] = {};
+			folderHistorySearch[targetDir] = textSearch();
+
 			timer = setInterval(() => m.redraw(true), 500);
 			findController.isCancel = false;
 			findController.maxFiles = textMaxFiles();
@@ -457,6 +513,8 @@ void function () {
 			if (targetDir.length > (isWindows ? 3 : 2) && targetDir.substr(-1) === path.sep)
 				targetDir = targetDir.substr(0, targetDir.length - 1);
 			targetDirChildren = null;
+			folderHistorySearchResult[targetDir] = folderHistorySearchResult[targetDir] ||
+				{ [ERROR_PROP]: 'まだ検索していません' };
 			m.redraw(true);
 			try {
 				const names = yield cb => fs.readdir(targetDir, cb);
