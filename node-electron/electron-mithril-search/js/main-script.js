@@ -3,13 +3,18 @@ void function () {
 
 	focus();
 
-	const version = 'version: 0.0.17 (2017/07/18)';
-
 	const fs = require('fs');
 	const path = require('path');
-	const spawn = require('child_process').spawn;
 	const electron = require('electron');
 	const aa = require('aa');
+
+	// range 0～n-1までの数字の配列
+	const range = require('./range');
+
+	// HTML要素のイベントと値にプロパティを接続するユーティリティ
+	const m_on = require('./mithril-on')(m);
+
+	const { openItem, showItemInFolder } = require('./electron-shell')(electron);
 
 	const Config = require('./config-local-storage');
 	const config = new Config('electron-mithril-async-file-search', {});
@@ -63,6 +68,20 @@ void function () {
 	const indentSpace = '　';
 	const SUBTREE_RETAIN = { subtree: 'retain' };
 
+	// 使い方表示
+	const viewUsage = require('./view-usage')(m);
+
+	// リリース・ノート表示
+	const viewReleaseNotes = require('./view-release-notes')(m);
+	const version = viewReleaseNotes.list[0];
+	document.title = '非同期ファイル検索 (electron + mithril) - ' + version;
+
+	// やりたいことリスト表示
+	const viewWishList = require('./view-wish-list')(m);
+
+	// デバッグ表示
+	const viewDebug = require('./view-debug')(m, __dirname, __filename);
+
 	isWindows && require('./windows-get-drive-letters')().then(list => {
 		driveLetters = list.map(x => x + ':\\');
 		m.redraw(true);
@@ -71,73 +90,6 @@ void function () {
 	targetDirChanged();
 
 	m.mount($div, { view: viewMain });
-
-	// 使い方表示
-	function viewUsage() {
-		const list = [
-			'ファイル名の一部として「検索したい文字列」を入れて「検索」します (Enterで検索)',
-			'ファイル名に「含む」文字列をフィルタします (Enterで更新)',
-			'ファイル名に「含まない」文字列を除外します (Enterで更新)',
-			'検索中に「キャンセル」できます',
-			'フォルダやファイルへリンクできます (ファイルの左の■でフォルダへリンク)',
-			'ツリー表示でき、チェックボックスで非表示にできます (再検索でリセット)',
-			'フォルダあたりの最大検索ファイル数を変更できます (超えたらスキップ)',
-			'トータルの最大検索ファイル数を変更できます (超えたら検索をキャンセル)',
-			'ワイルドカード検索ができます',
-			'　1. -A -> not A',
-			'　2. A,B -> A or  B',
-			'　3. A B -> A and B',
-			'　4. A;B -> A or  B',
-			'　ex. A,B C;E -F -> ((A or B) and C) or (E and (not F))',
-			'×あまりたくさんのファイルを検索するとハングする可能性があります',
-		];
-		return m('ul', list.map(x => m('li', x)));
-	}
-
-	// リリース・ノート表示
-	function viewReleaseNotes() {
-		const list = [
-			'0.0.17 (2017/07/18): 検索文字列履歴・フォルダ履歴・検索結果を切替可能にした',
-			'0.0.16 (2017/07/17): フォルダ移動できる様にした',
-			'0.0.15 (2017/07/15): WindowsだけでなくMacにも対応 for Gunma.web #28 (electron@1.5.1)',
-			'0.0.14 (2016/10/25): デフォルト値を変更 configバージョン変更',
-			'0.0.13 (2016/10/10): 起動時に入力テキストを選択',
-			'0.0.12 (2016/09/29): チェックボックスのラベルの不具合修正',
-			'0.0.11 (2016/09/27): チェックボックスのラベルをクリックでトグル',
-			'0.0.10 (2016/09/23): 検索文字列などを、そのまま保存',
-			'0.0.9  (2016/09/16): 正規表現的なワイルドカード(*?)検索、AND・OR・NOT( ,;-)検索を追加',
-			'0.0.8  (2016/08/31): 旧レイアウト削除、old・旧フォルダ等を非表示',
-			'0.0.7  (2016/06/16): 最大検索ファイル数の入力',
-			'0.0.6  (2016/06/14): ルート・フォルダのリンク不具合修正、最大検索ファイル数制限、ほか',
-			'0.0.5  (2016/06/13): リリース・ノート表示、リファクタリング',
-			'0.0.4  (2016/06/12): ツリー表示、新旧レイアウト切替',
-			'0.0.3  (2016/06/11): 検索中のキャンセル',
-			'0.0.2  (2016/06/10): フォルダやファイルへのリンク、フィルタ(含む＋含まない)',
-			'0.0.1  (2016/06/09): 検索したファイルの一覧表示',
-		];
-		return m('ul', list.map(x => m('li', x)));
-	}
-
-	// やりたいことリスト表示
-	function viewWishList() {
-		const list = [
-			'いろいろと実現した。後、やることは?',
-		];
-		return m('ul', list.map(x => m('li', x)));
-	}
-
-	// デバッグ表示
-	function viewDebug() {
-		const list = [
-			'カレント作業ディレクトリ process.cwd(): ' + process.cwd(),
-			'ディレクトリ名 __dirname: ' + __dirname,
-			'ファイル名 __filename: ' + __filename,
-			'プロセスID process.pid: ' + process.pid,
-			'バージョン process.versions: ' + JSON.stringify(process.versions, null, '\t'),
-			'環境変数 process.env: ' + JSON.stringify(process.env, null, '\t'),
-		];
-		return m('ul', list.map(x => m('li', m('pre', x))));
-	}
 
 	// メインview
 	function viewMain() {
@@ -361,13 +313,6 @@ void function () {
 		this.select(0, this.value.length);
 	}
 
-	// range 0～n-1までの数字の配列
-	function range(n) {
-		const arr = new Array(n);
-		for (let i = 0; i < n; ++i) arr[i] = i;
-		return arr;
-	}
-
 	// ツリー表示
 	function viewNode(nodePath, node, i, n) {
 		if (typeof node === 'object' && node !== null) {
@@ -491,21 +436,6 @@ void function () {
 		setTimeout(() => m.redraw(true), 500);
 	}
 
-	// フォルダやファイルを開く
-	function openItem(file) {
-		isWindows ?
-			spawn('explorer', [file]) :
-			electron.shell.openItem(file);
-		return;
-	}
-
-	// ファイルのあるフォルダを開く
-	function showItemInFolder(file) {
-		blur();
-		electron.shell.showItemInFolder(file);
-		return;
-	}
-
 	// ターゲット・ディレクトリが変更された時に、サブ・ディレクトリ一覧を取得する
 	function targetDirChanged() {
 		aa(function* () {
@@ -529,11 +459,4 @@ void function () {
 		});
 	}
 
-	// HTML要素のイベントと値にプロパティを接続するユーティリティ
-	function m_on(eventName, propName, propFunc, attrs) {
-		attrs = attrs || {};
-		attrs['on' + eventName] = m.withAttr(propName, propFunc);
-		attrs[propName] = propFunc();
-		return attrs;
-	}
 }();
