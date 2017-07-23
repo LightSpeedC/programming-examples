@@ -12,7 +12,6 @@ void function () {
 
 	const statAsync = aa.thunkify(fs, fs.stat);
 	const readdirAsync = aa.thunkify(fs, fs.readdir);
-	//aa.thunkifyAll(fs);
 	if (typeof statAsync !== 'function')
 		throw new TypeError('eh!? statAsync');
 	if (typeof readdirAsync !== 'function')
@@ -43,8 +42,8 @@ void function () {
 		let wholeObject;
 		let filesCount = 0;
 
-		const xqtor1 = Executors(2);
-		const xqtor2 = Executors(2);
+		const xqtorRead = Executors(10);
+		const xqtorStat = Executors(10);
 		const result = yield *find(dir);
 
 		if (filesCount > maxTotalFiles)
@@ -62,16 +61,19 @@ void function () {
 		// cancel
 		function *cancel() {
 			try {
-				yield *xqtor1.cancel();
-				yield *xqtor2.cancel();
+				yield *xqtorRead.cancel();
+				yield *xqtorStat.cancel();
 			} catch(e) {
-				yield *xqtor1.end();
-				yield *xqtor2.end();
+				yield *xqtorRead.end();
+				yield *xqtorStat.end();
 			}
 		}
 
 		// find
 		function *find(dir) {
+			if (filesCount > maxTotalFiles)
+				return undefined;
+
 			const result = new SpecialData();
 			if (!wholeObject) {
 				wholeObject = result;
@@ -86,7 +88,7 @@ void function () {
 				wholeObject[ERROR_PROP] = SEARCHING + ' (' + filesCount + ')';
 
 			try {
-				const names = yield xqtor1(readdirAsync, dir);
+				const names = yield xqtorRead(readdirAsync, dir);
 				if (controller.isCancel) {
 					result[ERROR_PROP] = CANCEL_ERROR;
 					setDirty(result);
@@ -105,16 +107,16 @@ void function () {
 				if (filesCount > maxTotalFiles)
 					return undefined;
 
-				//for (let name of names) {
 				yield names.map(name => function *() {
 					if (rexSearchSkip && rexSearchSkip.test(name))
 						return;
 
+					// 名前順 (readdirの結果の順番) に子キーを設定
 					result[name] = undefined;
 					setDirty(result);
 					try {
 						var file = path.resolve(dir, name);
-						const stat = yield xqtor2(statAsync, file);
+						const stat = yield xqtorStat(statAsync, file);
 						if (controller.isCancel) {
 							result[name] = new SpecialData(ERROR_PROP, CANCEL_ERROR);
 							setDirty(result);
@@ -171,7 +173,7 @@ void function () {
 	} // findDirFiles
 	findDirFiles.INVISIBLE_PROP = INVISIBLE_PROP;
 	findDirFiles.ERROR_PROP = ERROR_PROP;
-	findDirFiles.CLEAN_PROP = CLEAN_PROP;
+	// findDirFiles.CLEAN_PROP = CLEAN_PROP;
 	findDirFiles.HIDE_PROP = HIDE_PROP;
 
 }();

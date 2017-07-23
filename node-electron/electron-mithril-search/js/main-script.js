@@ -22,7 +22,7 @@ void function () {
 	const findDirFiles = require('./find-dir-files');
 	const findController = { isCancel: false, cancel, progress };
 	const INVISIBLE_PROP = findDirFiles.INVISIBLE_PROP;
-	const CLEAN_PROP = findDirFiles.CLEAN_PROP;
+	// const CLEAN_PROP = findDirFiles.CLEAN_PROP;
 	const ERROR_PROP = findDirFiles.ERROR_PROP;
 	const HIDE_PROP = findDirFiles.HIDE_PROP;
 
