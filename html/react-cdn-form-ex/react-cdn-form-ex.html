@@ -132,11 +132,6 @@ class Form条件 extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {メッセージ: null};
-
-		// 以下、thisを予めbindしておく(render時より性能が良い)
-		this.onClick条件検索 = this.onClick条件検索.bind(this);
-		this.onChange条件名前 = this.onChange条件名前.bind(this);
-		this.onKeyDown条件名前 = this.onKeyDown条件名前.bind(this);
 	} // constructor コンストラクタ
 
 	// レンダー(仮想DOMを返す)
@@ -157,7 +152,7 @@ class Form条件 extends React.Component {
 	} // render
 
 	// 検索ボタンをクリックした時
-	onClick条件検索() {
+	onClick条件検索 = () => {
 		// console.log(now(), 'Form条件.onClick条件検索');
 
 		// コンポーネント側で可能な入力チェックを行う
@@ -170,20 +165,18 @@ class Form条件 extends React.Component {
 		// プロパティに関数が指定されている場合、コールバックする
 		this.props.onClick条件検索 &&
 		this.props.onClick条件検索();
-	} // onClick条件検索
+	}; // onClick条件検索
 
 	// 名前の入力変更があった時
-	onChange条件名前(e) {
+	onChange条件名前 = e => {
 		const {vm条件} = this.props;
 		vm条件.名前 = e.target.value;
 		this.setState({メッセージ: null});
-	} // onChange条件名前
+	}; // onChange条件名前
 
 	// 名前入力で改行
-	onKeyDown条件名前(e) {
-		e.keyCode === 13 &&
-		this.onClick条件検索();
-	} // onKeyDown条件名前
+	onKeyDown条件名前 = e => e.keyCode === 13 ?
+		this.onClick条件検索() : undefined;
 } // Form条件
 
 //======================================================================
