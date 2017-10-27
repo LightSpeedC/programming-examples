@@ -1,0 +1,15 @@
+{
+  "name": "process-list-ex",
+  "version": "0.0.0",
+  "description": "",
+  "main": "process-list-ex.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Kazuaki Nishizawa <Kazuaki.Nishizawa@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "process-list": "^1.2.1"
+  }
+}
