@@ -1,4 +1,5 @@
-​# aa 仕様
+aa 仕様
+====
 
 * v aa(promise) resolve
 * v aa(gtor)
