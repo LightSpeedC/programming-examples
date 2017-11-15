@@ -1,0 +1,18 @@
+{
+  "name": "pkg3-ex",
+  "version": "0.0.0",
+  "description": "npm pkg example",
+  "main": "pkg3-ex.js",
+  "bin": "./pkg3-ex.js",
+  "scripts": {
+    "start": "node pkg3-ex",
+    "build": "pkg . --targets node7-win-x64",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "dependencies": {
+    "pkg": "^3.0.6"
+  }
+}
