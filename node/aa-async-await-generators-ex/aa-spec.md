@@ -1,18 +1,18 @@
 aa 仕様
 ====
 
-* v aa(promise) resolve
-* v aa(gtor)
-* v aa(gtor func)
-* v aa(thunk)
-* aa(stream)
-* v aa(number, value) wait()
-* v aa.wait(number, value)
-* aa(string) ?
-* aa(boolean) ?
-* v aa(array)
-* aa(object)
-* v aa() ... Channel()
-* v aa.Channel()
+```js
+const aa = require('aa-yocto');
+```
 
-aa-yocto
+aa(any) return promise.
+
+* aa() ... return new Channel()
+* aa(gtor | gtor-func | async-func | thunk-func) ... do it
+* aa(array | object) ... resolve all
+* aa(promise) ... return it
+* aa(undefined | null | number | string | boolean | other) ... resolve it
+* aa(stream) ... consume it
+
+* aa.Channel() ... return new Channel()
+* aa.wait(msec: number, [value: any]) ... wait
