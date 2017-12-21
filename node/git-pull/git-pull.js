@@ -24,10 +24,10 @@
 	var dttm = DateTime.toDateTimeString().replace(/[\-:]/g, '').replace(/ /g, '-').substr(0, 13);
 
 	var REX_GIT = new RegExp(
-							"On branch [-a-zA-Z0-9/]+\n" +
-							"Your branch is up-to-date with '[-a-zA-Z0-9/]+'\\.\n*" +
+							"On branch [a-zA-Z0-9/]+\n" +
+							"Your branch is up.to.date with '[a-zA-Z0-9/]+'\\.\n*" +
 							"nothing to commit, working (tree|directory) clean\n" +
-							"Already up-to-date\\.\n");
+							"Already up.to.date\\.\n");
 
 	// main
 	aa(function* main() {
