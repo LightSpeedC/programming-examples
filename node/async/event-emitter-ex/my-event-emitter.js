@@ -21,27 +21,23 @@ const EventEmitter = (function () {
 		// addListener
 		addListener(event, listener) {
 			// this.emit('newListener', event, listener);
-			if (!this.$listeners0) this.$listeners0 = Object.create(null);
 			return addListener(this.$listeners0, event, listener), this;
 		}
 
 		// on
 		on(event, listener) {
 			// this.emit('newListener', event, listener);
-			if (!this.$listeners0) this.$listeners0 = Object.create(null);
 			return addListener(this.$listeners0, event, listener), this;
 		}
 
 		// once
 		once(event, listener) {
 			// this.emit('newListener', event, listener);
-			if (!this.$listeners1) this.$listeners1 = Object.create(null);
 			return addListener(this.$listeners1, event, listener), this;
 		}
 
 		// removeListener
 		removeListener(event, listener) {
-			if (!event) return this.reset();
 			removeListener(this.$listeners0, event, listener);
 			removeListener(this.$listeners1, event, listener);
 			return this;
@@ -49,7 +45,6 @@ const EventEmitter = (function () {
 
 		// removeAllListeners
 		removeAllListeners(event) {
-			if (!event) return this.reset();
 			removeAllListeners(this.$listeners0, event);
 			removeAllListeners(this.$listeners1, event);
 			return this;
@@ -57,7 +52,6 @@ const EventEmitter = (function () {
 
 		// off
 		off(event, listener) {
-			if (!event) return this.reset();
 			removeListener(this.$listeners0, event, listener);
 			removeListener(this.$listeners1, event, listener);
 			return this;
@@ -67,15 +61,15 @@ const EventEmitter = (function () {
 		emit(event, ...args) {
 			emit(this.$listeners0, event, args);
 			emit(this.$listeners1, event, args);
-			if (this.$listeners1 && this.$listeners1[event])
+			if (this.$listeners1[event])
 				delete this.$listeners1[event];
 			return this;
 		}
 
 		// listeners(event)
 		listeners(event) {
-			return (this.$listeners0 && this.$listeners0[event] || [])
-				.concat(this.$listeners1 && this.$listeners1[event] || []);
+			return (this.$listeners0[event] || [])
+				.concat(this.$listeners1[event] || []);
 		}
 
 		// setMaxListeners(n)
@@ -101,12 +95,14 @@ const EventEmitter = (function () {
 
 	// addListener
 	function addListener($listeners0, event, listener) {
+		// ??? newListener(event, listener);
 		($listeners0[event] || ($listeners0[event] = [])).push(listener);
 	}
 
 	// removeListener
 	function removeListener($listeners0, event, listener) {
-		if (!$listeners0 || !$listeners0[event]) return;
+		// ??? removeListener(event, listener);
+		if (!$listeners0[event]) return;
 		if (!listener) return delete $listeners0[event];
 
 		$listeners0[event] = $listeners0[event].filter(fn => fn !== listener);
@@ -115,13 +111,13 @@ const EventEmitter = (function () {
 
 	// removeAllListeners
 	function removeAllListeners($listeners0, event) {
-		if (!$listeners0 || !$listeners0[event]) return;
+		if (!$listeners0[event]) return;
 		delete $listeners0[event];
 	}
 
 	// emit
 	function emit($listeners0, event, args) {
-		if ($listeners0 && $listeners0[event])
+		if ($listeners0[event])
 			$listeners0[event].forEach(listener => listener.apply(null, args));
 	}
 
@@ -148,17 +144,4 @@ const EventEmitter = (function () {
 
 })();
 
-// class MyClass extends EventEmitter {};
-class MyClass {};
-EventEmitter.mixin(MyClass);
-
-// var ee = new EventEmitter();
-var ee = new MyClass();
-ee.on('eventx', (arg1, arg2) => console.log('eventx', arg1, arg2));
-ee.emit('eventx', 11, 12);
-ee.emit('eventx', 21, 22);
-ee.one('event1', (arg1, arg2) => console.log('event1', arg1, arg2));
-ee.emit('event1', 11, 12);
-ee.emit('event1', 21, 22);
-ee.off('eventx');
-ee.emit('eventx', 31, 32);
+module.exports = EventEmitter;
