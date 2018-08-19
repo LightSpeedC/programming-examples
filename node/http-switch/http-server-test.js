@@ -9,7 +9,11 @@ const port = 8000;
 
 http.createServer((req, res) => {
 	console.log(req.method, req.url);
-	res.write('port: ' + port + ' ' + req.method + ' ' + req.url + ' ');
+	res.writeHead(200, {
+		'Content-Type': 'text/html; charset=UTF-8',
+	});
+	res.write('port: ' + port + ' ' + req.method + ' ' + req.url + '<br/>\r\n');
+	res.write('<pre>' + util.inspect(req.headers) + '</pre>\r\n');
 	req.on('data', data => {
 		res.write(data);
 	});

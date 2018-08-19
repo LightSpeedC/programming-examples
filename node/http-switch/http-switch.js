@@ -31,6 +31,7 @@ function fsWatcher(event, file) {
 
 const httpServers = {};
 const httpTransfers = {};
+const reqAgents = new WeakMap();
 
 function reloadPorts(newPorts) {
 	Object.keys(httpServers)
@@ -69,6 +70,12 @@ function reloadPorts(newPorts) {
 									headers: req.headers,
 								},
 									res2 => {
+										res.writeHead(res2.statusCode,
+											res2.statusMessage,
+											res2.headers);
+										console.log(res2.statusCode,
+											res2.statusMessage,
+											res2.headers);
 										res2.pipe(res);
 									}));
 								return true;
