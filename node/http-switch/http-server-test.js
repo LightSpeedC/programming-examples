@@ -5,7 +5,7 @@
 const fs = require('fs');
 const util = require('util');
 const http = require('http');
-const port = 8000;
+const port = Number(process.argv[2] || 8000);
 
 http.createServer((req, res) => {
 	console.log(req.method, req.url);
