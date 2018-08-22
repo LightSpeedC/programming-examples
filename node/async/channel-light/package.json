@@ -1,0 +1,26 @@
+{
+  "name": "channel-light",
+  "version": "0.1.1",
+  "description": "light version of Channel.",
+  "main": "channel-light.js",
+  "dependencies": {},
+  "devDependencies": {
+    "aa": ">=0.1.32"
+  },
+  "repository": {
+    "type": "git",
+    "url": "LightSpeedWorks/channel-light"
+  },
+  "keywords": [
+    "channel",
+    "async",
+    "co",
+    "aa",
+    "async-await"
+  ],
+  "author": "LightSpeedC",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
