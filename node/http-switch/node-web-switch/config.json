@@ -1,0 +1,12 @@
+{
+	"log": true,
+	"services": {
+		"9000": {
+			"subdir": "http://localhost:8000/subdir/",
+			"*": "http://localhost/"
+		},
+
+		"8001": {"*": "http://localhost:18101/"},
+		"9090": {"*": "http://localhost:19190/"},
+	}
+}
