@@ -1,6 +1,6 @@
 'use strict';
 
-class Prom {
+class PromiseImpl {
 
 	constructor(resolver) {
 		if (typeof resolver !== 'function')
@@ -70,7 +70,7 @@ class Prom {
 			throw new TypeError('Promise onRejected ' + onRej + ' is not a function');
 
 		let nextRes, nextRej;
-		const p = new Prom((res, rej) => (nextRes = res, nextRej = rej));
+		const p = new PromiseImpl((res, rej) => (nextRes = res, nextRej = rej));
 		this.ary.push([onRes, onRej, nextRes, nextRej]);
 		return p;
 	}
@@ -91,16 +91,16 @@ class Prom {
 	}
 
 	static resolve(result) {
-		return new Prom((res, rej) => res(result));
+		return new PromiseImpl((res, rej) => res(result));
 	}
 
 	static reject(error) {
-		return new Prom((res, rej) => rej(error));
+		return new PromiseImpl((res, rej) => rej(error));
 	}
 
 }
 
-new Prom((res, rej) => {
+new PromiseImpl((res, rej) => {
 	rej(110);
 })
 .then(v => (console.log('a1:', v), 'a1'))
