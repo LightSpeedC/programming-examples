@@ -2,18 +2,23 @@
 
 const PromiseImpl = require('./promise-impl-2018');
 
-new PromiseImpl((res, rej) => {
-	rej(110);
-})
-.then(v => (console.log('a1:', v), 'a1'))
-.catch(e => { console.log('a3:', e); throw 'a3'; })
-.then(v => console.log('a5:', v), e => console.log('a6:', e))
-.finally(() => console.log('a9: finally'));
+benchmarkPromise('a', PromiseImpl);
+benchmarkPromise('A', PromiseImpl);
+benchmarkPromise('b', Promise);
+benchmarkPromise('B', Promise);
 
-new Promise((res, rej) => {
-	rej(210);
-})
-.then(v => (console.log('b1:', v), 'b1'))
-.catch(e => { console.log('b3:', e); throw 'b3'; })
-.then(v => console.log('b5:', v), e => console.log('b6:', e))
-.then(() => console.log('b9: finally'), () => console.log('b9: finally'))
+function benchmarkPromise(name, PromiseClass) {
+	console.log(name + '0: start');
+
+	const p = new PromiseClass((res, rej) => res(name + '0'))
+		.then(v => (console.log(name + '1:', v, 'val'), name + '1'))
+		.catch(e => { console.log(name + '3:', e, 'err'); throw name + '3'; })
+		.then(v => console.log(name + '5:', v, 'val'), e => console.log(name + '6:', e, 'err'));
+
+	if (p.finally) p.finally(() => console.log(name + '9: finally'));
+	else p.then(() => console.log(name + '9: finally'), () => console.log(name + '9: finally'));
+
+	console.log(name + '0: started');
+}
+
+setTimeout(() => console.log('END'), 1000);

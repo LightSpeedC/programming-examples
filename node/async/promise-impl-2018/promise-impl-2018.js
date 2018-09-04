@@ -1,5 +1,13 @@
 'use strict';
 
+function execNext(func, arg) {
+	// process.nextTick(() => func(arg)); // speedy
+	// Promise.resolve().then(() => func(arg)); // equal
+	// setImmediate(() => func(arg)); // slow
+	setTimeout(func, 0, arg); // slow
+	// func(arg);
+}
+
 class PromiseImpl {
 
 	constructor(resolver) {
@@ -19,7 +27,7 @@ class PromiseImpl {
 			result = val;
 			if (progress) return;
 			progress = true;
-			setTimeout(after, 0, prom);
+			execNext(after, prom);
 		}
 
 		function rej(err) {
@@ -28,7 +36,7 @@ class PromiseImpl {
 			error = err;
 			if (progress) return;
 			progress = true;
-			setTimeout(after, 0, prom);
+			execNext(after, prom);
 		}
 
 		function after(prom) {
