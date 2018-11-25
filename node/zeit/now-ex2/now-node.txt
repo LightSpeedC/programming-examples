@@ -1,0 +1,15 @@
+C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2>npm i -S @now/node
+now-ex2@0.0.0 C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2
++-- UNMET PEER DEPENDENCY @now/build-utils@>=0.0.1
+`-- @now/node@0.4.25
+  +-- UNMET PEER DEPENDENCY @now/build-utils@>=0.0.1
+  +-- @now/node-bridge@0.1.8
+  `-- fs-extra@7.0.1
+    +-- graceful-fs@4.1.15
+    +-- jsonfile@4.0.0
+    `-- universalify@0.1.2
+
+npm WARN @now/node@0.4.25 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/node-bridge@0.1.8 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN now-ex2@0.0.0 No description
+npm WARN now-ex2@0.0.0 No repository field.

@@ -1,0 +1,59 @@
+C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2>npm i -S @now/go
+now-ex2@0.0.0 C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2
++-- UNMET PEER DEPENDENCY @now/build-utils@>=0.0.1
+`-- @now/go@0.2.8
+  +-- execa@1.0.0
+  | +-- cross-spawn@6.0.5
+  | | +-- nice-try@1.0.5
+  | | +-- path-key@2.0.1
+  | | +-- semver@5.6.0
+  | | +-- shebang-command@1.2.0
+  | | | `-- shebang-regex@1.0.0
+  | | `-- which@1.3.1
+  | |   `-- isexe@2.0.0
+  | +-- get-stream@4.1.0
+  | | `-- pump@3.0.0
+  | |   +-- end-of-stream@1.4.1
+  | |   `-- once@1.4.0
+  | |     `-- wrappy@1.0.2
+  | +-- is-stream@1.1.0
+  | +-- npm-run-path@2.0.2
+  | +-- p-finally@1.0.0
+  | +-- signal-exit@3.0.2
+  | `-- strip-eof@1.0.0
+  +-- lambda-git@0.1.2
+  | `-- tar-fs@1.16.3
+  |   +-- pump@1.0.3
+  |   `-- tar-stream@1.6.2
+  |     +-- bl@1.2.2
+  |     +-- buffer-alloc@1.2.0
+  |     | +-- buffer-alloc-unsafe@1.1.0
+  |     | `-- buffer-fill@1.0.0
+  |     +-- fs-constants@1.0.0
+  |     +-- readable-stream@2.3.6
+  |     | +-- core-util-is@1.0.2
+  |     | +-- inherits@2.0.3
+  |     | +-- isarray@1.0.0
+  |     | +-- process-nextick-args@2.0.0
+  |     | +-- string_decoder@1.1.1
+  |     | `-- util-deprecate@1.0.2
+  |     +-- to-buffer@1.1.1
+  |     `-- xtend@4.0.1
+  +-- mkdirp-promise@5.0.1
+  | `-- mkdirp@0.5.1
+  |   `-- minimist@0.0.8
+  +-- node-fetch@2.3.0
+  `-- tar@4.4.6
+    +-- chownr@1.1.1
+    +-- fs-minipass@1.2.5
+    +-- minipass@2.3.5
+    +-- minizlib@1.1.1
+    +-- safe-buffer@5.1.2
+    `-- yallist@3.0.3
+
+npm WARN @now/node@0.4.25 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/node-bridge@0.1.8 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/php@0.4.10 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/go@0.2.8 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN now-ex2@0.0.0 No description
+npm WARN now-ex2@0.0.0 No repository field.

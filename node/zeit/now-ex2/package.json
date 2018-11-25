@@ -1,0 +1,18 @@
+{
+  "name": "now-ex2",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC <Kazuaki.Nishizawa@gmail.com> (https://github.com/LightSpeedC/)",
+  "license": "MIT",
+  "dependencies": {
+    "@now/go": "^0.2.8",
+    "@now/next": "0.0.79",
+    "@now/node": "^0.4.25",
+    "@now/php": "^0.4.10"
+  }
+}

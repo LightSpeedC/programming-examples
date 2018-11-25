@@ -1,0 +1,640 @@
+C:\Git\LightSpeedC\programming-examples\node\zeit\now-next>npm i next react react-dom -S
+now-next@0.0.0 C:\Git\LightSpeedC\programming-examples\node\zeit\now-next
++-- next@7.0.2
+| +-- @babel/core@7.0.0
+| | +-- @babel/code-frame@7.0.0
+| | | `-- @babel/highlight@7.0.0
+| | +-- @babel/generator@7.1.6
+| | | +-- jsesc@2.5.2
+| | | `-- trim-right@1.0.1
+| | +-- @babel/helpers@7.1.5
+| | | `-- @babel/template@7.1.2
+| | +-- @babel/parser@7.1.6
+| | +-- @babel/traverse@7.1.6
+| | | +-- @babel/helper-split-export-declaration@7.0.0
+| | | +-- debug@4.1.0
+| | | `-- globals@11.9.0
+| | +-- @babel/types@7.1.6
+| | | +-- esutils@2.0.2
+| | | `-- to-fast-properties@2.0.0
+| | +-- convert-source-map@1.6.0
+| | | `-- safe-buffer@5.1.2
+| | +-- debug@3.2.6
+| | | `-- ms@2.1.1
+| | +-- json5@0.5.1
+| | +-- lodash@4.17.11
+| | `-- semver@5.6.0
+| +-- @babel/plugin-proposal-class-properties@7.0.0
+| | +-- @babel/helper-function-name@7.1.0
+| | | +-- @babel/helper-get-function-arity@7.0.0
+| | | `-- @babel/template@7.1.2
+| | +-- @babel/helper-member-expression-to-functions@7.0.0
+| | +-- @babel/helper-optimise-call-expression@7.0.0
+| | +-- @babel/helper-plugin-utils@7.0.0
+| | +-- @babel/helper-replace-supers@7.1.0
+| | `-- @babel/plugin-syntax-class-properties@7.0.0
+| +-- @babel/plugin-proposal-object-rest-spread@7.0.0
+| | `-- @babel/plugin-syntax-object-rest-spread@7.0.0
+| +-- @babel/plugin-syntax-dynamic-import@7.0.0
+| +-- @babel/plugin-transform-runtime@7.0.0
+| | +-- @babel/helper-module-imports@7.0.0
+| | `-- resolve@1.8.1
+| +-- @babel/preset-env@7.0.0
+| | +-- @babel/plugin-proposal-async-generator-functions@7.1.0
+| | | `-- @babel/helper-remap-async-to-generator@7.1.0
+| | |   +-- @babel/helper-wrap-function@7.1.0
+| | |   | `-- @babel/template@7.1.2
+| | |   `-- @babel/template@7.1.2
+| | +-- @babel/plugin-proposal-json-strings@7.0.0
+| | | `-- @babel/plugin-syntax-json-strings@7.0.0
+| | +-- @babel/plugin-proposal-optional-catch-binding@7.0.0
+| | +-- @babel/plugin-proposal-unicode-property-regex@7.0.0
+| | | +-- @babel/helper-regex@7.0.0
+| | | `-- regexpu-core@4.2.0
+| | |   +-- regenerate@1.4.0
+| | |   +-- regenerate-unicode-properties@7.0.0
+| | |   +-- regjsgen@0.4.0
+| | |   +-- regjsparser@0.3.0
+| | |   | `-- jsesc@0.5.0
+| | |   +-- unicode-match-property-ecmascript@1.0.4
+| | |   | +-- unicode-canonical-property-names-ecmascript@1.0.4
+| | |   | `-- unicode-property-aliases-ecmascript@1.0.4
+| | |   `-- unicode-match-property-value-ecmascript@1.0.2
+| | +-- @babel/plugin-syntax-async-generators@7.0.0
+| | +-- @babel/plugin-syntax-optional-catch-binding@7.0.0
+| | +-- @babel/plugin-transform-arrow-functions@7.0.0
+| | +-- @babel/plugin-transform-async-to-generator@7.1.0
+| | +-- @babel/plugin-transform-block-scoped-functions@7.0.0
+| | +-- @babel/plugin-transform-block-scoping@7.1.5
+| | +-- @babel/plugin-transform-classes@7.1.0
+| | | +-- @babel/helper-annotate-as-pure@7.0.0
+| | | `-- @babel/helper-define-map@7.1.0
+| | +-- @babel/plugin-transform-computed-properties@7.0.0
+| | +-- @babel/plugin-transform-destructuring@7.1.3
+| | +-- @babel/plugin-transform-dotall-regex@7.0.0
+| | +-- @babel/plugin-transform-duplicate-keys@7.0.0
+| | +-- @babel/plugin-transform-exponentiation-operator@7.1.0
+| | | `-- @babel/helper-builder-binary-assignment-operator-visitor@7.1.0
+| | |   `-- @babel/helper-explode-assignable-expression@7.1.0
+| | +-- @babel/plugin-transform-for-of@7.0.0
+| | +-- @babel/plugin-transform-function-name@7.1.0
+| | +-- @babel/plugin-transform-literals@7.0.0
+| | +-- @babel/plugin-transform-modules-amd@7.1.0
+| | | `-- @babel/helper-module-transforms@7.1.0
+| | |   `-- @babel/template@7.1.2
+| | +-- @babel/plugin-transform-modules-commonjs@7.1.0
+| | | `-- @babel/helper-simple-access@7.1.0
+| | |   `-- @babel/template@7.1.2
+| | +-- @babel/plugin-transform-modules-systemjs@7.1.3
+| | | `-- @babel/helper-hoist-variables@7.0.0
+| | +-- @babel/plugin-transform-modules-umd@7.1.0
+| | +-- @babel/plugin-transform-new-target@7.0.0
+| | +-- @babel/plugin-transform-object-super@7.1.0
+| | +-- @babel/plugin-transform-parameters@7.1.0
+| | | `-- @babel/helper-call-delegate@7.1.0
+| | +-- @babel/plugin-transform-regenerator@7.0.0
+| | | `-- regenerator-transform@0.13.3
+| | |   `-- private@0.1.8
+| | +-- @babel/plugin-transform-shorthand-properties@7.0.0
+| | +-- @babel/plugin-transform-spread@7.0.0
+| | +-- @babel/plugin-transform-sticky-regex@7.0.0
+| | +-- @babel/plugin-transform-template-literals@7.0.0
+| | +-- @babel/plugin-transform-typeof-symbol@7.0.0
+| | +-- @babel/plugin-transform-unicode-regex@7.0.0
+| | +-- browserslist@4.3.4
+| | | +-- caniuse-lite@1.0.30000910
+| | | +-- electron-to-chromium@1.3.84
+| | | `-- node-releases@1.0.4
+| | +-- invariant@2.2.4
+| | `-- js-levenshtein@1.1.4
+| +-- @babel/preset-react@7.0.0
+| | +-- @babel/plugin-transform-react-display-name@7.0.0
+| | +-- @babel/plugin-transform-react-jsx@7.1.6
+| | | +-- @babel/helper-builder-react-jsx@7.0.0
+| | | `-- @babel/plugin-syntax-jsx@7.0.0
+| | +-- @babel/plugin-transform-react-jsx-self@7.0.0
+| | `-- @babel/plugin-transform-react-jsx-source@7.0.0
+| +-- @babel/runtime@7.0.0
+| | `-- regenerator-runtime@0.12.1
+| +-- @babel/runtime-corejs2@7.0.0
+| | `-- core-js@2.5.7
+| +-- @babel/template@7.0.0
+| +-- ansi-html@0.0.7
+| +-- autodll-webpack-plugin@0.4.2
+| | +-- bluebird@3.5.3
+| | +-- find-cache-dir@1.0.0
+| | | +-- commondir@1.0.1
+| | | `-- pkg-dir@2.0.0
+| | +-- make-dir@1.3.0
+| | +-- memory-fs@0.4.1
+| | | `-- readable-stream@2.3.6
+| | |   +-- core-util-is@1.0.2
+| | |   +-- isarray@1.0.0
+| | |   +-- process-nextick-args@2.0.0
+| | |   `-- util-deprecate@1.0.2
+| | +-- read-pkg@2.0.0
+| | | +-- load-json-file@2.0.0
+| | | | +-- parse-json@2.2.0
+| | | | | `-- error-ex@1.3.2
+| | | | |   `-- is-arrayish@0.2.1
+| | | | +-- pify@2.3.0
+| | | | `-- strip-bom@3.0.0
+| | | +-- normalize-package-data@2.4.0
+| | | | +-- hosted-git-info@2.7.1
+| | | | +-- is-builtin-module@1.0.0
+| | | | | `-- builtin-modules@1.1.1
+| | | | `-- validate-npm-package-license@3.0.4
+| | | |   +-- spdx-correct@3.0.2
+| | | |   | `-- spdx-license-ids@3.0.2
+| | | |   `-- spdx-expression-parse@3.0.0
+| | | |     `-- spdx-exceptions@2.2.0
+| | | `-- path-type@2.0.0
+| | |   `-- pify@2.3.0
+| | +-- tapable@1.1.0
+| | `-- webpack-merge@4.1.4
+| +-- babel-core@7.0.0-bridge.0
+| +-- babel-loader@8.0.2
+| | +-- mkdirp@0.5.1
+| | | `-- minimist@0.0.8
+| | `-- util.promisify@1.0.0
+| |   +-- define-properties@1.1.3
+| |   `-- object.getownpropertydescriptors@2.0.3
+| |     `-- es-abstract@1.12.0
+| |       +-- es-to-primitive@1.2.0
+| |       | +-- is-date-object@1.0.1
+| |       | `-- is-symbol@1.0.2
+| |       +-- is-callable@1.1.4
+| |       `-- is-regex@1.0.4
+| +-- babel-plugin-react-require@3.0.0
+| +-- babel-plugin-transform-react-remove-prop-types@0.4.15
+| +-- case-sensitive-paths-webpack-plugin@2.1.2
+| +-- cross-spawn@5.1.0
+| | +-- lru-cache@4.1.4
+| | | +-- pseudomap@1.0.2
+| | | `-- yallist@3.0.3
+| | +-- shebang-command@1.2.0
+| | | `-- shebang-regex@1.0.0
+| | `-- which@1.3.1
+| |   `-- isexe@2.0.0
+| +-- del@3.0.0
+| | +-- globby@6.1.0
+| | | +-- array-union@1.0.2
+| | | | `-- array-uniq@1.0.3
+| | | +-- pify@2.3.0
+| | | `-- pinkie-promise@2.0.1
+| | |   `-- pinkie@2.0.4
+| | +-- is-path-cwd@1.0.0
+| | +-- is-path-in-cwd@1.0.1
+| | | `-- is-path-inside@1.0.1
+| | |   `-- path-is-inside@1.0.2
+| | +-- p-map@1.2.0
+| | +-- pify@3.0.0
+| | `-- rimraf@2.6.2
+| +-- etag@1.8.1
+| +-- event-source-polyfill@0.0.12
+| +-- find-up@2.1.0
+| | `-- locate-path@2.0.0
+| |   +-- p-locate@2.0.0
+| |   | `-- p-limit@1.3.0
+| |   |   `-- p-try@1.0.0
+| |   `-- path-exists@3.0.0
+| +-- fresh@0.5.2
+| +-- friendly-errors-webpack-plugin@1.7.0
+| | +-- chalk@1.1.3
+| | | +-- ansi-styles@2.2.1
+| | | +-- escape-string-regexp@1.0.5
+| | | +-- has-ansi@2.0.0
+| | | `-- supports-color@2.0.0
+| | +-- error-stack-parser@2.0.2
+| | | `-- stackframe@1.0.4
+| | `-- string-width@2.1.1
+| |   +-- is-fullwidth-code-point@2.0.0
+| |   `-- strip-ansi@4.0.0
+| |     `-- ansi-regex@3.0.0
+| +-- glob@7.1.2
+| | +-- fs.realpath@1.0.0
+| | +-- inflight@1.0.6
+| | | `-- wrappy@1.0.2
+| | +-- inherits@2.0.3
+| | +-- minimatch@3.0.4
+| | | `-- brace-expansion@1.1.11
+| | |   +-- balanced-match@1.0.0
+| | |   `-- concat-map@0.0.1
+| | +-- once@1.4.0
+| | `-- path-is-absolute@1.0.1
+| +-- hoist-non-react-statics@2.5.5
+| +-- htmlescape@1.1.1
+| +-- http-errors@1.6.2
+| | +-- depd@1.1.1
+| | +-- setprototypeof@1.0.3
+| | `-- statuses@1.5.0
+| +-- http-status@1.0.1
+| +-- launch-editor@2.2.1
+| | +-- chalk@2.4.1
+| | | +-- ansi-styles@3.2.1
+| | | | `-- color-convert@1.9.3
+| | | |   `-- color-name@1.1.3
+| | | `-- supports-color@5.5.0
+| | |   `-- has-flag@3.0.0
+| | `-- shell-quote@1.6.1
+| |   +-- array-filter@0.0.1
+| |   +-- array-map@0.0.0
+| |   +-- array-reduce@0.0.0
+| |   `-- jsonify@0.0.0
+| +-- loader-utils@1.1.0
+| | +-- big.js@3.2.0
+| | `-- emojis-list@2.1.0
+| +-- minimist@1.2.0
+| +-- mkdirp-then@1.2.0
+| | `-- any-promise@1.3.0
+| +-- nanoid@1.2.1
+| +-- path-to-regexp@2.1.0
+| +-- prop-types@15.6.2
+| +-- prop-types-exact@1.2.0
+| | +-- has@1.0.3
+| | | `-- function-bind@1.1.1
+| | +-- object.assign@4.1.0
+| | | +-- has-symbols@1.0.0
+| | | `-- object-keys@1.0.12
+| | `-- reflect.ownkeys@0.2.0
+| +-- react-error-overlay@4.0.0
+| +-- recursive-copy@2.0.6
+| | +-- del@2.2.2
+| | | `-- globby@5.0.0
+| | +-- emitter-mixin@0.0.3
+| | +-- errno@0.1.7
+| | | `-- prr@1.0.1
+| | +-- graceful-fs@4.1.15
+| | +-- junk@1.0.3
+| | +-- maximatch@0.1.0
+| | | +-- array-differ@1.0.0
+| | | `-- arrify@1.0.1
+| | +-- pify@2.3.0
+| | +-- promise@7.3.1
+| | | `-- asap@2.0.6
+| | `-- slash@1.0.0
+| +-- resolve@1.5.0
+| | `-- path-parse@1.0.6
+| +-- send@0.16.1
+| | +-- debug@2.6.9
+| | +-- destroy@1.0.4
+| | +-- encodeurl@1.0.2
+| | +-- escape-html@1.0.3
+| | +-- mime@1.4.1
+| | +-- ms@2.0.0
+| | +-- on-finished@2.3.0
+| | | `-- ee-first@1.1.1
+| | +-- range-parser@1.2.0
+| | `-- statuses@1.3.1
+| +-- source-map@0.5.7
+| +-- strip-ansi@3.0.1
+| | `-- ansi-regex@2.1.1
+| +-- styled-jsx@3.1.0
+| | +-- babel-plugin-syntax-jsx@6.18.0
+| | +-- babel-types@6.26.0
+| | | +-- babel-runtime@6.26.0
+| | | | `-- regenerator-runtime@0.11.1
+| | | `-- to-fast-properties@1.0.3
+| | +-- convert-source-map@1.5.1
+| | +-- source-map@0.7.3
+| | +-- string-hash@1.1.3
+| | +-- stylis@3.5.3
+| | `-- stylis-rule-sheet@0.0.10
+| +-- terser-webpack-plugin@1.0.2
+| | +-- cacache@11.3.1
+| | | +-- chownr@1.1.1
+| | | +-- figgy-pudding@3.5.1
+| | | +-- mississippi@3.0.0
+| | | | +-- concat-stream@1.6.2
+| | | | | `-- typedarray@0.0.6
+| | | | +-- duplexify@3.6.1
+| | | | | `-- stream-shift@1.0.0
+| | | | +-- end-of-stream@1.4.1
+| | | | +-- flush-write-stream@1.0.3
+| | | | +-- from2@2.3.0
+| | | | +-- parallel-transform@1.1.0
+| | | | | `-- cyclist@0.2.2
+| | | | +-- pump@3.0.0
+| | | | +-- pumpify@1.5.1
+| | | | | `-- pump@2.0.1
+| | | | +-- stream-each@1.2.3
+| | | | `-- through2@2.0.5
+| | | +-- move-concurrently@1.0.1
+| | | | +-- aproba@1.2.0
+| | | | +-- copy-concurrently@1.0.5
+| | | | | `-- iferr@0.1.5
+| | | | +-- fs-write-stream-atomic@1.0.10
+| | | | | `-- imurmurhash@0.1.4
+| | | | `-- run-queue@1.0.3
+| | | +-- promise-inflight@1.0.1
+| | | +-- ssri@6.0.1
+| | | +-- unique-filename@1.1.1
+| | | | `-- unique-slug@2.0.1
+| | | `-- y18n@4.0.0
+| | +-- find-cache-dir@2.0.0
+| | | `-- pkg-dir@3.0.0
+| | |   `-- find-up@3.0.0
+| | |     `-- locate-path@3.0.0
+| | |       `-- p-locate@3.0.0
+| | |         `-- p-limit@2.0.0
+| | |           `-- p-try@2.0.0
+| | +-- schema-utils@1.0.0
+| | | `-- ajv-errors@1.0.0
+| | +-- serialize-javascript@1.5.0
+| | +-- source-map@0.6.1
+| | +-- terser@3.10.12
+| | | +-- commander@2.17.1
+| | | +-- source-map@0.6.1
+| | | `-- source-map-support@0.5.9
+| | |   +-- buffer-from@1.1.1
+| | |   `-- source-map@0.6.1
+| | `-- worker-farm@1.6.0
+| +-- unfetch@3.0.0
+| +-- url@0.11.0
+| | +-- punycode@1.3.2
+| | `-- querystring@0.2.0
+| +-- webpack@4.20.2
+| | +-- @webassemblyjs/ast@1.7.8
+| | | +-- @webassemblyjs/helper-wasm-bytecode@1.7.8
+| | | `-- @webassemblyjs/wast-parser@1.7.8
+| | |   +-- @webassemblyjs/floating-point-hex-parser@1.7.8
+| | |   +-- @webassemblyjs/helper-code-frame@1.7.8
+| | |   +-- @webassemblyjs/helper-fsm@1.7.8
+| | |   `-- @xtuc/long@4.2.1
+| | +-- @webassemblyjs/helper-module-context@1.7.8
+| | +-- @webassemblyjs/wasm-edit@1.7.8
+| | | +-- @webassemblyjs/helper-buffer@1.7.8
+| | | +-- @webassemblyjs/helper-wasm-section@1.7.8
+| | | +-- @webassemblyjs/wasm-gen@1.7.8
+| | | +-- @webassemblyjs/wasm-opt@1.7.8
+| | | `-- @webassemblyjs/wast-printer@1.7.8
+| | +-- @webassemblyjs/wasm-parser@1.7.8
+| | | +-- @webassemblyjs/helper-api-error@1.7.8
+| | | +-- @webassemblyjs/ieee754@1.7.8
+| | | | `-- @xtuc/ieee754@1.2.0
+| | | +-- @webassemblyjs/leb128@1.7.8
+| | | `-- @webassemblyjs/utf8@1.7.8
+| | +-- acorn@5.7.3
+| | +-- acorn-dynamic-import@3.0.0
+| | +-- ajv@6.5.5
+| | | +-- fast-deep-equal@2.0.1
+| | | +-- fast-json-stable-stringify@2.0.0
+| | | +-- json-schema-traverse@0.4.1
+| | | `-- uri-js@4.2.2
+| | |   `-- punycode@2.1.1
+| | +-- ajv-keywords@3.2.0
+| | +-- chrome-trace-event@1.0.0
+| | | `-- tslib@1.9.3
+| | +-- enhanced-resolve@4.1.0
+| | +-- eslint-scope@4.0.0
+| | | +-- esrecurse@4.2.1
+| | | `-- estraverse@4.2.0
+| | +-- json-parse-better-errors@1.0.2
+| | +-- loader-runner@2.3.1
+| | +-- micromatch@3.1.10
+| | | +-- arr-diff@4.0.0
+| | | +-- array-unique@0.3.2
+| | | +-- braces@2.3.2
+| | | | +-- arr-flatten@1.1.0
+| | | | +-- extend-shallow@2.0.1
+| | | | | `-- is-extendable@0.1.1
+| | | | +-- fill-range@4.0.0
+| | | | | +-- extend-shallow@2.0.1
+| | | | | +-- is-number@3.0.0
+| | | | | | `-- kind-of@3.2.2
+| | | | | |   `-- is-buffer@1.1.6
+| | | | | +-- repeat-string@1.6.1
+| | | | | `-- to-regex-range@2.1.1
+| | | | +-- isobject@3.0.1
+| | | | +-- repeat-element@1.1.3
+| | | | +-- snapdragon-node@2.1.1
+| | | | | +-- define-property@1.0.0
+| | | | | | `-- is-descriptor@1.0.2
+| | | | | |   +-- is-accessor-descriptor@1.0.0
+| | | | | |   `-- is-data-descriptor@1.0.0
+| | | | | `-- snapdragon-util@3.0.1
+| | | | |   `-- kind-of@3.2.2
+| | | | `-- split-string@3.1.0
+| | | +-- define-property@2.0.2
+| | | | `-- is-descriptor@1.0.2
+| | | |   +-- is-accessor-descriptor@1.0.0
+| | | |   `-- is-data-descriptor@1.0.0
+| | | +-- extend-shallow@3.0.2
+| | | | +-- assign-symbols@1.0.0
+| | | | `-- is-extendable@1.0.1
+| | | |   `-- is-plain-object@2.0.4
+| | | +-- extglob@2.0.4
+| | | | +-- define-property@1.0.0
+| | | | | `-- is-descriptor@1.0.2
+| | | | |   +-- is-accessor-descriptor@1.0.0
+| | | | |   `-- is-data-descriptor@1.0.0
+| | | | +-- expand-brackets@2.1.4
+| | | | | +-- debug@2.6.9
+| | | | | | `-- ms@2.0.0
+| | | | | +-- define-property@0.2.5
+| | | | | +-- extend-shallow@2.0.1
+| | | | | `-- posix-character-classes@0.1.1
+| | | | `-- extend-shallow@2.0.1
+| | | +-- fragment-cache@0.2.1
+| | | | `-- map-cache@0.2.2
+| | | +-- kind-of@6.0.2
+| | | +-- nanomatch@1.2.13
+| | | | `-- is-windows@1.0.2
+| | | +-- object.pick@1.3.0
+| | | +-- regex-not@1.0.2
+| | | | `-- safe-regex@1.1.0
+| | | |   `-- ret@0.1.15
+| | | +-- snapdragon@0.8.2
+| | | | +-- base@0.11.2
+| | | | | +-- cache-base@1.0.1
+| | | | | | +-- collection-visit@1.0.0
+| | | | | | | +-- map-visit@1.0.0
+| | | | | | | `-- object-visit@1.0.1
+| | | | | | +-- get-value@2.0.6
+| | | | | | +-- has-value@1.0.0
+| | | | | | | `-- has-values@1.0.0
+| | | | | | |   `-- kind-of@4.0.0
+| | | | | | +-- set-value@2.0.0
+| | | | | | | `-- extend-shallow@2.0.1
+| | | | | | +-- to-object-path@0.3.0
+| | | | | | | `-- kind-of@3.2.2
+| | | | | | +-- union-value@1.0.0
+| | | | | | | `-- set-value@0.4.3
+| | | | | | |   `-- extend-shallow@2.0.1
+| | | | | | `-- unset-value@1.0.0
+| | | | | |   `-- has-value@0.3.1
+| | | | | |     +-- has-values@0.1.4
+| | | | | |     `-- isobject@2.1.0
+| | | | | +-- class-utils@0.3.6
+| | | | | | +-- arr-union@3.1.0
+| | | | | | +-- define-property@0.2.5
+| | | | | | `-- static-extend@0.1.2
+| | | | | |   +-- define-property@0.2.5
+| | | | | |   `-- object-copy@0.1.0
+| | | | | |     +-- copy-descriptor@0.1.1
+| | | | | |     +-- define-property@0.2.5
+| | | | | |     `-- kind-of@3.2.2
+| | | | | +-- component-emitter@1.2.1
+| | | | | +-- define-property@1.0.0
+| | | | | | `-- is-descriptor@1.0.2
+| | | | | |   +-- is-accessor-descriptor@1.0.0
+| | | | | |   `-- is-data-descriptor@1.0.0
+| | | | | +-- mixin-deep@1.3.1
+| | | | | | +-- for-in@1.0.2
+| | | | | | `-- is-extendable@1.0.1
+| | | | | `-- pascalcase@0.1.1
+| | | | +-- debug@2.6.9
+| | | | | `-- ms@2.0.0
+| | | | +-- define-property@0.2.5
+| | | | | `-- is-descriptor@0.1.6
+| | | | |   +-- is-accessor-descriptor@0.1.6
+| | | | |   | `-- kind-of@3.2.2
+| | | | |   +-- is-data-descriptor@0.1.4
+| | | | |   | `-- kind-of@3.2.2
+| | | | |   `-- kind-of@5.1.0
+| | | | +-- extend-shallow@2.0.1
+| | | | +-- source-map-resolve@0.5.2
+| | | | | +-- atob@2.1.2
+| | | | | +-- decode-uri-component@0.2.0
+| | | | | +-- resolve-url@0.2.1
+| | | | | +-- source-map-url@0.4.0
+| | | | | `-- urix@0.1.0
+| | | | `-- use@3.1.1
+| | | `-- to-regex@3.0.2
+| | +-- neo-async@2.6.0
+| | +-- node-libs-browser@2.1.0
+| | | +-- assert@1.4.1
+| | | | `-- util@0.10.3
+| | | |   `-- inherits@2.0.1
+| | | +-- browserify-zlib@0.2.0
+| | | | `-- pako@1.0.6
+| | | +-- buffer@4.9.1
+| | | | +-- base64-js@1.3.0
+| | | | `-- ieee754@1.1.12
+| | | +-- console-browserify@1.1.0
+| | | | `-- date-now@0.1.4
+| | | +-- constants-browserify@1.0.0
+| | | +-- crypto-browserify@3.12.0
+| | | | +-- browserify-cipher@1.0.1
+| | | | | +-- browserify-aes@1.2.0
+| | | | | | `-- buffer-xor@1.0.3
+| | | | | +-- browserify-des@1.0.2
+| | | | | | `-- des.js@1.0.0
+| | | | | `-- evp_bytestokey@1.0.3
+| | | | +-- browserify-sign@4.0.4
+| | | | | +-- bn.js@4.11.8
+| | | | | +-- browserify-rsa@4.0.1
+| | | | | +-- elliptic@6.4.1
+| | | | | | +-- brorand@1.1.0
+| | | | | | +-- hash.js@1.1.5
+| | | | | | +-- hmac-drbg@1.0.1
+| | | | | | +-- minimalistic-assert@1.0.1
+| | | | | | `-- minimalistic-crypto-utils@1.0.1
+| | | | | `-- parse-asn1@5.1.1
+| | | | |   `-- asn1.js@4.10.1
+| | | | +-- create-ecdh@4.0.3
+| | | | +-- create-hash@1.2.0
+| | | | | +-- cipher-base@1.0.4
+| | | | | +-- md5.js@1.3.5
+| | | | | | `-- hash-base@3.0.4
+| | | | | +-- ripemd160@2.0.2
+| | | | | `-- sha.js@2.4.11
+| | | | +-- create-hmac@1.1.7
+| | | | +-- diffie-hellman@5.0.3
+| | | | | `-- miller-rabin@4.0.1
+| | | | +-- pbkdf2@3.0.17
+| | | | +-- public-encrypt@4.0.3
+| | | | +-- randombytes@2.0.6
+| | | | `-- randomfill@1.0.4
+| | | +-- domain-browser@1.2.0
+| | | +-- events@1.1.1
+| | | +-- https-browserify@1.0.0
+| | | +-- os-browserify@0.3.0
+| | | +-- path-browserify@0.0.0
+| | | +-- process@0.11.10
+| | | +-- punycode@1.4.1
+| | | +-- querystring-es3@0.2.1
+| | | +-- stream-browserify@2.0.1
+| | | +-- stream-http@2.8.3
+| | | | +-- builtin-status-codes@3.0.0
+| | | | +-- to-arraybuffer@1.0.1
+| | | | `-- xtend@4.0.1
+| | | +-- string_decoder@1.1.1
+| | | +-- timers-browserify@2.0.10
+| | | | `-- setimmediate@1.0.5
+| | | +-- tty-browserify@0.0.0
+| | | +-- util@0.10.4
+| | | `-- vm-browserify@0.0.4
+| | |   `-- indexof@0.0.1
+| | +-- schema-utils@0.4.7
+| | +-- uglifyjs-webpack-plugin@1.3.0
+| | | +-- cacache@10.0.4
+| | | | +-- mississippi@2.0.0
+| | | | | `-- pump@2.0.1
+| | | | `-- ssri@5.3.0
+| | | +-- schema-utils@0.4.7
+| | | +-- source-map@0.6.1
+| | | `-- uglify-es@3.3.9
+| | |   +-- commander@2.13.0
+| | |   `-- source-map@0.6.1
+| | +-- watchpack@1.6.0
+| | | `-- chokidar@2.0.4
+| | |   +-- anymatch@2.0.0
+| | |   +-- async-each@1.0.1
+| | |   +-- glob-parent@3.1.0
+| | |   | +-- is-glob@3.1.0
+| | |   | `-- path-dirname@1.0.2
+| | |   +-- is-binary-path@1.0.1
+| | |   | `-- binary-extensions@1.12.0
+| | |   +-- is-glob@4.0.0
+| | |   | `-- is-extglob@2.1.1
+| | |   +-- lodash.debounce@4.0.8
+| | |   +-- normalize-path@2.1.1
+| | |   | `-- remove-trailing-separator@1.1.0
+| | |   +-- readdirp@2.2.1
+| | |   `-- upath@1.1.0
+| | `-- webpack-sources@1.3.0
+| |   `-- source-map@0.6.1
+| +-- webpack-dev-middleware@3.4.0
+| | +-- mime@2.3.1
+| | `-- webpack-log@2.0.0
+| |   +-- ansi-colors@3.2.1
+| |   `-- uuid@3.3.2
+| +-- webpack-hot-middleware@2.22.3
+| | `-- html-entities@1.2.1
+| +-- webpack-sources@1.2.0
+| | +-- source-list-map@2.0.1
+| | `-- source-map@0.6.1
+| +-- webpackbar@2.6.3
+| | +-- consola@1.4.5
+| | +-- figures@2.0.0
+| | +-- log-update@2.3.0
+| | | +-- ansi-escapes@3.1.0
+| | | +-- cli-cursor@2.1.0
+| | | | `-- restore-cursor@2.0.0
+| | | |   +-- onetime@2.0.1
+| | | |   | `-- mimic-fn@1.2.0
+| | | |   `-- signal-exit@3.0.2
+| | | `-- wrap-ansi@3.0.1
+| | |   `-- strip-ansi@4.0.0
+| | |     `-- ansi-regex@3.0.0
+| | +-- pretty-time@1.1.0
+| | +-- std-env@1.3.1
+| | | `-- is-ci@1.2.1
+| | |   `-- ci-info@1.6.0
+| | `-- table@4.0.3
+| |   `-- slice-ansi@1.0.0
+| `-- write-file-webpack-plugin@4.3.2
+|   +-- filesize@3.6.1
+|   `-- moment@2.22.2
++-- react@16.6.3
+| +-- loose-envify@1.4.0
+| | `-- js-tokens@4.0.0
+| +-- object-assign@4.1.1
+| `-- scheduler@0.11.2
+`-- react-dom@16.6.3
+
+npm WARN optional SKIPPING OPTIONAL DEPENDENCY: fsevents@^1.2.2 (node_modules\chokidar\node_modules\fsevents):
+npm WARN notsup SKIPPING OPTIONAL DEPENDENCY: Unsupported platform for fsevents@1.2.4: wanted {"os":"darwin","arch":"any"} (current: {"os":"win32","arch":"x64"})
+npm WARN now-next@0.0.0 No description
+npm WARN now-next@0.0.0 No repository field.

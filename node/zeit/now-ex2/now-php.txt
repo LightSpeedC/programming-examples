@@ -1,0 +1,10 @@
+C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2>npm i -S @now/php
+now-ex2@0.0.0 C:\Git\LightSpeedC\programming-examples\node\zeit\now-ex2
++-- UNMET PEER DEPENDENCY @now/build-utils@>=0.0.1
+`-- @now/php@0.4.10
+
+npm WARN @now/node@0.4.25 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/node-bridge@0.1.8 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN @now/php@0.4.10 requires a peer of @now/build-utils@>=0.0.1 but none was installed.
+npm WARN now-ex2@0.0.0 No description
+npm WARN now-ex2@0.0.0 No repository field.

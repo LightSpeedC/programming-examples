@@ -1,0 +1,21 @@
+{
+  "name": "zeit",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "now": "now",
+    "micro": "micro",
+    "start": "micro",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC <Kazuaki.Nishizawa@gmail.com> (https://github.com/LightSpeedC/)",
+  "license": "MIT",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "micro": "^9.3.3",
+    "now": "^12.1.5"
+  }
+}
