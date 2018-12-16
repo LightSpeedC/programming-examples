@@ -1,0 +1,1 @@
+[たった7行でテトリスを実装「七行プログラミング」とは](https://qiita.com/ryuichi1208/items/f9e6ac2b99bbe4fc82d3)
