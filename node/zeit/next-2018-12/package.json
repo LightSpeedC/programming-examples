@@ -1,0 +1,17 @@
+{
+  "name": "next-1",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "next": "^7.0.2"
+  },
+  "scripts": {
+    "dev": "next",
+    "start": "next",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC <Kazuaki.Nishizawa@gmail.com> (https://github.com/LightSpeedC/)",
+  "license": "MIT"
+}
