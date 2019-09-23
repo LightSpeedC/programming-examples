@@ -7,8 +7,8 @@ const gengos = [
 	{from:18680125, to:19120729, name:'明治', ryaku:'㍾', alpha:'M'},
 	{from:19120730, to:19261224, name:'大正', ryaku:'㍽', alpha:'T'},
 	{from:19261225, to:19890107, name:'昭和', ryaku:'㍼', alpha:'S'},
-	{from:19890108, to:20181231, name:'平成', ryaku:'㍻', alpha:'H'},
-	{from:20190101, to:99999999, name:'元号', ryaku:'新', alpha:'G'},
+	{from:19890108, to:20190430, name:'平成', ryaku:'㍻', alpha:'H'},
+	{from:20190501, to:99999999, name:'令和', ryaku:'㋿', alpha:'R'},
 ];
 gengos.forEach(x => x.year = Math.floor(x.from / 10000) - 1);
 //console.log(gengos);
@@ -39,3 +39,5 @@ console.log(ymd2wareki(19890107));
 console.log(ymd2wareki(19890108));
 console.log(ymd2wareki(20181231));
 console.log(ymd2wareki(20190101));
+console.log(ymd2wareki(20190430));
+console.log(ymd2wareki(20190501));
