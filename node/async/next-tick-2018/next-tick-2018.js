@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 1;
 const delay = 3;
 
 const msgs = [];
@@ -32,27 +32,27 @@ function test({name, depth, id}) {
 
 	if (++depth > MAX_DEPTH) return;
 
-	fs.readFile(__filename, () => test(
-		{name: name + ' file1', depth, id: ++uid}));
+	//fs.readFile(__filename, () => test(
+	//	{name: name + ' file1', depth, id: ++uid}));
 	setTimeout(test, delay,
 		{name: name + ' main1', depth, id: ++uid});
-	setImmediate(test,
-		{name: name + ' immd1', depth, id: ++uid});
 	setTimeout(test, 0,
 		{name: name + ' time1', depth, id: ++uid});
+	setImmediate(test,
+		{name: name + ' immd1', depth, id: ++uid});
 	Promise.resolve(
 		{name: name + ' rslv1', depth, id: ++uid}).then(test);
 	process.nextTick(test,
 		{name: name + ' next1', depth, id: ++uid});
 
-	fs.readFile(__filename, () => test(
-		{name: name + ' file2', depth, id: ++uid}));
+	//fs.readFile(__filename, () => test(
+	//	{name: name + ' file2', depth, id: ++uid}));
 	setTimeout(test, delay,
 		{name: name + ' main2', depth, id: ++uid});
-	setImmediate(test,
-		{name: name + ' immd2', depth, id: ++uid});
 	setTimeout(test, 0,
 		{name: name + ' time2', depth, id: ++uid});
+	setImmediate(test,
+		{name: name + ' immd2', depth, id: ++uid});
 	Promise.resolve(
 		{name: name + ' rslv2', depth, id: ++uid}).then(test);
 	process.nextTick(test,
