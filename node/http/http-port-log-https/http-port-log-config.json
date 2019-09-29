@@ -1,0 +1,10 @@
+{
+	"servicePort": 8088,
+	"!!!forwardHost": "localhost",
+	"!!!forwardPort": 8089,
+	"forwardProtocol": "https",
+	"forwardCertFile": "",
+	"forwardCertKey": "",
+	"forwardHost": "192.168.101.180",
+	"forwardPort": 80
+}
