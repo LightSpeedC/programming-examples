@@ -1,0 +1,19 @@
+{
+  "name": "next-2019-1",
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "next build",
+    "dev": "next",
+    "start": "next",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "LightSpeedC <Kazuaki.Nishizawa@gmail.com> (https://github.com/LightSpeedC/)",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "isomorphic-fetch": "^2.2.1",
+    "next": "^9.0.5"
+  }
+}
