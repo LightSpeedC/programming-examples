@@ -26,8 +26,4 @@ function getInfo() {
 	};
 }
 
-// function showInfo() {
-// 	console.log(getInfo());
-// }
-// showInfo();
 setInterval(() => console.log(getInfo()), 5000);
