@@ -7,21 +7,21 @@ const DateTime = require('./date-time-string');
 const toDateTimeString = DateTime.toDateTimeString;
 
 const prev = os.cpus();
-const TYPES = Object.keys(prev[0].times);
+const KEYS = Object.keys(prev[0].times);
 
 const round = x => Math.round(x * 10) / 10;
 const fmtPct = x => ('  ' + round(x).toFixed(1) + '%').substr(-6);
 
 const getInfo = () => ({
 	cpus: os.cpus().map((cpu, i) => {
-		const delta = TYPES.reduce((delta, type) => {
-			delta[type] = cpu.times[type] - prev[i].times[type];
-			prev[i].times[type] = cpu.times[type];
-			return delta;
+		const dif = KEYS.reduce((dif, k) => {
+			dif[k] = cpu.times[k] - prev[i].times[k];
+			prev[i].times[k] = cpu.times[k];
+			return dif;
 		}, { });
-		const sum = TYPES.reduce((sum, k) => sum + delta[k], 0);
-		return TYPES.reduce((load, k) => (load[k] = delta[k] / sum * 100, load),
-			{util: (sum - delta.idle) / sum * 100});
+		const sum = KEYS.reduce((sum, k) => sum + dif[k], 0);
+		return KEYS.reduce((load, k) => (load[k] = dif[k] / sum * 100, load),
+			{util: (sum - dif.idle) / sum * 100});
 	}),
 	memory: {util: (os.totalmem() - os.freemem()) / os.totalmem() * 100,
 		totalmem: os.totalmem(), freemem: os.freemem()},
