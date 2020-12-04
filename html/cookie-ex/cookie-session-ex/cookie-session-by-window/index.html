@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+	<meta charset="utf-8">
+	<title>index.html</title>
+	<!--link rel="stylesheet" href="css-style-sheet.css"-->
+	<style>
+	/* css style sheet */
+	#_state { color: darkgreen; background-color: #efe; }
+	#_debug { color: red; background-color: #eee; }
+	</style>
+</head>
+<body>
+
+<script>
+function getNow() {
+	const dt = new Date();
+	return dt.getFullYear() + '-' +
+		pad2(dt.getMonth() + 1) + '-' +
+		pad2(dt.getDate()) + ' ' +
+		pad2(dt.getHours()) + ':' +
+		pad2(dt.getMinutes()) + ':' +
+		pad2(dt.getSeconds()) + '.' +
+		pad3(dt.getMilliseconds());
+}
+function pad2(n) { return ('0' + n).substr(-2); }
+function pad3(n) { return ('00' + n).substr(-3); }
+
+document.writeln('<h5>' + getNow() + ' Loaded</h5>');
+</script>
+
+コンテンツ
+
+<h4 id="_state">state=Loading...</h4>
+<h5 id="_debug" style="{background: light-gray;}"></h5>
+
+<button onclick="page(1)">page 1</button>
+<button onclick="page(2)">page 2</button>
+<button onclick="page(3)">page 3</button>
+<br/>
+<button onclick="repage(1)">repage 1</button>
+<button onclick="repage(2)">repage 2</button>
+<button onclick="repage(3)">repage 3</button>
+
+<script>
+const x = '!\'()*-._~:;=?$#&+,/@<> \"%[\\]^`{|}';
+// showDebug({x: x, a: encodeURI(x), b: encodeURIComponent(x)});
+let queryObject = getQueryObject();
+
+function getQueryObject(searchString) {
+	const srch = searchString || document.location.search;
+	if (!srch || srch.substr(0, 1) !== '?') return {};
+	const queryObject = srch.substr(1).split('&')
+		.reduce((a, b) => {
+			const kv = b.split('='), k = kv[0], v = kv[1];
+			if (a[k])
+				if (typeof a[k] === 'string')
+					a[k] = [a[k], v];
+				else
+					a[k].push(v);
+			else
+				a[k] = v;
+			return a;
+		}, {});
+	// showDebug(queryObject);
+	return queryObject;
+}
+
+function getSearchString(queryObject) {
+	return '?' + Object.keys(queryObject).reduce((a, b) =>
+		a + (a && '&') + b + '=' + encodeURIComponent(queryObject[b]), '');
+}
+
+
+showDebug(queryObject);
+setTimeout(() => {
+	showDebug(getSearchString({a:"a b+c", b:"a=b"}));
+}, 3000);
+setTimeout(() => {
+	showDebug(getQueryObject('?a=10&a=20'));
+}, 6000);
+
+window.onpopstate = function () {
+	showState('popstate');
+};
+
+// repage(0);
+showState('initial');
+
+function showState(msg) {
+	_state.innerHTML = '<pre>state ' + JSON.stringify(history.state, null, '\t') + '\n' + msg + '</pre>';
+}
+function showDebug(msg) {
+	_debug.innerHTML = '<pre>debug ' + JSON.stringify(msg, null, '\t') + '</pre>';
+}
+
+function page(n) {
+	history.pushState({
+			page: n,
+			title: 'title ' + n,
+			time: new Date().toLocaleTimeString(),
+		},
+		"title " + n,
+		"?page=" + n);
+	showState('page');
+}
+
+function repage(n) {
+	history.replaceState({
+			page: n,
+			title: 're-title ' + n,
+			time: new Date().toLocaleTimeString(),
+		},
+		're-title ' + n,
+		'?repage=' + n);
+	showState('repage');
+}
+
+//history.replaceState({page: 3}, "title 3", "?page=3")
+</script>
+
+</body>
+</html>
