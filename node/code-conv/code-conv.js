@@ -115,7 +115,7 @@ function convUni2SjSync(strUni) {
       listSj.push(c10h);
     listSj.push(c10 & 0xFF);
   }
-  return new Buffer(listSj);
+  return Buffer.from(listSj);
 }
 CodeConv.convUni2SjSync = convUni2SjSync;
 
