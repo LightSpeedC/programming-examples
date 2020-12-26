@@ -1,6 +1,7 @@
 // code-conv-test.js
 // 文字コード変換
 
+// @ts-check
 'use strict';
 
 const fs = require('fs');
@@ -17,7 +18,7 @@ function delta() {
 	return ret;
 }
 
-const CodeConv = require('../code-conv').CodeConv;
+const CodeConv = require('../code-conv');
 console.log('load maps:', delta());
 
 function testSj2Uni(dir, file, outDir) {

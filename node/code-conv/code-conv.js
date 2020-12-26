@@ -1,14 +1,11 @@
 // code-conv.js
 // 文字コード変換
 
+// @ts-check
 'use strict';
 
-const mapSj2Uni = createMap(require('./code-conv-sjis-uni'));
-const mapUni2Sj = createMap(require('./code-conv-uni-sjisnaiji-nkf'));
-
-//for (var i in mapSj2Uni)
-//  console.log(Number(i).toString(16) + ':' + String.fromCharCode(mapSj2Uni[i]));
-
+const mapSj2Uni = createMap(require('./code-conv-sjis-uni.json'));
+const mapUni2Sj = createMap(require('./code-conv-uni-sjisnaiji-nkf.json'));
 
 //######################################################################
 // load map
@@ -24,7 +21,7 @@ function createMap(codePairList) {
 
   const map = {};
 
-  for (var i = 0, n = codePairList.length; i < n; i += 2)
+  for (let i = 0, n = codePairList.length; i < n; i += 2)
     map[codePairList[i]] = codePairList[i + 1];
 
   return map;
@@ -50,7 +47,7 @@ function convSj2UniSync(buffSj) {
 
   let strUni = '';
 
-  for (let i = 0, n = buffSj.length; i < n; ) {
+  for (let i = 0, n = buffSj.length; i < n;) {
     const c1 = buffSj[i++];
     if (c1 <= 0x80 || c1 >= 0xFD) {
       strUni += String.fromCharCode(c1);
@@ -133,5 +130,5 @@ function convAny2UniSync(buffAny) {
 }
 CodeConv.convAny2UniSync = convAny2UniSync;
 
-
-module.exports.CodeConv = CodeConv;
+CodeConv.CodeConv = CodeConv;
+module.exports = CodeConv;
