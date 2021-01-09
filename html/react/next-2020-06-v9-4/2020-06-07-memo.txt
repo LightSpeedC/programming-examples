@@ -1,0 +1,48 @@
+npx create-next-app my-app-001
+cd my-app-001 & npm run dev
+npm run dev
+npm run build
+npm start
+
+
+Microsoft Windows [Version 10.0.18363.836]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2020-06>npx create-next-app my-app-001
+npx: installed 1 in 8.843s
+√ Pick a template » Default starter app
+Creating a new Next.js app in C:\Git\LightSpeedC\programming-examples\html\react\next-2020-06\my-app-001.
+
+Installing react, react-dom, and next using npm...
+
+
+> @ampproject/toolbox-optimizer@2.4.0 postinstall C:\Git\LightSpeedC\programming-examples\html\react\next-2020-06\my-app-001\node_modules\@ampproject\toolbox-optimizer
+> node lib/warmup.js
+
+AMP Optimizer Downloading latest AMP runtime data
++ react@16.13.1
++ react-dom@16.13.1
++ next@9.4.4
+added 834 packages from 323 contributors and audited 837 packages in 158.377s
+found 0 vulnerabilities
+
+
+Success! Created my-app-001 at C:\Git\LightSpeedC\programming-examples\html\react\next-2020-06\my-app-001
+Inside that directory, you can run several commands:
+
+  npm run dev
+    Starts the development server.
+
+  npm run build
+    Builds the app for production.
+
+  npm start
+    Runs the built app in production mode.
+
+We suggest that you begin by typing:
+
+  cd my-app-001
+  npm run dev
+
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2020-06>
