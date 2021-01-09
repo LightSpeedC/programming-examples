@@ -1,0 +1,47 @@
+Microsoft Windows [Version 10.0.18363.778]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2020-04>npm init next-app
+npx: installed 1 in 2.944s
+√ What is your project named? ... my-app-001
+√ Pick a template » Example from the Next.js repo
+√ Pick an example » api-routes-rest
+Creating a new Next.js app in C:\Git\LightSpeedC\programming-examples\html\react\next-2020-04\my-app-001.
+
+Downloading files for example api-routes-rest. This might take a moment.
+
+Installing packages. This might take a couple of minutes.
+
+added 763 packages from 308 contributors and audited 8528 packages in 30.886s
+found 0 vulnerabilities
+
+
+Success! Created my-app-001 at C:\Git\LightSpeedC\programming-examples\html\react\next-2020-04\my-app-001
+Inside that directory, you can run several commands:
+
+  npm run dev
+    Starts the development server.
+
+  npm run build
+    Builds the app for production.
+
+  npm start
+    Runs the built app in production mode.
+
+We suggest that you begin by typing:
+
+  cd my-app-001
+  npm run dev
+
+
+
+   ╭────────────────────────────────────────────────────────────────╮
+   │                                                                │
+   │      New minor version of npm available! 6.13.4 -> 6.14.4      │
+   │   Changelog: https://github.com/npm/cli/releases/tag/v6.14.4   │
+   │               Run npm install -g npm to update!                │
+   │                                                                │
+   ╰────────────────────────────────────────────────────────────────╯
+
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2020-04>
