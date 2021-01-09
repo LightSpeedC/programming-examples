@@ -1,0 +1,50 @@
+Microsoft Windows [Version 10.0.18363.1256]
+(c) 2019 Microsoft Corporation. All rights reserved.
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01 11:42:39.82 > npx create-next-app nextjs-blog --use-npm --example "https://github.com/vercel/next-learn-starter/tree/master/learn-starter"
+npx: installed 1 in 9.85s
+Creating a new Next.js app in C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog.
+
+Downloading files from repo https://github.com/vercel/next-learn-starter/tree/master/learn-starter. This might take a moment.
+
+Installing packages. This might take a couple of minutes.
+
+
+> sharp@0.26.3 install C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog\node_modules\sharp
+> (node install/libvips && node install/dll-copy && prebuild-install) || (node-gyp rebuild && node install/dll-copy)
+
+info sharp Downloading https://github.com/lovell/sharp-libvips/releases/download/v8.10.0/libvips-8.10.0-win32-x64.tar.br
+info sharp Creating C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog\node_modules\sharp\build\Release
+info sharp Copying DLLs from C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog\node_modules\sharp\vendor\8.10.0\lib to C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog\node_modules\sharp\build\Release
+
+> @ampproject/toolbox-optimizer@2.7.1-alpha.0 postinstall C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog\node_modules\@ampproject\toolbox-optimizer
+> node lib/warmup.js
+
+AMP OPTIMIZER Downloaded latest AMP runtime data.
+added 643 packages from 433 contributors and audited 645 packages in 118.732s
+
+36 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+
+Success! Created nextjs-blog at C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01\nextjs-blog
+Inside that directory, you can run several commands:
+
+  npm run dev
+    Starts the development server.
+
+  npm run build
+    Builds the app for production.
+
+  npm start
+    Runs the built app in production mode.
+
+We suggest that you begin by typing:
+
+  cd nextjs-blog
+  npm run dev
+
+
+C:\Git\LightSpeedC\programming-examples\html\react\next-2021-01 11:45:13.72 >
