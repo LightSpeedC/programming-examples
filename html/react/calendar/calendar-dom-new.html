@@ -67,9 +67,10 @@
 			}
 
 			//calendar(document.getElementById('calendar'), 2017, 1);
-			calendar($calendar1, 2016, 12);
-			calendar($calendar2, 2017, 1);
-			calendar($calendar3, 2017, 2);
+			const xdt = new Date(), xy = xdt.getFullYear(), xm = xdt.getMonth() + 1;
+			calendar($calendar1, xm <= 1 ? xy -1 : xy, xm <= 1 ? 12 : xm - 1);
+			calendar($calendar2, xy, xm);
+			calendar($calendar3, xm >= 12 ? xy + 1 : xy, xm >= 12 ? 1 : xm + 1);
 		</script>
 	</body>
 </html>

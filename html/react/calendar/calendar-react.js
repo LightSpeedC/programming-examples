@@ -1,5 +1,5 @@
 const WAREKI_LIST = [
-	{from: new Date('2019-01-01'), gengo: '新元号'},
+	{from: new Date('2019-05-01'), gengo: '令和'},
 	{from: new Date('1989-01-08'), gengo: '平成'},
 	{from: new Date('1926-12-25'), gengo: '昭和'},
 	{from: new Date('1912-07-30'), gengo: '大正'},
@@ -44,9 +44,11 @@ const Calendar = props => {
 	</table>;
 };
 
-ReactDOM.render(<Calendar year={2016} month={12} />, $calendar1);
-ReactDOM.render(<Calendar year={2017} month={1} />, $calendar2);
-ReactDOM.render(<Calendar year={2017} month={2} />, $calendar3);
+const xdt = new Date(), xy = xdt.getFullYear(), xm = xdt.getMonth() + 1;
+
+ReactDOM.render(<Calendar year={xm <= 1 ? xy -1 : xy} month={xm <= 1 ? 12 : xm - 1} />, $calendar1);
+ReactDOM.render(<Calendar year={xy} month={xm} />, $calendar2);
+ReactDOM.render(<Calendar year={xm >= 12 ? xy + 1 : xy} month={xm >= 12 ? 1 : xm + 1} />, $calendar3);
 
 // range([from], to)
 function range(from, to) {
