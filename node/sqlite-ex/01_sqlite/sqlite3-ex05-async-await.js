@@ -1,7 +1,7 @@
 // @ts-check
 
 const sqlite3 = require('sqlite3').verbose();
-const aaSqlite = require('./aa-sqlite');
+const asyncSqlite = require('./async-sqlite');
 
 const startTime = Date.now();
 
@@ -13,7 +13,7 @@ function log(...args) {
 }
 
 async function main() {
-	const db = aaSqlite(new sqlite3.Database('./test.db'));
+	const db = asyncSqlite(new sqlite3.Database('./test.db'));
 
 	db.on('trace', (...data) => log('trace', data));
 	db.on('profile', (...data) => log('profile', data));
