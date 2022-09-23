@@ -1,8 +1,13 @@
 'use strict';
 
-module.exports = aaSqlite;
+module.exports = asyncSqlite;
 
-function aaSqlite(obj) {
+/**
+ * asyncSqlite - make thenable SQLite object. Database or Statement.
+ * @param {*} obj
+ * @returns obj
+ */
+function asyncSqlite(obj) {
 	// make thenable methods for Database and Statement
 	const methods = [
 		'run', 'exec', 'get', 'all', 'each',
@@ -29,7 +34,7 @@ function aaSqlite(obj) {
 	if (typeof prepare === 'function') {
 		obj.prepare = (...args) => ({then: (res, rej) => {
 			try {
-				const stmt = aaSqlite(prepare.apply(obj,
+				const stmt = asyncSqlite(prepare.apply(obj,
 					[...args, err => err ? rej(err) : res(stmt)]));
 			}
 			catch (err) { rej(err); }
