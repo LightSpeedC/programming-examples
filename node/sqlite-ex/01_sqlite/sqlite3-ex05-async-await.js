@@ -1,11 +1,11 @@
 // @ts-check
 
 const sqlite3 = require('sqlite3').verbose();
-const asyncSqlite = require('./async-sqlite');
+const aaSqlite3 = require('aa-sqlite3');
 
 const startTime = Date.now();
 
-main().catch(console.error);
+main().catch(err => console.error('=============\n', err));
 
 
 function log(...args) {
@@ -13,13 +13,15 @@ function log(...args) {
 }
 
 async function main() {
-	const db = asyncSqlite(new sqlite3.Database('./test.db'));
+	const db = aaSqlite3(new sqlite3.Database('./test.db'));
 
-	db.on('trace', (...data) => log('trace', data));
-	db.on('profile', (...data) => log('profile', data));
+	// db.on('trace', sql => log('trace:', sql));
+	db.on('profile', (sql, msec) => log('profile:', msec, sql));
+	// db.on('profile', (sql, msec) => msec > 0 ? log('profile:', msec, sql) : null);
 
 	await db.run('drop table if exists members');
-	await db.run('create table if not exists members(name,age)');
+	await db.run('create table if not exists members(name text, age integer)');
+	// await db.run('create index if not exists members_ix01 on members(name)');
 	log('=> nRows:', await db.each('select * from members', (err, row) => {
 		db.interrupt();
 		if (err) log(err);
@@ -27,6 +29,8 @@ async function main() {
 	}));
 	await db.run('insert into members(name,age) values(?,?)', 'Kaz', 57);
 	await db.run('insert into members(name,age) values(?,?)', 'Leo', 13);
+	// for (let i = 1000; i < 2000; ++i)
+	// 	await db.run('insert into members(name,age) values(?,?)', 'Name' + i, i - 1000);
 	log('=> nRows:', await db.each('select * from members', (err, row) => {
 		db.interrupt();
 		if (err) log(err);
