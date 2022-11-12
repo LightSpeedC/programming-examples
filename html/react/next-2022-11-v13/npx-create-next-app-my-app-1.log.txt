@@ -1,0 +1,46 @@
+C:\programming-examples\html\react\next-2022-11-v13>aaa
+
+C:\programming-examples\html\react\next-2022-11-v13>npx create-next-app@latest --experimental-app
+Need to install the following packages:
+  create-next-app@13.0.0
+Ok to proceed? (y) y
+√ What is your project named? ... my-app-1
+Creating a new Next.js app in C:\programming-examples\html\react\next-2022-11-v13\my-app-1.
+
+Using npm.
+
+Installing dependencies:
+- react
+- react-dom
+- next
+
+
+added 18 packages, and audited 19 packages in 27s
+
+2 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+Installing devDependencies:
+- eslint
+- eslint-config-next
+- typescript
+- @types/react
+- @types/node
+- @types/react-dom
+
+
+added 218 packages, and audited 237 packages in 28s
+
+78 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+Initializing project with template:  experimental-app
+
+Success! Created my-app-1 at C:\programming-examples\html\react\next-2022-11-v13\my-app-1
+
+
+C:\programming-examples\html\react\next-2022-11-v13>
