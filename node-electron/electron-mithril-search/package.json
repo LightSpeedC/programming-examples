@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "aa": ">=0.1.40",
-    "electron": "2.*",
+    "electron": "9.*",
     "executors": ">=0.0.6"
   },
   "scripts": {
