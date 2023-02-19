@@ -36,9 +36,12 @@ async function main(dirSrc, dirDst, name = '') {
 						await fs.mkdir(fileDst);
 					} catch (err) { }
 					console.log('copy', fileSrc + '\\*.*', fileDst + '\\');
-					const result = await spawnAsync('cmd', ['/c', 'copy', fileSrc + '\\*.*', fileDst + '\\']);
-					if (result.code !== 0) {
-						w.write(getNow() + ' ■copy■: Error ' + fileSrc + '\r\n');
+					const names2 = await fs.readdir(fileDst);
+					if (names.join(',') !== names2.join(',')) {
+						const result = await spawnAsync('cmd', ['/c', 'copy', fileSrc + '\\*.*', fileDst + '\\']);
+						if (result.code !== 0) {
+							w.write(getNow() + ' ■copy■: Error ' + fileSrc + '\r\n');
+						}
 					}
 				}
 			}
