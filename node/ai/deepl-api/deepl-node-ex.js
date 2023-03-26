@@ -19,4 +19,5 @@ async function main() {
 	const result = await translator.translateText(srcText, null, 'ja');
 	console.log(result.text);
 	// こんにちは、世界よ！
+	console.log('detectedSourceLang:', result.detectedSourceLang);
 }
