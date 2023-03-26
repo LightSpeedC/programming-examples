@@ -1,0 +1,16 @@
+{
+  "name": "deepl-api-example",
+  "version": "0.0.0",
+  "description": "DEEPL API Example",
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "deepl-node": "^1.8.0"
+  }
+}
